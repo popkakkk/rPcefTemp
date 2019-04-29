@@ -1,0 +1,14 @@
+package phoebe.eqx.pcef.enums;
+
+public enum EState {
+    BEGIN,
+    WAIT_A,
+    W_QUERY_DB,
+    W_CREATE_CORRECTION,
+    W_UPDATE_RESOURCE,
+    W_USAGE_MONITORING_START,
+    W_USAGE_MONITORING_UPDATE,
+    W_USAGE_MONITORING_STOP,
+    W_GET_RESOURCE_ID,
+    END
+}

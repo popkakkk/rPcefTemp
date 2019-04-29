@@ -1,0 +1,22 @@
+<dummy-request>
+
+    <dummy-message id="1">
+        <EquinoxMessage from="mOCHKF.E11.0" via="mOCHKF.E11.0"
+                        session="testsession1234"
+                        timeout="10" ret="0" diag="">
+
+            <EquinoxRawData orig="mOCHKF.ES05.DAMOCLES.0" name="HTTP" invoke="1572653657" type="request" method="POST"
+                            url="/" ctype="text/plain" val="{
+  &quot;command&quot;: &quot;firsttestcmd&quot;,
+  &quot;privateId&quot;: &quot;1234test&quot;
+}"
+                            to="mOCHKF.ES00" ret="0"/>
+
+
+
+            <EquinoxInstance>
+                <value val=""/>
+            </EquinoxInstance>
+        </EquinoxMessage>
+    </dummy-message>
+</dummy-request>

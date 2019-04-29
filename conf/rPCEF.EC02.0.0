@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="tis-620" ?>
+<configuration>
+    <cold>
+        <HomeDirectory value="" />
+        <Application group="Sample" service="0" instance="0" />
+        <Listener port="8888" backlog="256"/>
+        <Library directory="" name="rpcef_0_0_1.jar" function="phoebe.eqx.pcef.main.PCEFMain" />
+        <ECProperties>
+            <ThreadPool value="5" />
+            <AutoCpuUtilize value="true"/>
+            <CpuUtilizeList value="4,5,6,7,8,9,10,11,12,13,14,15,16"/>
+            <JavaOption value="-server"/>
+            <JavaOption value="-XX:CompileThreshold=1000"/>
+            <JavaOption value="-XX:ThreadStackSize=65535"/>
+            <JavaOption value="-XX:MainThreadStackSize=65535"/>
+            <JavaOption value="-Xms1G"/>
+            <JavaOption value="-Xmx1G"/>
+            <JavaOption value="-Djavax.xml.xpath.XPathFactory:http://java.sun.com/jaxp/xpath/dom=com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl"/>
+            <JavaOption value="-Djava.version=1.8"/>
+            <AFLibrary value="rpcef_0_0_1.jar"/>
+        </ECProperties>
+    </cold>
+    <warm>
+        <StatInterval value="3" />
+        <HousekeeperInterval value="10" />
+        <RestartDelay value="10" />
+        <ServerMaxSession value="10" />
+        <ServerReadTimeout value="30" />
+        <ServerWriteTimeout value="30" />
+        <ServerIdleTimeout value="30" />
+        <IncomingMsgDecode value="true" />
+        <OutgoingMsgEncode value="true" />
+        <IncomingMsgTrim value="false" />
+        <OutgoingMsgTrim value="true" />
+        <CompressInstance value="0" />
+        <SFLOG value="FATAL|ERROR|WARN|INFO|DEBUG" />
+        <AFLOG value="FATAL|ERROR|WARN|INFO|DEBUG" />
+        <LogMaxFileSize value="1GB" />
+        <Trace type="none" directory="/opt/equinoxAS/trace" filename="Test.trc">
+            <Number value="66860500900" />
+        </Trace>
+        <AFLOG name="testCustomLog">
+            <LogLevel value="FATAL|ERROR|WARN|INFO|DEBUG" />
+            <Filename value="PreReleasedTest.log" />
+            <TargetDirectory value="./CustomLog" />
+            <LogPattern value="%p|%d{HH:mm:ss}|%t|%c{2}|%x%m%n" />
+            <RollingInterval value="4" />
+            <Encoding value="UTF-8" />
+            <DatePattern value="'_'yyyy-MM-dd-HH-mm" />
+            <Custom>
+                <property name="log4jProperty1" value="propValue" />
+                <property name="log4jProperty2" value="propValue" />
+            </Custom>
+        </AFLOG>
+            <resource-name-test value = "PCEF.ES99.0.0" />
+            <timeout-test value = "4" />
+
+            <!-- Mongodb -->
+            <mongodb-url value = "mongodb://localhost:27017" />
+            <mongodb-database-name value = "mydbtest" />
+            <interval-processing value = "3" />
+            <retry-processing value = "3" />
+
+
+
+
+    </warm>
+</configuration>
