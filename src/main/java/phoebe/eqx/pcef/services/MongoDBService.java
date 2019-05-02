@@ -2,22 +2,20 @@ package phoebe.eqx.pcef.services;
 
 import com.google.gson.Gson;
 import com.mongodb.*;
-import ec02.af.utils.AFLog;
-import phoebe.eqx.pcef.enums.EState;
+import phoebe.eqx.pcef.core.exceptions.TimeoutIntervalException;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.message.req.MeteringRequest;
 import phoebe.eqx.pcef.model.LockProcess;
 import phoebe.eqx.pcef.model.Quota;
 import phoebe.eqx.pcef.model.Transaction;
+import phoebe.eqx.pcef.utils.Interval;
 
 public class MongoDBService {
 
-    private static final String TRANSACTION_COLLECTION_NAME = "Transaction";
-    private static final String QUOTA_COLLECTION_NAME = "Quota";
-    private static final String LOCK_PROCESS_COLLECTION_NAME = "LockProcess";
 
     private AppInstance appInstance;
+    MongoClient mongoClient;
     private DB db;
 
     public MongoDBService(AppInstance appInstance) {
@@ -26,33 +24,37 @@ public class MongoDBService {
     }
 
     private void connectDB(String url, String dbName) {
-        try {
-            MongoClient mongoClient = new MongoClient(new MongoClientURI(url));
-            this.db = mongoClient.getDB(dbName);
-        } catch (Exception e) {
-            AFLog.e("Connect MongoDB failed!", e);
-        }
+        mongoClient = new MongoClient(new MongoClientURI(url));
+        this.db = mongoClient.getDB(dbName);
     }
 
 
     public void insertTransaction(String resourceId) {
-        MeteringRequest meteringRequest = appInstance.getPcefInstance().getMeteringRequest();
 
-        Transaction transaction = new Transaction();
-        transaction.setSessionId(meteringRequest.getSessionId());
-        transaction.setRtid(meteringRequest.getRtid());
-        transaction.setTid(meteringRequest.getTid());
-        transaction.setActualTime(meteringRequest.getActualTime());
+        try {
+
+            MeteringRequest meteringRequest = appInstance.getPcefInstance().getMeteringRequest();
+
+            Transaction transaction = new Transaction();
+            transaction.setSessionId(meteringRequest.getSessionId());
+            transaction.setRtid(meteringRequest.getRtid());
+            transaction.setTid(meteringRequest.getTid());
+            transaction.setActualTime(meteringRequest.getActualTime());
 //        transaction.setUserType();
-        transaction.setResourceId(resourceId);
-        transaction.setResourceName(meteringRequest.getResourceName());
+            transaction.setResourceId(resourceId);
+            transaction.setResourceName(meteringRequest.getResourceName());
 //        transaction.setMonitoringKey();
 //        transaction.setCounterId();
 //        transaction.setCreateDate();
-        transaction.setStatus(Transaction.EStatus.Waiting.getName());
+            transaction.setStatus(Transaction.EStatus.Waiting.getName());
 //        transaction.setApp();
-        transaction.setClientId(meteringRequest.getClientId());
-        insert(TRANSACTION_COLLECTION_NAME, transaction);
+            transaction.setClientId(meteringRequest.getClientId());
+            insert(Config.COLLECTION_TRANSACTION_NAME, transaction);
+
+        } catch (Exception e) {
+
+
+        }
     }
 
 
@@ -61,37 +63,45 @@ public class MongoDBService {
         BasicDBObject doc = BasicDBObject.parse(json);
         DBCollection collection = db.getCollection(collectionName);
         collection.insert(doc);
-
     }
 
 
-    public void insertLockProcess() {
-        MeteringRequest meteringRequest = appInstance.getPcefInstance().getMeteringRequest();
-        LockProcess lockProcess = new LockProcess();
-        lockProcess.set_id(meteringRequest.getPrivateId());
-        lockProcess.setPrivateId(meteringRequest.getPrivateId());
-        lockProcess.setIsProcessing(1); // #1 = processing
-        lockProcess.setSequenceNumber(1);
-        lockProcess.setSessionId(appInstance.getPcefInstance().getMeteringRequest().getSessionId());
-        insert(LOCK_PROCESS_COLLECTION_NAME, lockProcess);
-    }
-
-
-    public void waitIntervalIsProcessing() throws Exception {
-        boolean canProcess = false;
-        int retry = 0;
-        while (!canProcess) {
-            retry++;
-            if (retry > Config.RETRY_PROCESSING) {
-                throw new Exception("can not retry processing");
-            }
-            Thread.sleep(Config.INTERVAL_PROCESSING * 1000);
-            canProcess = checkCanProcess(findLockProcess());
+    public boolean insertLockProcess() {
+        try {
+            MeteringRequest meteringRequest = appInstance.getPcefInstance().getMeteringRequest();
+            LockProcess lockProcess = new LockProcess();
+            lockProcess.set_id(meteringRequest.getPrivateId());
+            lockProcess.setPrivateId(meteringRequest.getPrivateId());
+            lockProcess.setIsProcessing(1); // #1 = processing
+            lockProcess.setSequenceNumber(1);
+            lockProcess.setSessionId(appInstance.getPcefInstance().getMeteringRequest().getSessionId());
+            insert(Config.COLLECTION_LOCK_PROCESS_NAME, lockProcess);
+            return true;
+        } catch (DuplicateKeyException e) {
+            throw e;
+        } catch (Exception e) {
+            return false;
         }
     }
 
 
-    public boolean checkCanProcess(DBCursor lockProcessCursor) {
+    public boolean isNotThisTransaction() {
+
+
+        return true;
+    }
+
+
+    public DBCursor findTransaction() {
+        String privateId = appInstance.getPcefInstance().getMeteringRequest().getPrivateId();
+        DBCollection collection = db.getCollection(Config.COLLECTION_TRANSACTION_NAME);
+        BasicDBObject searchQuery = new BasicDBObject();
+        searchQuery.put("privateId", privateId);
+        return collection.find(searchQuery);
+    }
+
+
+    public boolean checkIsProcessing(DBCursor lockProcessCursor) {
         DBObject dbObject = lockProcessCursor.next();
         String isProcessing = String.valueOf(dbObject.get("isProcessing"));
         return isProcessing.equals("0");
@@ -100,9 +110,7 @@ public class MongoDBService {
 
     public DBCursor findLockProcess() {
         String privateId = appInstance.getPcefInstance().getMeteringRequest().getPrivateId();
-
-
-        DBCollection collection = db.getCollection(LOCK_PROCESS_COLLECTION_NAME);
+        DBCollection collection = db.getCollection(Config.COLLECTION_LOCK_PROCESS_NAME);
         BasicDBObject searchQuery = new BasicDBObject();
         searchQuery.put("privateId", privateId);
         return collection.find(searchQuery);
@@ -113,7 +121,7 @@ public class MongoDBService {
         String privateId = "";
         String resourceName = "";
 
-        DBCollection collection = db.getCollection(TRANSACTION_COLLECTION_NAME);
+        DBCollection collection = db.getCollection(Config.COLLECTION_TRANSACTION_NAME);
         BasicDBObject searchQuery = new BasicDBObject();
         searchQuery.put("privateId", privateId);
         searchQuery.put("resourceName", resourceName);
@@ -137,7 +145,7 @@ public class MongoDBService {
         quota.setResource();
 */
 
-        insert(QUOTA_COLLECTION_NAME, quota);
+        insert(Config.COLLECTION_QUOTA_NAME, quota);
     }
 
 
@@ -145,7 +153,7 @@ public class MongoDBService {
 
         String privateId = "";
 
-        DBCollection collection = db.getCollection(LOCK_PROCESS_COLLECTION_NAME);
+        DBCollection collection = db.getCollection(Config.COLLECTION_LOCK_PROCESS_NAME);
 
         BasicDBObject searchQuery = new BasicDBObject();
         searchQuery.put("privateId", privateId);
@@ -159,6 +167,55 @@ public class MongoDBService {
 
     }
 
+
+    public boolean checkIsUsageMonitoringStartState() {
+
+        boolean isStartState = false;
+        boolean check = false;
+
+        //set interval obj
+        Interval intervalIsProcessing = new Interval(Config.RETRY_PROCESSING, Config.INTERVAL_PROCESSING);
+        Interval intervalInsertLockProcess = new Interval(Config.RETRY_PROCESSING, Config.INTERVAL_PROCESSING);
+
+        //check is START state
+        while (!check) {
+            DBCursor lockProcessCursor = findLockProcess();
+
+            //not found
+            if (!lockProcessCursor.hasNext()) {
+                try {
+                    /*Insert LockProcess*/
+                    boolean insert = insertLockProcess();
+                    if (!insert) {
+                        intervalInsertLockProcess.waitIntervalAndRetry(() -> insertLockProcess());
+                    }
+                    isStartState = true;
+                } catch (TimeoutIntervalException e) {
+                    //kill
+                } catch (DuplicateKeyException e) {
+                    continue;
+                }
+            }
+            //#found and isPr0cessing = 0
+            else if (!checkIsProcessing(lockProcessCursor)) {
+                try {
+                    intervalIsProcessing.waitInterval();
+                    continue;
+                } catch (TimeoutIntervalException e) {
+                    isStartState = true;
+                }
+            }
+            check = true;
+        }
+        return isStartState;
+    }
+
+
+    public void closeConnection() {
+        if (mongoClient != null) {
+            mongoClient.close();
+        }
+    }
 
     public void updateMonitoringKeyTransaction() {
 

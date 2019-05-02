@@ -1,12 +1,12 @@
-INFO|11:29:03:195|main|EC02Server|-1|EC02 :: Library Version --> 4.0.7
-DEBUG|11:29:03:198|main|ConfigLoader|-1|Initial Custom AF Log
-WARN|11:29:03:199|main|ConfigLoader|-1|testCustomLog : file name is rotated
-INFO|11:29:03:208|main|EC02Server|-1|application level ready
-ADEBUG|11:29:03:220|main|Config|46|----- Verify AF Configuration [true] -----
-DEBUG|11:29:03:267|main|EC02Handler|-1|Received data from LL Content-Length: 1084
-DEBUG|11:29:03:269|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
+INFO|15:50:42:596|main|EC02Server|-1|EC02 :: Library Version --> 4.0.7
+DEBUG|15:50:42:599|main|ConfigLoader|-1|Initial Custom AF Log
+WARN|15:50:42:600|main|ConfigLoader|-1|testCustomLog : file name is rotated
+INFO|15:50:42:609|main|EC02Server|-1|application level ready
+ADEBUG|15:50:42:620|main|Config|59|----- Verify AF Configuration [true] -----
+DEBUG|15:50:42:666|main|EC02Handler|-1|Received data from LL Content-Length: 1084
+DEBUG|15:50:42:668|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
 #====> Incoming Message :        <EquinoxMessage from="mOCHKF.E11.0" via="mOCHKF.E11.0"                        session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615"                        timeout="10" ret="0" diag="">            <EquinoxRawData orig="mOCHKF.ES05.DAMOCLES.0" name="HTTP" invoke="1572653657" type="request" method="POST"                            url="/rpcef/api/v1/metering-method" ctype="text/plain" val="{	&quot;sessionId&quot;:&quot;SessionA123456781234679ACTIVE&quot;,	&quot;tid&quot;:&quot;tid-00000000001&quot;,	&quot;rtid&quot;:&quot;r-tid-00000000001&quot;,	&quot;actualTime&quot;:&quot;20181105174020&quot;,	&quot;app&quot;:&quot;Cookie Run&quot;,	&quot;clientId&quot;:&quot;cGdb4azinlmwq8N5FDGXvQNwUKC352vv2de8fyCUIiI&quot;,	&quot;privateId&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;,	&quot;resourceName&quot;:&quot;Send One Time Password&quot;}"                            to="mOCHKF.ES00" ret="0"/>            <EquinoxInstance>                <value val=""/>            </EquinoxInstance>        </EquinoxMessage>    
-DEBUG|11:29:03:290|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Controller|-1|=== >> INCOMING DATA
+DEBUG|15:50:42:689|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Controller|-1|=== >> INCOMING DATA
 -->applicationName  :  Sample
 -->session  : 668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615
 -->via  : mOCHKF.E11.0
@@ -29,23 +29,23 @@ DEBUG|11:29:03:290|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|2018122
 	-->to : mOCHKF.ES00
 	-->type : request
 	-->url : /rpcef/api/v1/metering-method
-ADEBUG|11:29:03:332|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|16|## actionProcess || extractInstance || Finish...
-ADEBUG|11:29:03:333|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|70|--------------------- [ Start Before Process ] ---------------------
-ADEBUG|11:29:03:334|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|73|--------------------- [ Stop Before Process  ] ---------------------
-ADEBUG|11:29:03:335|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|74|--------------------- [   Start Do Process   ] ---------------------
-ADEBUG|11:29:03:335|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|166|[Request Type]: USAGE_MONITORING
-ADEBUG|11:29:03:594|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|35|Set state to null -->  BEGIN
-ADEBUG|11:29:03:594|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|17|disPatch W_USAGE_MONITORING BEGIN
-ADEBUG|11:29:03:597|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|21|Invoke begin
-ADEBUG|11:29:06:966|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|MessagePool|69|Build 
-ADEBUG|11:29:06:978|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|InvokeManager|89|Operation[GetResourceId] has configured retryTimeout number as 1
-ADEBUG|11:29:08:183|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|76|--------------------- [    Stop Do Process   ] ---------------------
-ADEBUG|11:29:08:183|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|77|--------------------- [ Start After Process  ] ---------------------
-ADEBUG|11:29:08:189|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|80|--------------------- [ Stop After Process   ] ---------------------
-ADEBUG|11:29:08:193|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|19|## actionProcess || callActionProcess || Finish...
-ADEBUG|11:29:08:211|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|22|## actionProcess || composeInstance || Finish...
-DEBUG|11:29:08:214|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|AFProxy|-1|action process completed :: 4924
-DEBUG|11:29:08:214|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Controller|-1|=== >> OUTGOING DATA
+ADEBUG|15:50:42:729|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|16|## actionProcess || extractInstance || Finish...
+ADEBUG|15:50:42:729|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|70|--------------------- [ Start Before Process ] ---------------------
+ADEBUG|15:50:42:731|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|73|--------------------- [ Stop Before Process  ] ---------------------
+ADEBUG|15:50:42:732|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|74|--------------------- [   Start Do Process   ] ---------------------
+ADEBUG|15:50:42:732|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|166|[Request Type]: USAGE_MONITORING
+ADEBUG|15:50:43:001|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|35|Set state to null -->  BEGIN
+ADEBUG|15:50:43:001|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|17|disPatch W_USAGE_MONITORING BEGIN
+ADEBUG|15:50:43:005|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|21|Invoke begin
+ADEBUG|15:50:51:520|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|MessagePool|50|Build 
+ADEBUG|15:50:51:532|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|InvokeManager|89|Operation[GetResourceId] has configured retryTimeout number as 1
+ADEBUG|15:50:52:043|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|76|--------------------- [    Stop Do Process   ] ---------------------
+ADEBUG|15:50:52:043|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|77|--------------------- [ Start After Process  ] ---------------------
+ADEBUG|15:50:52:050|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|80|--------------------- [ Stop After Process   ] ---------------------
+ADEBUG|15:50:52:053|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|19|## actionProcess || callActionProcess || Finish...
+ADEBUG|15:50:52:071|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|22|## actionProcess || composeInstance || Finish...
+DEBUG|15:50:52:075|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|AFProxy|-1|action process completed :: 9386
+DEBUG|15:50:52:076|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Controller|-1|=== >> OUTGOING DATA
 -->applicationName  :  Sample
 -->session  : 668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615
 -->via  : mOCHKF.E11.0
@@ -64,16 +64,16 @@ DEBUG|11:29:08:214|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|2018122
 	-->oid : 0.0.17.1218.8.7.0
 	-->type : request
 	-->timeout : 4
-DEBUG|11:29:08:232|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
-#====> Outgoing Message is:<?xml version="1.0" encoding="tis-620" ?><EquinoxMessage diag="" from="Sample.ES00" ret="0" session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615" via="mOCHKF.E11.0" timeout="4" ><EquinoxRawData to="Sample.E04.0" name="EQSTAT" type="noreply" ><stats name="PCEF_RECEIVE_TEST_DATA [SUCCESS]" type="increment"/></EquinoxRawData><EquinoxRawData ctype="text/plain" val="{&quot;methodVersion&quot;:&quot;7&quot;,&quot;data&quot;:&quot;test data&quot;}" name="HTTP" invoke="getResourceId_" to="PCEF.ES99.0.0" oid="0.0.17.1218.8.7.0" type="request" timeout="4" ></EquinoxRawData><EquinoxInstance><value val="1::ACTIVE::false::ZUY1OVUxMXpvakFVL1N0T1poOWJsaUFJK09ZcXNrd3J1cWl0TTJ2SFNTRzFWRXdRZ2g5MS9POTdFOWh1dDl0Wkh6QTU5K2JtM25OT3ppaVA2VlBBU2tGWVRGSDNqTFpVMENKbDY0anVLbG9LQ1pXMExGUE9nZ1IxMGJSZTk3RFJOcTJPN2NqL2p1MzIrclBnemtOWFNLUXlDNzdYK3RzUEExN1VnZUw2M3hDSlJVV3lXYnFGKzVHaFl3ZGozY0sycVJzNkhDUjVEbkNmODAxS1cxSEZBSXF6bERLaDJvbjk1TkVrcnluTHRvZWRFMXJEZ2IvWS93Z1A4NXQrMnpMMmV5T2h6dE9wUHcvU0FBN21SYm9uZ3FxVCtzSmQrS2VqT0c1R3J5L1A0V1FSWmZZa2NvZm1ic3hmYmtVUFc2WmpXN2JqV0czSGxBUFFrbGRGVEVPaStweFNsclRHakxaazM2MEpLY3NETHhKMHVjaE14VnlmTTBHUGlzQUdtWjF5ZVhRKzdmbmVhalFPZzlrNENrSWZpZ1A5aGFnWndKYlZNU3pETmR2dHRxa2lndDVpT1BiTjg0T3d6Z1hFQU9SKzVYdXpWZVJOeC9Pbzc2MkNBWUxiVTdibkd6b2lqS3hwSVMvUFVxbml6M01UVWNPdnFZaWFlWUprQlVWNVRnc2lRR1FJK3UrRDcyTVJPWUFyWkUxUlQwSmozZEFTSW9qbTdhcVU4U05rREdBN0JFbDVjZnJ5Tnhwczh3ekt5WHhGU3AzYkUwSzFHVGMxSldkZjg0eWtVbWxXay8xOU5wdkFyaDd0cy9ZRkIzVFM5NGFhTjNWZFRkZWtjN2l5SXF3MWJHdll3STdtYUxhS05GYzFza2dBUk9RVjBJUk15U0cwNXUzQllyOEZZeHZHRDdJZitoNE5iOEx4dlZTa21XUUVUd05JaHlMbnBYeEd6enk1bzRWOE9VdlVYU0o3aWE2V2FucTFGV0NSVnIyN0tOczhreEkwcVRMbzRvbGtKWlZHRXNVSmRYR3pDcXZ0bzVSVVZ4Yjc0SmFPYTNjdUQxQ21yTFpiVXB4dSticFVxbWQ4M1ZqMm82NDFuWi83NFUrVkFSVWt6YVJDLzh0L2EwZytZRmMzalE3R2hxdDNXanIwSlNtU3ZrRnFBVzJoc3h6NTRmSUxaVXB1MVE9PQ==::" /></EquinoxInstance></EquinoxMessage>
-DEBUG|11:29:08:236|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
--->TIME,total Processing Time(msec) : 4964
--->TIME,application process (msec) :4924
--->TIME,ec02 process(msec) : 40
-DEBUG|11:29:08:238|main|EC02Handler|-1|Received data from LL Content-Length: 1775
-DEBUG|11:29:08:238|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
-#====> Incoming Message :        <EquinoxMessage from="mOCHKF.E11.0" via="mOCHKF.E11.0"                        session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615"                        timeout="10" ret="0" diag="">            <EquinoxRawData orig="mOCHKF.ES05.DAMOCLES.0" name="HTTP" invoke="getResourceId_" type="response" method="POST"                            url="" ctype="text/plain" val=""                            to="mOCHKF.ES00" ret="0"/>            <EquinoxInstance><value val="1::ACTIVE::false::ZUY1OVUxMXpvakFVL1N0T1poOWJsaUFJK09ZcXNrd3J1cWl0TTJ2SFNTRzFWRXdRZ2g5MS9POTdFOWh1dDl0Wkh6QTU5K2JtM25OT3ppaVA2VlBBU2tGWVRGSDNqTFpVMENKbDY0anVLbG9LQ1pXMExGUE9nZ1IxMGJSZTk3RFJOcTJPN2NqL2p1MzIrclBnemtOWFNLUXlDNzdYK3RzUEExN1VnZUw2M3hDSlJVV3lXYnFGKzVHaFl3ZGozY0sycVJzNkhDUjVEbkNmODAxS1cxSEZBSXF6bERLaDJvbjk1TkVrcnluTHRvZWRFMXJEZ2IvWS93Z1A4NXQrMnpMMmV5T2h6dE9wUHcvU0FBN21SYm9uZ3FxVCtzSmQrS2VqT0c1R3J5L1A0V1FSWmZZa2NvZm1ic3hmYmtVUFc2WmpXN2JqV0czSGxBUFFrbGRGVEVPaStweFNsclRHakxaazM2MEpLY3NETHhKMHVjaE14VnlmTTBHUGlzQUdtWjF5ZVhRKzdmbmVhalFPZzlrNENrSWZpZ1A5aGFnWndKYlZNU3pETmR2dHRxa2lndDVpT1BiTjg0T3d6Z1hFQU9SKzVYdXpWZVJOeC9Pbzc2MkNBWUxiVTdibkd6b2lqS3hwSVMvUFVxbml6M01UVWNPdnFZaWFlWUprQlVWNVRnc2lRR1FJK3UrRDcyTVJPWUFyWkUxUlQwSmozZEFTSW9qbTdhcVU4U05rREdBN0JFbDVjZnJ5Tnhwczh3ekt5WHhGU3AzYkUwSzFHVGMxSldkZjg0eWtVbWxXay8xOU5wdkFyaDd0cy9ZRkIzVFM5NGFhTjNWZFRkZWtjN2l5SXF3MWJHdll3STdtYUxhS05GYzFza2dBUk9RVjBJUk15U0cwNXUzQllyOEZZeHZHRDdJZitoNE5iOEx4dlZTa21XUUVUd05JaHlMbnBYeEd6enk1bzRWOE9VdlVYU0o3aWE2V2FucTFGV0NSVnIyN0tOczhreEkwcVRMbzRvbGtKWlZHRXNVSmRYR3pDcXZ0bzVSVVZ4Yjc0SmFPYTNjdUQxQ21yTFpiVXB4dSticFVxbWQ4M1ZqMm82NDFuWi83NFUrVkFSVWt6YVJDLzh0L2EwZytZRmMzalE3R2hxdDNXanIwSlNtU3ZrRnFBVzJoc3h6NTRmSUxaVXB1MVE9PQ==::" /></EquinoxInstance>        </EquinoxMessage>    
-DEBUG|11:29:08:246|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Controller|-1|=== >> INCOMING DATA
+DEBUG|15:50:52:095|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
+#====> Outgoing Message is:<?xml version="1.0" encoding="tis-620" ?><EquinoxMessage diag="" from="Sample.ES00" ret="0" session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615" via="mOCHKF.E11.0" timeout="4" ><EquinoxRawData to="Sample.E04.0" name="EQSTAT" type="noreply" ><stats name="PCEF_RECEIVE_TEST_DATA [SUCCESS]" type="increment"/></EquinoxRawData><EquinoxRawData ctype="text/plain" val="{&quot;methodVersion&quot;:&quot;7&quot;,&quot;data&quot;:&quot;test data&quot;}" name="HTTP" invoke="getResourceId_" to="PCEF.ES99.0.0" oid="0.0.17.1218.8.7.0" type="request" timeout="4" ></EquinoxRawData><EquinoxInstance><value val="1::ACTIVE::false::ZUY1OVUxMXpvakFVL1N0T1poOWJsaUFJK3VZcXNrd3J1b2l0TTJ2SFNTRzFWRXdRZ2g5MS9POTdFOWh1dTl0Wkh6QTU5K2JtM25OT3ppaVA2WlBQU2tGWVRGSHZqTFpVMENKbDY1RHVLbG9LQ1pXMExGUE8vQVQxMEt4ZTk3SFJOcTJPN2NqL2p0M3REeUwvemtWWFNLUXlDNzdYK3RzUEExN1VnZUw2M3hDSlJVV3lLTjNDL2NqUXNZT3hibUhiMUEwZERwSThCM2pBK1NhbHJiQmlBTVZaU3BsUTdjUmU4bWlTMTVSbDI4UE9DYXpSMEZ2c2Z3U0grYzJnYlJuN3ZaRlE1K2swbVB1cER3ZnpJdDBUUWRWSmZkRmRlS2VqT0c3R3J5L1B3WFFSWnZZMDdJN00zWVMvM0lvK3Rrekh0bXpIc2RxT0tRZWdKYStLbUFaRTlUbWpMR2xOR0czSnZsdFRVcFlIWGlUb2NwR1ppcmtCWjRJZUZZRU5FcDF5ZVhRKzYzdnVhandKL0dnUytvRUh4WUgrUXRRTVlNdnFkTEJwbUliZHhpb2k2QzJHWTk5Y3p3L3FYRUFNUU81WG5odXRRbmMybVljRGQrVVBFZHllc2ozZjBERmhaRTBMZVhtV1NoVi9ucHVJR241TlJkak00eWNyS01weldoQUJJa1BRZXg5OEh3dkpBVndoYTRwNkVocnJocFlRUVRSM1Y2V01IeUZqQ05zUlNNcUwwNWVQcUwvTk15Z244eFVwZFc1ZkNOVm0zTlNVbkgzTk01SktwVmxOOXZjb21zS3VIdTJ6OWdVSGREcHdSNW83NjNZMVhaUE80Y3FLc05hd3JXRURPNXFqMlNyU1hOWElJZ0VRa1ZkQUV6SWxoOUNhdXdlTC9SYU1iUmcveUg3b2V6UzRDU2IzVXBGbWtqRThEU0FkaXB5WDhoazk4K1NPRnZMbExGRnZpZXdsdWxxcTZkVldnRVZhOWU2aWJQTk1TdENreXFDTEo1S1ZWQnBKRkNmVUF4ZW9WVkJ0SDZXa3VyTFlSN2RZMkdycmx3Y29VMWJiTFNsT3QzeGRLdFV6dm00cys3ZXVOWjJmKytGUGxTRVZKTTJrUXYvTGYydElQdUN1YnJaMThERzg0cFlPZlVtS3BHK1FXa0JiNkN4SGZyajhBa1JTYnFRPQ==::" /></EquinoxInstance></EquinoxMessage>
+DEBUG|15:50:52:098|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
+-->TIME,total Processing Time(msec) : 9427
+-->TIME,application process (msec) :9386
+-->TIME,ec02 process(msec) : 41
+DEBUG|15:50:52:101|main|EC02Handler|-1|Received data from LL Content-Length: 1775
+DEBUG|15:50:52:101|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
+#====> Incoming Message :        <EquinoxMessage from="mOCHKF.E11.0" via="mOCHKF.E11.0"                        session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615"                        timeout="10" ret="0" diag="">            <EquinoxRawData orig="mOCHKF.ES05.DAMOCLES.0" name="HTTP" invoke="getResourceId_" type="response" method="POST"                            url="" ctype="text/plain" val=""                            to="mOCHKF.ES00" ret="0"/>            <EquinoxInstance><value val="1::ACTIVE::false::ZUY1OVUxMXpvakFVL1N0T1poOWJsaUFJK3VZcXNrd3J1b2l0TTJ2SFNTRzFWRXdRZ2g5MS9POTdFOWh1dTl0Wkh6QTU5K2JtM25OT3ppaVA2WlBQU2tGWVRGSHZqTFpVMENKbDY1RHVLbG9LQ1pXMExGUE8vQVQxMEt4ZTk3SFJOcTJPN2NqL2p0M3REeUwvemtWWFNLUXlDNzdYK3RzUEExN1VnZUw2M3hDSlJVV3lLTjNDL2NqUXNZT3hibUhiMUEwZERwSThCM2pBK1NhbHJiQmlBTVZaU3BsUTdjUmU4bWlTMTVSbDI4UE9DYXpSMEZ2c2Z3U0grYzJnYlJuN3ZaRlE1K2swbVB1cER3ZnpJdDBUUWRWSmZkRmRlS2VqT0c3R3J5L1B3WFFSWnZZMDdJN00zWVMvM0lvK3Rrekh0bXpIc2RxT0tRZWdKYStLbUFaRTlUbWpMR2xOR0czSnZsdFRVcFlIWGlUb2NwR1ppcmtCWjRJZUZZRU5FcDF5ZVhRKzYzdnVhandKL0dnUytvRUh4WUgrUXRRTVlNdnFkTEJwbUliZHhpb2k2QzJHWTk5Y3p3L3FYRUFNUU81WG5odXRRbmMybVljRGQrVVBFZHllc2ozZjBERmhaRTBMZVhtV1NoVi9ucHVJR241TlJkak00eWNyS01weldoQUJJa1BRZXg5OEh3dkpBVndoYTRwNkVocnJocFlRUVRSM1Y2V01IeUZqQ05zUlNNcUwwNWVQcUwvTk15Z244eFVwZFc1ZkNOVm0zTlNVbkgzTk01SktwVmxOOXZjb21zS3VIdTJ6OWdVSGREcHdSNW83NjNZMVhaUE80Y3FLc05hd3JXRURPNXFqMlNyU1hOWElJZ0VRa1ZkQUV6SWxoOUNhdXdlTC9SYU1iUmcveUg3b2V6UzRDU2IzVXBGbWtqRThEU0FkaXB5WDhoazk4K1NPRnZMbExGRnZpZXdsdWxxcTZkVldnRVZhOWU2aWJQTk1TdENreXFDTEo1S1ZWQnBKRkNmVUF4ZW9WVkJ0SDZXa3VyTFlSN2RZMkdycmx3Y29VMWJiTFNsT3QzeGRLdFV6dm00cys3ZXVOWjJmKytGUGxTRVZKTTJrUXYvTGYydElQdUN1YnJaMThERzg0cFlPZlVtS3BHK1FXa0JiNkN4SGZyajhBa1JTYnFRPQ==::" /></EquinoxInstance>        </EquinoxMessage>    
+DEBUG|15:50:52:108|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Controller|-1|=== >> INCOMING DATA
 -->applicationName  :  Sample
 -->session  : 668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615
 -->via  : mOCHKF.E11.0
@@ -96,38 +96,47 @@ DEBUG|11:29:08:246|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|2018122
 	-->to : mOCHKF.ES00
 	-->type : response
 	-->url : 
-ADEBUG|11:29:08:255|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|16|## actionProcess || extractInstance || Finish...
-ADEBUG|11:29:08:255|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|70|--------------------- [ Start Before Process ] ---------------------
-ADEBUG|11:29:08:256|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|InvokeManager|44|OK [0] phoebe.eqx.pcef.core.data.InvokeObject@7dda48d9
-ADEBUG|11:29:08:256|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|73|--------------------- [ Stop Before Process  ] ---------------------
-ADEBUG|11:29:08:256|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|74|--------------------- [   Start Do Process   ] ---------------------
-ADEBUG|11:29:08:257|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|166|[Request Type]: USAGE_MONITORING
-ADEBUG|11:29:08:257|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|17|disPatch W_USAGE_MONITORING W_GET_RESOURCE_ID
-ADEBUG|11:29:08:258|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|21|Invoke wGetResourceId
-ADEBUG|11:31:12:569|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|17|disPatch W_USAGE_MONITORING W_USAGE_MONITORING_UPDATE
-ADEBUG|11:31:12:570|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|56|Stop...by..flag
-ADEBUG|11:31:12:570|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|76|--------------------- [    Stop Do Process   ] ---------------------
-ADEBUG|11:31:12:570|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|77|--------------------- [ Start After Process  ] ---------------------
-ADEBUG|11:31:12:571|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFUtils|53|REQ=null
-ADEBUG|11:31:12:571|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFUtils|54|RES=null
-ADEBUG|11:31:12:572|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFUtils|55|SUMMARY={{"GetResourceId":{"invokeId":"getResourceId_","reqTime":"20190426112906 0976","req":"","res":"{}"}}}
-ADEBUG|11:31:12:572|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|80|--------------------- [ Stop After Process   ] ---------------------
-ADEBUG|11:31:12:572|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|19|## actionProcess || callActionProcess || Finish...
-ADEBUG|11:31:12:573|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|22|## actionProcess || composeInstance || Finish...
-DEBUG|11:31:12:573|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|AFProxy|-1|action process completed :: 124327
-DEBUG|11:31:12:573|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Controller|-1|=== >> OUTGOING DATA
+ADEBUG|15:50:52:115|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|16|## actionProcess || extractInstance || Finish...
+ADEBUG|15:50:52:116|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|70|--------------------- [ Start Before Process ] ---------------------
+ADEBUG|15:50:52:117|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|InvokeManager|44|OK [0] phoebe.eqx.pcef.core.data.InvokeObject@7dda48d9
+ADEBUG|15:50:52:117|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|73|--------------------- [ Stop Before Process  ] ---------------------
+ADEBUG|15:50:52:117|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|74|--------------------- [   Start Do Process   ] ---------------------
+ADEBUG|15:50:52:117|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|166|[Request Type]: USAGE_MONITORING
+ADEBUG|15:50:52:117|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|17|disPatch W_USAGE_MONITORING W_GET_RESOURCE_ID
+ADEBUG|15:50:52:118|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|21|Invoke wGetResourceId
+ADEBUG|15:51:37:161|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|35|Set state to null -->  BEGIN
+ADEBUG|15:51:37:162|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|17|disPatch W_USAGE_MONITORING BEGIN
+ADEBUG|15:51:37:162|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|21|Invoke begin
+ADEBUG|15:51:37:162|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|MessagePool|50|Build 
+ADEBUG|15:51:37:163|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|InvokeManager|89|Operation[GetResourceId] has configured retryTimeout number as 1
+ADEBUG|15:51:37:163|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|76|--------------------- [    Stop Do Process   ] ---------------------
+ADEBUG|15:51:37:163|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|77|--------------------- [ Start After Process  ] ---------------------
+ADEBUG|15:51:37:164|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|80|--------------------- [ Stop After Process   ] ---------------------
+ADEBUG|15:51:37:164|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|19|## actionProcess || callActionProcess || Finish...
+ADEBUG|15:51:37:164|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|22|## actionProcess || composeInstance || Finish...
+DEBUG|15:51:37:165|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|AFProxy|-1|action process completed :: 45057
+DEBUG|15:51:37:165|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Controller|-1|=== >> OUTGOING DATA
 -->applicationName  :  Sample
 -->session  : 668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615
 -->via  : mOCHKF.E11.0
 -->from  : Sample.ES00
 -->diag  : 
--->state  : IDLE
--->timeout  : 10
+-->state  : ACTIVE
+-->timeout  : 4
 
--->rawdata(s)  : no raw data
-DEBUG|11:31:12:574|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
-#====> Outgoing Message is:<?xml version="1.0" encoding="tis-620" ?><EquinoxMessage diag="" from="Sample.ES00" ret="10" session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615" via="mOCHKF.E11.0" timeout="10" ><EquinoxInstance><value val="1::IDLE::false::ZUY1dFVWMlBtekFRL0N1STU1NkUrZWJlS01raDFJU2toTFNScWxQa3doNzFCUXdCUTVLTDh0KzdodlJhdGVYQldETTd1N1BqcTlwazhCTHhUbENlZ2ZwNFZTc1EwREplSkhEc29STVM2cURyV00yalhIMVVOOVBkSjdwaFdyYmp5ci90ZUg2UVJsL202Z2RWTUZtRjU0UDIvaEhFMjRsb0gvNmxhQ1o2V3Fhc3d2bXFyaEdYRU0waWpxbnBHZ3BwMHlBYzFQV0JnWkwwSEtHc1pNREZhQ2NMOCs4bWZXTzhyRTVITjdhZVp1RnUrQnlmdHA4Q3c5S0hRYy9CZmJrRTI0aEZLR3hhTmxBQm8xTGJlYnZ3Y2hibncvTHQ5VWU4M2lXbHMwNjhKL080cWw4WHdpZVc2VHFXNDdxVzRacHlBZWpxdnMwZ3BxUFBEZkJjV1hGUXBHOWxUYnZ1VkxlNWVydkp5akc1b09ZQ3ptT0FkeVM5TkZLNjNmamhmTDljeFZHNlNxSTR4T1lZZnl1bUJJaGwyYnFsZTZaaEdPYklDRmdRbEgyY2gxRTgxU0tpSS9KMS8zZXIvWFk5ODlPNWlpNFlIK29ETENtbkJiVFNSTW5rYTM1N1JxN3JxNHEybDBWZGRJZ2dWUmYzdFVJUXlYMVJUT2xYbHpHdzRrOXFMNDI4ZDVtQm9LeVVRNmFwLzYvSEZINC9zcWVadWsySTdtbTJvbm1PUFNaOHhERlQxSGk1M2pETjU5dFBqWHJUSXc9PQ==::" /></EquinoxInstance></EquinoxMessage>
-DEBUG|11:31:12:575|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
--->TIME,total Processing Time(msec) : 124337
--->TIME,application process (msec) :124327
--->TIME,ec02 process(msec) : 10
+-->rawdata(s)  : 1
+-->raw data index : 0
+	-->message : {"methodVersion":"7","data":"test data"}
+	-->ctype : text/plain
+	-->name : HTTP
+	-->invoke : getResourceId_
+	-->to : PCEF.ES99.0.0
+	-->oid : 0.0.17.1218.8.7.0
+	-->type : request
+	-->timeout : 4
+DEBUG|15:51:37:165|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
+#====> Outgoing Message is:<?xml version="1.0" encoding="tis-620" ?><EquinoxMessage diag="" from="Sample.ES00" ret="0" session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615" via="mOCHKF.E11.0" timeout="4" ><EquinoxRawData to="Sample.E04.0" name="EQSTAT" type="noreply" ><stats name="PCEF_RECEIVE_TEST_DATA [SUCCESS]" type="increment"/></EquinoxRawData><EquinoxRawData ctype="text/plain" val="{&quot;methodVersion&quot;:&quot;7&quot;,&quot;data&quot;:&quot;test data&quot;}" name="HTTP" invoke="getResourceId_" to="PCEF.ES99.0.0" oid="0.0.17.1218.8.7.0" type="request" timeout="4" ></EquinoxRawData><EquinoxInstance><value val="1::ACTIVE::false::ZUY3RlVzRnltekFRL1JXUHBrY1BSV0NiT0xmVUpwUnBqRE9ZTkllU1lWUzhjWmlBWkNPUnhNUHc3MWtKMGpxZHROZmV0UHRXdTIvZjI1YnNjN2dQdVZTTTUwRE8yMjVNYWpnMElOVkNjQVV2Q25Odm1lUzR4eEp5czdrSS9HeTFqc0prSFlkUlFNWUV2OWNxS1NxRTZYUTZtOUdKTTNFOGx4cEV3UlhGYjEvOElJejZXc3c0bUxuTkFqL0pZbit6dm9rWGZoWXVDVTR2K0pONGhCWGpiQWUxSGw0V0VrbjhhQWNrM09MUEhhZ1lwR2pxSE1KdGhrM0ZIbXFtQ3NFUkRFN0JVeXhtenpFY2RFL1Zid0s1N1ZoYnBwamxINXFDaXhlc1dHSjR5WElsNnVPbjk5bXcycGZZVHRjYlVmcmFDNlVNelh6b3FUWDd2Qzlad2JHV015MEorWm9rMXhqMXEzMUVYd25NWGkvOFM4dmZ6T2VXYmRtYWQ2Rlh4YmRGUFlzNjlNdzZzenlEREtNR28zUUNwUmNOeWtRbVdrT2s1ajhCVjIrRzhVY3VualVmT00xRzM2TDFyWFprMkdRRlVxTG8yS1JOU1FYcVFXeS9ReTFSMUpTY3A4Ukx5VGcxMjV0UTRZbU0rcWdqSFE1OVlCSTlhVXBrY2M5S0NmcVFWSDNFaXhoZVVWUDkxSmJhNXNUZVg4dmNvek8zdThNMnNxa3FWaCt2eEU0YTEwdXhpM29WLy9TMWwvUGplL2pkWlFtS0ZhVjI2Ri8xdndnUng2WnplK0xhZU1mMmxJN3NxYXNWUnh4MU1RK2tSVnF6OG44bFIxMXZaS05vZnlGMzE3MENaencvdVE9PQ==::" /></EquinoxInstance></EquinoxMessage>
+DEBUG|15:51:37:166|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
+-->TIME,total Processing Time(msec) : 45065
+-->TIME,application process (msec) :45057
+-->TIME,ec02 process(msec) : 8

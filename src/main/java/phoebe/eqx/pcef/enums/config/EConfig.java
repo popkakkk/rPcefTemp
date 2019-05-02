@@ -14,11 +14,18 @@ public enum EConfig {
     INTERVAL_PROCESSING("interval-processing", EConfigType.MANDATORY, null),
     RETRY_PROCESSING("retry-processing", EConfigType.MANDATORY, null),
 
+    //Collection name
+    COLLECTION_TRANSACTION_NAME("collection-transaction-name", EConfigType.MANDATORY, null),
+    COLLECTION_PROFILE_NAME("collection-transaction-name", EConfigType.MANDATORY, null),
+    COLLECTION_QUOTA_NAME("collection-transaction-name", EConfigType.MANDATORY, null),
+    COLLECTION_LOCK_PROCESS_NAME("collection-lock-process-name", EConfigType.MANDATORY, null),
+
+
     /* Part 2 : Optional  */
 
     //Timeout
     TIMEOUT_TEST("timeout-test", EConfigType.OPTIONAL, "10"),
-   ;
+    ;
 
     private final String configName;
     private final EConfigType configType;
@@ -29,6 +36,9 @@ public enum EConfig {
         this.configType = configType;
         this.defaultData = defaultData;
     }
+
+
+
 
     public String getConfigName() {
         return this.configName;
@@ -41,7 +51,6 @@ public enum EConfig {
     public String getDefaultData() {
         return defaultData;
     }
-
 
 
 }

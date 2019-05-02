@@ -37,7 +37,7 @@ public abstract class ComplexState extends State {
             }
 
             try {
-                dispatchToWorkingState(state); //find state
+                dispatchToWorkingState(state); //execute state
             } catch (Exception e) {
 
                 appInstance.setFinish(true);

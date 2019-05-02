@@ -3,11 +3,10 @@ package phoebe.eqx.pcef.services;
 import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.enums.Operation;
 import phoebe.eqx.pcef.instance.AppInstance;
-import phoebe.eqx.pcef.utils.MockData;
+import phoebe.eqx.pcef.message.req.UsageMonitroingStartRequest;
 
-public class UsageMonitoringStartService extends PCEFService {
-
-    public UsageMonitoringStartService(AppInstance appInstance) {
+public class UsageMonitoringService extends PCEFService {
+    public UsageMonitoringService(AppInstance appInstance) {
         super(appInstance);
     }
 
@@ -16,12 +15,13 @@ public class UsageMonitoringStartService extends PCEFService {
             Operation operation = Operation.UsageMonitoringStart;
             String invokeId = "umstart_";
 
-            /* mock */
-            String data = MockData.startRequest;
 
-            EquinoxRawData equinoxRawData = msgPool.getUsageMonitringStartRequest(data, invokeId);
-            invokeExternal(equinoxRawData, Operation.TestOperation, msgPool.getRequestObj());
+            UsageMonitroingStartRequest usageMonitroingStartRequest = new UsageMonitroingStartRequest();
+            usageMonitroingStartRequest.setCommand("usageMonitoringStart");
 
+
+            EquinoxRawData equinoxRawData = msgPool.getUsageMonitoringStartRequest(usageMonitroingStartRequest, invokeId);
+            invokeExternal(equinoxRawData, operation, msgPool.getRequestObj());
 
         } catch (Exception e) {
 
@@ -36,5 +36,4 @@ public class UsageMonitoringStartService extends PCEFService {
 
         }
     }
-
 }

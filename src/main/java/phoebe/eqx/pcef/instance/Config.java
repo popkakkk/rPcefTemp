@@ -13,12 +13,25 @@ public class Config {
     public static int INTERVAL_PROCESSING;
     public static int RETRY_PROCESSING;
 
+    //collection name
+    public static String COLLECTION_TRANSACTION_NAME;
+    public static String COLLECTION_PROFILE_NAME;
+    public static String COLLECTION_QUOTA_NAME;
+    public static String COLLECTION_LOCK_PROCESS_NAME;
+
+
     public static void loadConfiguration(AbstractAF abstractAF) {
         TEST_CONFIG = PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_TEST);
         MONGODB_URL = PCEFUtils.getWarmConfig(abstractAF, EConfig.MONGODB_URL);
         MY_DB_NAME = PCEFUtils.getWarmConfig(abstractAF, EConfig.MONGODB_DATABASE_NAME);
         INTERVAL_PROCESSING = Integer.parseInt(PCEFUtils.getWarmConfig(abstractAF, EConfig.INTERVAL_PROCESSING));
         RETRY_PROCESSING = Integer.parseInt(PCEFUtils.getWarmConfig(abstractAF, EConfig.RETRY_PROCESSING));
+        COLLECTION_LOCK_PROCESS_NAME = PCEFUtils.getWarmConfig(abstractAF,EConfig.COLLECTION_LOCK_PROCESS_NAME);
+        COLLECTION_PROFILE_NAME = PCEFUtils.getWarmConfig(abstractAF,EConfig.COLLECTION_PROFILE_NAME);
+        COLLECTION_QUOTA_NAME = PCEFUtils.getWarmConfig(abstractAF,EConfig.COLLECTION_QUOTA_NAME);
+        COLLECTION_TRANSACTION_NAME = PCEFUtils.getWarmConfig(abstractAF,EConfig.COLLECTION_TRANSACTION_NAME);
+
+
     }
 
     public static boolean verify(AbstractAF abstractAF) {

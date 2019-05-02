@@ -62,6 +62,12 @@
             <retry-processing value = "3" />
 
 
+            <collection-transaction-name value = "Transaction" />
+            <collection-profile-name value = "Profile" />
+            <collection-quota-name value = "Quota" />
+            <collection-lock-process-name value = "LockProcess" />
+
+
 
 
     </warm>

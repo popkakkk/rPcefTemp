@@ -29,7 +29,7 @@ public abstract class State {
                 }
             }
         }
-        throw new Exception("Can not find method for " + state);
+        throw new Exception("Can not execute method for " + state);
     }
 
     protected EState getWorkState() {
