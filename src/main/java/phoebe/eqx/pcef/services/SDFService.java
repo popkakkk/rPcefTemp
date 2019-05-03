@@ -42,8 +42,7 @@ public class SDFService extends PCEFService {
     }
 
 
-    public String readGetResourceId() {
-        String resourceId = null;
+    public void readGetResourceId() {
         try {
             //extract
             Operation operation = Operation.GetResourceId;
@@ -60,8 +59,6 @@ public class SDFService extends PCEFService {
             //summarylog res
 //            appInstance.setSummaryLogExternalResponse(operation, SummaryLog.getSummaryLogResponse(operation, testResponseData));
 
-            resourceId = "1234";
-
         } catch (TimeoutException e) {
             // handle time out
         } catch (ResponseErrorException e) {
@@ -72,7 +69,7 @@ public class SDFService extends PCEFService {
             // read fail
 
         }
-        return resourceId;
+
     }
 
 

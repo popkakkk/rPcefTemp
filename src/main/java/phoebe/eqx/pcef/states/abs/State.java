@@ -20,17 +20,7 @@ public abstract class State {
 
     abstract public void dispatch();
 
-    public Method findMethod(Class clazz, EState state) throws Exception {
-        for (Method method : clazz.getMethods()) {
-            if (method.isAnnotationPresent(MessageRecieved.class)) {
-                MessageRecieved messageRecieved = method.getAnnotation(MessageRecieved.class);
-                if (state.equals(messageRecieved.messageType())) {
-                    return method;
-                }
-            }
-        }
-        throw new Exception("Can not execute method for " + state);
-    }
+
 
     protected EState getWorkState() {
         EState result = null;

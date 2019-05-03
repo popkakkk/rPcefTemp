@@ -11,24 +11,19 @@ public class SummaryLogDetail {
     private Object req;
     private Object res;
 
-
-
-
     //Details External
     public SummaryLogDetail(String invokeId, String reqTime, Object req) {
         this.invokeId = invokeId;
         this.reqTime = reqTime;
         this.req = req;
         this.res = "{}";
-
     }
 
     //Details E01
     public SummaryLogDetail(String invokeId, String reqTime, String reqKey) {
         this.invokeId = invokeId;
         this.reqTime = reqTime;
-      }
-
+    }
 
     public String getInvokeId() {
         return invokeId;

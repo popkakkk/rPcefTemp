@@ -253,7 +253,7 @@ public class EQX4Wrapper {
 
 
     private enum EStateApp {
-        IDLE("IDLE"),
+        IDLE("BEGIN"),
         ACTIVE("ACTIVE");
 
         private String name;

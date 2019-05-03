@@ -6,7 +6,7 @@ import phoebe.eqx.pcef.utils.PCEFUtils;
 import java.util.Date;
 
 public class SummaryLog {
-    private String logName; //operation --> External || E01
+    private String logName; //get from operation
     private String invokeId;
     private SummaryLogDetail summaryLogDetail;
 

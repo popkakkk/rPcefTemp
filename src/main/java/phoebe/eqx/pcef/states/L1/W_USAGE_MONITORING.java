@@ -1,9 +1,10 @@
 package phoebe.eqx.pcef.states.L1;
 
+import com.mongodb.DBCursor;
 import phoebe.eqx.pcef.enums.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.services.*;
-import phoebe.eqx.pcef.states.L2.MongoDBFirstState;
+import phoebe.eqx.pcef.states.mongodb.W_MONGODB_PROCESS_STATE;
 import phoebe.eqx.pcef.states.abs.ComplexState;
 import phoebe.eqx.pcef.states.abs.MessageRecieved;
 
@@ -27,89 +28,49 @@ public class W_USAGE_MONITORING extends ComplexState {
     @MessageRecieved(messageType = EState.W_GET_RESOURCE_ID)
     public void wGetResourceId() throws Exception {
         SDFService sdfService = new SDFService(appInstance);
-        String resourceId = sdfService.readGetResourceId();
+        sdfService.readGetResourceId();
 
-        MongoDBService2 mgService = null;
+        MongoDBService mongoDBService = null;
         EState nextState = null;
         try {
-            mgService = new MongoDBService2(appInstance);
-            MongoDBFirstState mongoDBFirstState = new MongoDBFirstState(mgService);
-            mongoDBFirstState.start();
+            mongoDBService = new MongoDBService(appInstance);
+            mongoDBService.insertTransaction();
 
-            if (mongoDBFirstState.getStatus().equalsIgnoreCase("Success")) {
+            W_MONGODB_PROCESS_STATE mongodbProcessState = new W_MONGODB_PROCESS_STATE(mongoDBService);
+            mongodbProcessState.dispatch();
 
-                if (mongoDBFirstState.getNextState() != null) {
-                    nextState = mongoDBFirstState.getNextState();
-                    if (EState.W_USAGE_MONITORING_START.equals(nextState)) {
-                        //sent usageMonitoring
-                        UsageMonitoringService usageMonitoringStartService = new UsageMonitoringService(appInstance);
-                        usageMonitoringStartService.buildUsageMonitoringStart();
-                    } else if (EState.W_USAGE_MONITORING_UPDATE.equals(nextState)) {
-
-                    }
-
-
+            nextState = mongodbProcessState.getPcefNextState();
+            if (EState.END.equals(nextState)) {
+                SACFService sacfService = new SACFService(appInstance);
+                if (mongodbProcessState.isResponseSuccess()) {
+                    sacfService.buildResponseSACFSuccess();
                 } else {
-                    //build response success 200
+                    sacfService.buildResponseSACFFail();
                 }
             } else {
-                //build response error 500
+                UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
+                if (EState.W_USAGE_MONITORING_START.equals(nextState)) {
+
+                    DBCursor transactionCursor = mongoDBService.findTransactionForFirstUsage();
+                    usageMonitoringService.buildUsageMonitoringStart();
+                } else if (EState.W_USAGE_MONITORING_UPDATE.equals(nextState)) {
+                    usageMonitoringService.buildUsageMonitoringUpdate();
+                }
             }
-
-
         } catch (Exception e) {
 
 
         } finally {
-            if (mgService != null) {
-                mgService.closeConnection();
+            if (mongoDBService != null) {
+                mongoDBService.closeConnection();
+            }
+            if (nextState == null) {
+                nextState = EState.END;
             }
         }
 
         setWorkState(nextState);
     }
-
-    /* @MessageRecieved(messageType = EState.W_GET_RESOURCE_ID)
-    public void wGetResourceId() throws Exception {
-        SDFService sdfService = new SDFService(appInstance);
-        String resourceId = sdfService.readGetResourceId();
-
-        MongoDBService mgService = null;
-        EState nextState = null;
-        try {
-            mgService = new MongoDBService(appInstance);
-            mgService.insertTransaction(resourceId);
-
-            boolean isStartState = mgService.checkIsUsageMonitoringStartState();
-            if (isStartState) {
-                //find Col_Transaction
-                //#if(is not transaction) set status=Processing
-
-                //sent usageMonitoring
-                UsageMonitoringService usageMonitoringStartService = new UsageMonitoringService(appInstance);
-                usageMonitoringStartService.buildUsageMonitoringStart();
-
-                nextState = EState.W_USAGE_MONITORING_START;
-            } else {
-
-
-
-
-                nextState = EState.W_USAGE_MONITORING_UPDATE;
-            }
-
-
-        } catch (Exception e) {
-
-
-        } finally {
-            if (mgService != null) {
-                mgService.closeConnection();
-            }
-        }
-
-        setWorkState(nextState);
-    }*/
 
 
     @MessageRecieved(messageType = EState.W_USAGE_MONITORING_START)

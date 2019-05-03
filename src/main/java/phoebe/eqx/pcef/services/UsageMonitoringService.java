@@ -28,6 +28,15 @@ public class UsageMonitoringService extends PCEFService {
         }
     }
 
+    public void buildUsageMonitoringUpdate() {
+        try {
+
+
+        } catch (Exception e) {
+
+        }
+    }
+
 
     public void readUsageMonitoringStart() {
         try {

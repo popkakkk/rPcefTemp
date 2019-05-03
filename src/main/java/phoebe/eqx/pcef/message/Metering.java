@@ -1,6 +1,6 @@
-package phoebe.eqx.pcef.message.req;
+package phoebe.eqx.pcef.message;
 
-public class MeteringRequest {
+public class Metering {
     private String sessionId;
     private String tid;
     private String rtid;
@@ -11,10 +11,10 @@ public class MeteringRequest {
     private String resourceName;
 
 
-    public MeteringRequest() {
+    public Metering() {
     }
 
-    public MeteringRequest(String sessionId, String tid, String rtid, String actualTime, String app, String clientId, String privateId, String resourceName) {
+    public Metering(String sessionId, String tid, String rtid, String actualTime, String app, String clientId, String privateId, String resourceName) {
         this.sessionId = sessionId;
         this.tid = tid;
         this.rtid = rtid;

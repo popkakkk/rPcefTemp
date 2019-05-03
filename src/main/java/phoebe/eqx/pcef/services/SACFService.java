@@ -2,7 +2,7 @@ package phoebe.eqx.pcef.services;
 
 import com.google.gson.Gson;
 import phoebe.eqx.pcef.instance.AppInstance;
-import phoebe.eqx.pcef.message.req.MeteringRequest;
+import phoebe.eqx.pcef.message.Metering;
 
 public class SACFService extends PCEFService {
     public SACFService(AppInstance appInstance) {
@@ -13,8 +13,8 @@ public class SACFService extends PCEFService {
 
         try {
             String message = context.getReqMessage();
-            MeteringRequest meteringRequest = new Gson().fromJson(message, MeteringRequest.class);
-            appInstance.getPcefInstance().setMeteringRequest(meteringRequest);
+            Metering metering = new Gson().fromJson(message, Metering.class);
+            appInstance.getPcefInstance().setMetering(metering);
         } catch (Exception e) {
 
         }
@@ -24,6 +24,11 @@ public class SACFService extends PCEFService {
 
 
     public void buildResponseSACFSuccess() {
+
+
+    }
+
+    public void buildResponseSACFFail() {
 
 
     }

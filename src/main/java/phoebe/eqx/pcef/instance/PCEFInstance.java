@@ -1,19 +1,20 @@
 package phoebe.eqx.pcef.instance;
 
-import phoebe.eqx.pcef.message.req.MeteringRequest;
+import phoebe.eqx.pcef.message.Metering;
 
 public class PCEFInstance {
 
     private TestResponseData testResponseData;
-    private MeteringRequest meteringRequest;
+    private Metering metering;
+    private String resource_id_test = "1234";
 
 
-    public MeteringRequest getMeteringRequest() {
-        return meteringRequest;
+    public Metering getMetering() {
+        return metering;
     }
 
-    public void setMeteringRequest(MeteringRequest meteringRequest) {
-        this.meteringRequest = meteringRequest;
+    public void setMetering(Metering metering) {
+        this.metering = metering;
     }
 
     public TestResponseData getTestResponseData() {
@@ -22,5 +23,9 @@ public class PCEFInstance {
 
     public void setTestResponseData(TestResponseData testResponseData) {
         this.testResponseData = testResponseData;
+    }
+
+    public String getResource_id_test() {
+        return resource_id_test;
     }
 }

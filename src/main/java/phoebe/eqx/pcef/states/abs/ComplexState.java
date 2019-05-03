@@ -39,7 +39,6 @@ public abstract class ComplexState extends State {
             try {
                 dispatchToWorkingState(state); //execute state
             } catch (Exception e) {
-
                 appInstance.setFinish(true);
                 stop = true;
             }
@@ -49,7 +48,7 @@ public abstract class ComplexState extends State {
                 if (handler != null) {
                     handler.onEnd();
                 }
-                AFLog.d("stop by set stateWork .. END");
+                AFLog.d("stop by set stateWork .. RESPONSE");
                 break;
             }
             if (stop) {
@@ -58,6 +57,18 @@ public abstract class ComplexState extends State {
             }
         }
 
+    }
+
+    public static Method findMethod(Class clazz, EState state) throws Exception {
+        for (Method method : clazz.getMethods()) {
+            if (method.isAnnotationPresent(MessageRecieved.class)) {
+                MessageRecieved messageRecieved = method.getAnnotation(MessageRecieved.class);
+                if (state.equals(messageRecieved.messageType())) {
+                    return method;
+                }
+            }
+        }
+        throw new Exception("Can not execute method for " + state);
     }
 
     public boolean isStop() {

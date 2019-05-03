@@ -16,10 +16,14 @@ public class Transaction {
     private String app;
     private String clientId;
 
+    private String firstTime;
+    private String isActive;
+
 
     public enum EStatus {
 
-        Waiting("Waiting");
+        Waiting("Waiting"),
+        Done("Done");
 
 
         private String status;
@@ -144,5 +148,21 @@ public class Transaction {
 
     public void setClientId(String clientId) {
         this.clientId = clientId;
+    }
+
+    public String getFirstTime() {
+        return firstTime;
+    }
+
+    public void setFirstTime(String firstTime) {
+        this.firstTime = firstTime;
+    }
+
+    public String getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(String isActive) {
+        this.isActive = isActive;
     }
 }

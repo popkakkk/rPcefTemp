@@ -6,7 +6,6 @@ import phoebe.eqx.pcef.services.IMyFuncInterval;
 
 public class Interval {
 
-
     private int retryConfig;
     private int interval;
     private int retry = 0;
@@ -25,7 +24,7 @@ public class Interval {
         try {
             Thread.sleep(interval * 1000);
         } catch (InterruptedException e) {
-            AFLog.d("Thread has interrupt error");
+            AFLog.d("Thread has interrupt!!");
         }
     }
 
