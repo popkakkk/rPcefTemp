@@ -14,6 +14,7 @@ import phoebe.eqx.pcef.utils.ValidateMessage;
 
 public class MyService extends PCEFService {
 
+
     public MyService(AppInstance appInstance) {
         super(appInstance);
     }
@@ -76,13 +77,13 @@ public class MyService extends PCEFService {
             String data = "test data";
 
             //build message
-            EquinoxRawData equinoxRawData = msgPool.getHTTPTest(data, invokeId);
+//            EquinoxRawData equinoxRawData = msgPool.getHTTPTest(data, invokeId);
 
             //add raw data to list
-            invokeExternal(equinoxRawData, Operation.TestOperation, msgPool.getRequestObj());
+//            invokeExternal(equinoxRawData, Operation.TestOperation, msgPool.getRequestObj());
 
             //increase stat
-            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.PCEF_RECEIVE_TEST_DATA);
+//            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.PCEF_RECEIVE_TEST_DATA);
 
 
         } catch (Exception e) {

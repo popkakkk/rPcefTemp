@@ -3,11 +3,11 @@ package phoebe.eqx.pcef.instance;
 import ec02.af.abstracts.AbstractAF;
 import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
-import phoebe.eqx.pcef.core.context.InvokeManager;
-import phoebe.eqx.pcef.core.context.RequestContext;
 import phoebe.eqx.pcef.core.data.InvokeObject;
 import phoebe.eqx.pcef.core.logs.summary.SummaryLog;
 import phoebe.eqx.pcef.core.logs.summary.SummaryLogDetail;
+import phoebe.eqx.pcef.enums.ERequestType;
+import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.enums.Operation;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 
@@ -20,10 +20,14 @@ public class AppInstance {
 
     //----- instance data -------------------
     private PCEFInstance pcefInstance;
-
-    //------ context ------------------------
-    private RequestContext requestContext;
     private InvokeManager invokeManager;
+
+    //----- instance state------------------
+    private String requestInvokeId;
+    private ERequestType requestType;
+    private Date startTime;
+    private EState stateL1;
+    private EState stateL2;
 
     //------ instance logs ------------------
     private List<SummaryLog> summaryLogs;
@@ -31,15 +35,26 @@ public class AppInstance {
     private String responseLog;
 
     //------- transient ---------------------
+    private transient boolean hasRequest;
+    private transient String reqMessage;
+
     private transient ArrayList<EquinoxRawData> outList = new ArrayList<>();
     private transient boolean finish;
     private transient AbstractAF abstractAF;
 
-    public synchronized void create() {
+
+    public synchronized void create(String reqMessage, String invoke, ERequestType requestType) {
+        this.requestInvokeId = invoke;
+        this.reqMessage = reqMessage;
+        this.requestType = requestType;
+        this.startTime = new Date();
         this.pcefInstance = new PCEFInstance();
-        this.requestContext = new RequestContext();
         this.invokeManager = new InvokeManager();
         this.summaryLogs = new ArrayList<>();
+    }
+
+    public void patchResponse() {
+        invokeManager.patchResponse(outList);
     }
 
     public void setSummaryLogExternalResponse(Operation operation, Object resp) throws Exception {
@@ -87,15 +102,6 @@ public class AppInstance {
     public void setAbstractAF(AbstractAF abstractAF) {
         this.abstractAF = abstractAF;
     }
-
-    public RequestContext getRequestContext() {
-        return requestContext;
-    }
-
-    public void setRequestContext(RequestContext requestContext) {
-        this.requestContext = requestContext;
-    }
-
 
     public InvokeManager getInvokeManager() {
         return invokeManager;
@@ -153,7 +159,56 @@ public class AppInstance {
         this.outList = outList;
     }
 
-    public void patchResponse() {
-        invokeManager.patchResponse(outList);
+    public ERequestType getRequestType() {
+        return requestType;
     }
-}
+
+    public void setRequestType(ERequestType requestType) {
+        this.requestType = requestType;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public EState getStateL1() {
+        return stateL1;
+    }
+
+    public void setStateL1(EState stateL1) {
+        this.stateL1 = stateL1;
+    }
+
+    public EState getStateL2() {
+        return stateL2;
+    }
+
+    public void setStateL2(EState stateL2) {
+        this.stateL2 = stateL2;
+    }
+
+    public String getReqMessage() {
+        return reqMessage;
+    }
+
+    public void setReqMessage(String reqMessage) {
+        this.reqMessage = reqMessage;
+    }
+
+    public boolean isHasRequest() {
+        return hasRequest;
+    }
+
+    public void setHasRequest(boolean hasRequest) {
+        this.hasRequest = hasRequest;
+    }
+
+    public String getRequestInvokeId() {
+        return requestInvokeId;
+    }
+
+ }

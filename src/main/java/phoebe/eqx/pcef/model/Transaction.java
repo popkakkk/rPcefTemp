@@ -1,6 +1,10 @@
 package phoebe.eqx.pcef.model;
 
+import java.util.Date;
+
 public class Transaction {
+
+    //-- from SACF
     private String sessionId;
     private String rtid;
     private String tid;
@@ -9,33 +13,19 @@ public class Transaction {
     private String userValue;
     private String resourceId;
     private String resourceName;
+
+    //-- from OCF
     private String monitoringKey;
     private String counterId;
+
     private String status;
-    private String createDate;
+    private Date createDate;
+    private Date updateDate;
     private String app;
     private String clientId;
 
     private String firstTime;
     private String isActive;
-
-
-    public enum EStatus {
-
-        Waiting("Waiting"),
-        Done("Done");
-
-
-        private String status;
-
-        EStatus(String status) {
-            this.status = status;
-        }
-
-        public String getName() {
-            return status;
-        }
-    }
 
 
     public String getSessionId() {
@@ -126,14 +116,6 @@ public class Transaction {
         this.status = status;
     }
 
-    public String getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(String createDate) {
-        this.createDate = createDate;
-    }
-
     public String getApp() {
         return app;
     }
@@ -164,5 +146,21 @@ public class Transaction {
 
     public void setIsActive(String isActive) {
         this.isActive = isActive;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
     }
 }

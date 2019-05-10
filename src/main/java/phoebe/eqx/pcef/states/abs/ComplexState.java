@@ -1,7 +1,8 @@
 package phoebe.eqx.pcef.states.abs;
 
 import ec02.af.utils.AFLog;
-import phoebe.eqx.pcef.enums.EState;
+import phoebe.eqx.pcef.core.exceptions.PCEFException;
+import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 
 import java.lang.reflect.Method;
@@ -38,12 +39,14 @@ public abstract class ComplexState extends State {
 
             try {
                 dispatchToWorkingState(state); //execute state
+            } catch (PCEFException e) {
+
             } catch (Exception e) {
                 appInstance.setFinish(true);
                 stop = true;
             }
             EState workState = getWorkState();
-            continueWork = !this.context.isHasRequest();
+            continueWork = !this.appInstance.isHasRequest();
             if (EState.END.equals(workState)) {
                 if (handler != null) {
                     handler.onEnd();

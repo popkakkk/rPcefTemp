@@ -13,13 +13,13 @@ import ec02.data.interfaces.ESxxData;
 import ec02.data.interfaces.EquinoxPropertiesAF;
 import ec02.data.interfaces.EquinoxRawData;
 import org.apache.commons.lang3.StringUtils;
-import phoebe.eqx.pcef.core.context.InvokeManager;
-import phoebe.eqx.pcef.core.context.PCEFDispatcher;
-import phoebe.eqx.pcef.core.context.RequestContextFactory;
+import phoebe.eqx.pcef.instance.InvokeManager;
 import phoebe.eqx.pcef.core.data.InvokeObject;
 import phoebe.eqx.pcef.enums.EEvent;
 import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.instance.AppInstance;
+import phoebe.eqx.pcef.states.L1.W_USAGE_MONITORING;
+import phoebe.eqx.pcef.states.abs.State;
 import phoebe.eqx.pcef.utils.*;
 
 import java.util.*;
@@ -87,6 +87,22 @@ public class EQX4Wrapper {
         return AFDataFactory.createECDialogue(eqxPropOut);
     }
 
+
+    public static String composeInstance(AppInstance appInstance) {
+        try {
+            /*
+             * * encode logic
+             * */
+            String str = gson.toJson(appInstance);
+            byte[] bytes = str.getBytes();
+            byte[] zipBytes = Zip.compressBytes(bytes);
+            return Base64.getEncoder().encodeToString(zipBytes);
+        } catch (Exception e) {
+            AFLog.e("Compose instance error", e);
+            return "";
+        }
+    }
+
     private static boolean beforeProcess(EquinoxPropertiesAF equinoxPropertiesAF, AbstractAF abstractAF, ArrayList<EquinoxRawData> equinoxRawDatas, AppInstance appInstance) {
         boolean process = true;
         try {
@@ -101,6 +117,7 @@ public class EQX4Wrapper {
                     String cType = rawData.getCType();
                     String method = rawData.getRawDataAttribute("method");
                     String url = rawData.getRawDataAttribute("url");
+                    String invoke = rawData.getInvoke();
 
                     if (name.equalsIgnoreCase("http")
                             && cType.equalsIgnoreCase("text/plain")
@@ -109,7 +126,7 @@ public class EQX4Wrapper {
                         //String cmd = PCEFUtils.getValueFromJson("command", val);
 
                         String val = rawData.getRawDataAttribute("val");
-                        RequestContextFactory.getUsageMonitoring(val, appInstance);
+                        appInstance.create(val, invoke, ERequestType.USAGE_MONITORING);
                     }
                 } else if ("response".equals(type)) {
                     InvokeManager invokeManager = appInstance.getInvokeManager();
@@ -162,14 +179,19 @@ public class EQX4Wrapper {
     private static void doProcess(AbstractAF abstractAF, AppInstance appInstance) {
         try {
             appInstance.setAbstractAF(abstractAF);
-            ERequestType requestType = appInstance.getRequestContext().getRequestType();
+            ERequestType requestType = appInstance.getRequestType();
             AFLog.d("[Request Type]: " + requestType);
+
+            State state = null;
             switch (requestType) {
-                case TEST_CMD:
-//                    PCEFDispatcher.getTest(appInstance);
                 case USAGE_MONITORING:
-                    PCEFDispatcher.dispatchUsageMonitoring(appInstance);
+                    state = new W_USAGE_MONITORING(appInstance);
             }
+            if (state != null) {
+                state.dispatch();
+                appInstance.patchResponse();
+            }
+
         } catch (Exception e) {
             AFLog.e("Do process error", e);
         }
@@ -222,22 +244,7 @@ public class EQX4Wrapper {
         //get Summary Log
         String summaryLog = appInstance.getSummaryLogStr();
 
-        PCEFUtils.writeLog(abstractAF, requestLog, responseLog, summaryLog, appInstance.getRequestContext().getStartTime(), "");
-    }
-
-    public static String composeInstance(AppInstance appInstance) {
-        try {
-            /*
-             * * encode logic
-             * */
-            String str = gson.toJson(appInstance);
-            byte[] bytes = str.getBytes();
-            byte[] zipBytes = Zip.compressBytes(bytes);
-            return Base64.getEncoder().encodeToString(zipBytes);
-        } catch (Exception e) {
-            AFLog.e("Compose instance error", e);
-            return "";
-        }
+        PCEFUtils.writeLog(abstractAF, requestLog, responseLog, summaryLog, appInstance.getStartTime(), "");
     }
 
 

@@ -1,6 +1,6 @@
 package phoebe.eqx.pcef.states.mongodb.abs;
 
-import phoebe.eqx.pcef.enums.EMongoState;
+import phoebe.eqx.pcef.enums.state.EMongoState;
 
 import java.lang.reflect.Method;
 
@@ -8,14 +8,14 @@ import java.lang.reflect.Method;
 public abstract class MongoState {
 
     private EMongoState nextState = EMongoState.BEGIN;
-    private boolean isInterval;
+
 
     public void dispatch() throws Exception {
         boolean continueWork = true;
         while (continueWork) {
             Class clazz = getClass();
             Method method = findMethod(clazz, nextState);
-            method.invoke(this);
+            nextState = (EMongoState) method.invoke(this);
             continueWork = !EMongoState.END.equals(nextState);
         }
     }
@@ -38,9 +38,10 @@ public abstract class MongoState {
     }
 
     public void setNextState(EMongoState nextState) {
-        if (nextState == null) {
+    /*    if (nextState == null) {
             this.nextState = EMongoState.END;
-        }
+        } else {*/
         this.nextState = nextState;
+//        }
     }
 }

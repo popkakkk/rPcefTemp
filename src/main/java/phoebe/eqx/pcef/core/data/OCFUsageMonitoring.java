@@ -1,12 +1,9 @@
-package phoebe.eqx.pcef.message.req;
-
-import phoebe.eqx.pcef.core.data.Resource;
+package phoebe.eqx.pcef.core.data;
 
 import java.util.ArrayList;
 
-public class UsageMonitroingStartRequest {
-
-    private ArrayList<Resource> resources = new ArrayList<Resource>();
+public class OCFUsageMonitoring {
+    private ArrayList<Resource> resources;
     private String command;
     private String sessionId;
     private String tid;
@@ -88,6 +85,4 @@ public class UsageMonitroingStartRequest {
     public void setDevMessage(String devMessage) {
         this.devMessage = devMessage;
     }
-
-
 }

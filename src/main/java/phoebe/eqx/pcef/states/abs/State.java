@@ -1,32 +1,27 @@
 package phoebe.eqx.pcef.states.abs;
 
-import phoebe.eqx.pcef.core.context.RequestContext;
-import phoebe.eqx.pcef.enums.EState;
+import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
-
-import java.lang.reflect.Method;
 
 
 public abstract class State {
     protected AppInstance appInstance;
-    protected RequestContext context;
+
     private Level level;
 
     public State(AppInstance appInstance, Level level) {
         this.appInstance = appInstance;
-        this.context = appInstance.getRequestContext();
         this.level = level;
     }
 
     abstract public void dispatch();
 
 
-
     protected EState getWorkState() {
         EState result = null;
         switch (level) {
             case L1:
-                result = context.getStateL2();
+                result = appInstance.getStateL2();
                 break;
 
         }
@@ -45,10 +40,10 @@ public abstract class State {
         EState result = null;
         switch (level) {
             case L1:
-                result = context.getStateL1();
+                result = appInstance.getStateL1();
                 break;
             case L2:
-                result = context.getStateL2();
+                result = appInstance.getStateL2();
                 break;
 
         }
@@ -67,12 +62,12 @@ public abstract class State {
         }
     }
 
-    public void setStateL1(EState state) {
-        context.setStateL1(state);
+    private void setStateL1(EState state) {
+        appInstance.setStateL1(state);
     }
 
-    public void setStateL2(EState state) {
-        context.setStateL2(state);
+    private void setStateL2(EState state) {
+        appInstance.setStateL2(state);
     }
 
     public AppInstance getAppInstance() {

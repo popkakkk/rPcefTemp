@@ -2,7 +2,7 @@ package phoebe.eqx.pcef.states.abs;
 
 ;
 
-import phoebe.eqx.pcef.enums.EState;
+import phoebe.eqx.pcef.enums.state.EState;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

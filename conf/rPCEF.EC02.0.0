@@ -52,23 +52,31 @@
                 <property name="log4jProperty2" value="propValue" />
             </Custom>
         </AFLOG>
-            <resource-name-test value = "PCEF.ES99.0.0" />
-            <timeout-test value = "4" />
 
-            <!-- Mongodb -->
-            <mongodb-url value = "mongodb://localhost:27017" />
-            <mongodb-database-name value = "mydbtest" />
-            <interval-processing value = "3" />
-            <retry-processing value = "3" />
+        <!-- resource name -->
+        <resource-name-test value = "PCEF.ES99.0.0" />
+        <resource-name-ocf value="PCEF.ES04.OCF"/>
 
+        <!-- timeout -->
+        <timeout-test value = "4" />
+        <timeout-ocf value = "4" />
 
-            <collection-transaction-name value = "Transaction" />
-            <collection-profile-name value = "Profile" />
-            <collection-quota-name value = "Quota" />
-            <collection-lock-process-name value = "LockProcess" />
+        <!-- retry timeout -->
+        <retry-ocf-usage-monitoring-start value="1"/>
 
 
 
+        <!--             MongoDB          -->
+        <mongodb-url value = "mongodb://localhost:27017" />
+        <mongodb-database-name value = "mydbtest" />
 
+        <!-- Interval and retry -->
+        <interval-processing value = "3" />
+        <retry-processing value = "3" />
+
+        <!-- Collection -->
+        <collection-transaction-name value = "Transaction" />
+        <collection-profile-name value = "Profile" />
+        <collection-quota-name value = "Quota" />
     </warm>
 </configuration>

@@ -5,14 +5,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import ec02.af.abstracts.AbstractAF;
 import ec02.af.utils.AFLog;
-import phoebe.eqx.pcef.core.data.InvokeObject;
-import phoebe.eqx.pcef.enums.EState;
 import phoebe.eqx.pcef.enums.config.EConfig;
 import phoebe.eqx.pcef.enums.stats.EStatCmd;
 import phoebe.eqx.pcef.enums.stats.EStatMode;
-import phoebe.eqx.pcef.states.abs.MessageRecieved;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -21,6 +17,8 @@ public class PCEFUtils {
 
     public static final SimpleDateFormat startStopDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     public static final SimpleDateFormat dtLongFormatterMs = new SimpleDateFormat("yyyyMMddHHmmss SSSS", Locale.US);
+
+    public static final SimpleDateFormat transactionDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 
     public static String getWarmConfig(AbstractAF abstractAF, EConfig eConfig) {
         try {
@@ -90,11 +88,10 @@ public class PCEFUtils {
     }
 
 
-    public static void writeMessageFlow(String message, String status, String sessionId) {
-        MessageFlow messageFlow = new MessageFlow(message, status, sessionId);
+    public static void writeMessageFlow(String message, MessageFlow.Status status, String sessionId) {
+        MessageFlow messageFlow = new MessageFlow(message, status.name(), sessionId);
         AFLog.d("[MESSAGE_FLOW] : " + gsonToJson(messageFlow));
     }
-
 
 
 }

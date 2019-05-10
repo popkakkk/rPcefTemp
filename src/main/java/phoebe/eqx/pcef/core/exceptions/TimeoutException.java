@@ -1,6 +1,6 @@
 package phoebe.eqx.pcef.core.exceptions;
 
-public class TimeoutException extends Exception {
+public class TimeoutException extends PCEFException {
 
 
 

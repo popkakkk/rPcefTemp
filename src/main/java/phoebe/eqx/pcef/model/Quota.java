@@ -8,7 +8,7 @@ public class Quota {
     private String userType;
     private String userValue;
     private String mainProcessing;
-    private String appointmentDate;
+    private String expirtDate;
     private String monitoringKey;
     private String counterId;
     private String quota;
@@ -49,12 +49,12 @@ public class Quota {
         this.mainProcessing = mainProcessing;
     }
 
-    public String getAppointmentDate() {
-        return appointmentDate;
+    public String getExpirtDate() {
+        return expirtDate;
     }
 
-    public void setAppointmentDate(String appointmentDate) {
-        this.appointmentDate = appointmentDate;
+    public void setExpirtDate(String expirtDate) {
+        this.expirtDate = expirtDate;
     }
 
     public String getMonitoringKey() {

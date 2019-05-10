@@ -1,4 +1,4 @@
-package phoebe.eqx.pcef.core.context;
+package phoebe.eqx.pcef.instance;
 
 import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
@@ -78,6 +78,8 @@ public class InvokeManager {
         newList.add(invokeObject);
     }
 
+
+
     private int retrieveRetryNumber(Operation operation) {
         try {
             int retryNumber = 1;
@@ -130,11 +132,6 @@ public class InvokeManager {
                     invokeObject.setInvokeId(newInvokeId);
                     rawData.setInvoke(newInvokeId);
                     rawOutList.add(rawData);
-                } else {
-                    /*
-                     * E01 retryTimeout
-                     *
-                     * */
                 }
             }
         } catch (Exception e) {
@@ -146,7 +143,4 @@ public class InvokeManager {
         return list;
     }
 
-    public void setList(List<InvokeObject> list) {
-        this.list = list;
-    }
 }

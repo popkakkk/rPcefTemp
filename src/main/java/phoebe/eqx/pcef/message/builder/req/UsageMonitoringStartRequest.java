@@ -1,8 +1,11 @@
-package phoebe.eqx.pcef.core.data;
+package phoebe.eqx.pcef.message.builder.req;
+
+import phoebe.eqx.pcef.core.data.Resource;
 
 import java.util.ArrayList;
 
-public class MyDB {
+public class UsageMonitoringStartRequest {
+
     private ArrayList<Resource> resources = new ArrayList<Resource>();
     private String command;
     private String sessionId;
@@ -18,9 +21,7 @@ public class MyDB {
         return resources;
     }
 
-    public void setResources(ArrayList<Resource> resources) {
-        this.resources = resources;
-    }
+
 
     public String getCommand() {
         return command;
@@ -84,5 +85,9 @@ public class MyDB {
 
     public void setDevMessage(String devMessage) {
         this.devMessage = devMessage;
+    }
+
+    public void setResources(ArrayList<Resource> resources) {
+        this.resources = resources;
     }
 }

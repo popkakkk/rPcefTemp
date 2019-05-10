@@ -1,6 +1,6 @@
 package phoebe.eqx.pcef.states.mongodb.abs;
 
-import phoebe.eqx.pcef.enums.EMongoState;
+import phoebe.eqx.pcef.enums.state.EMongoState;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

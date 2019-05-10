@@ -2,9 +2,14 @@ package phoebe.eqx.pcef.utils;
 
 public class MessageFlow {
 
-    private String message ;
+    private String message;
     private String status;
     private String session;
+
+
+    public enum Status {
+        Success, Error
+    }
 
 
     public MessageFlow(String message, String status, String session) {

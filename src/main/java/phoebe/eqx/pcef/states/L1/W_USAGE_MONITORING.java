@@ -1,12 +1,15 @@
 package phoebe.eqx.pcef.states.L1;
 
-import com.mongodb.DBCursor;
-import phoebe.eqx.pcef.enums.EState;
+import ec02.af.utils.AFLog;
+import phoebe.eqx.pcef.core.data.Resource;
+import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.services.*;
 import phoebe.eqx.pcef.states.mongodb.W_MONGODB_PROCESS_STATE;
 import phoebe.eqx.pcef.states.abs.ComplexState;
 import phoebe.eqx.pcef.states.abs.MessageRecieved;
+
+import java.util.List;
 
 public class W_USAGE_MONITORING extends ComplexState {
 
@@ -17,44 +20,45 @@ public class W_USAGE_MONITORING extends ComplexState {
 
     @MessageRecieved(messageType = EState.BEGIN)
     public void begin() throws Exception {
-        SACFService sacfService = new SACFService(appInstance);
-        sacfService.readRequest();
+        UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
+        usageMonitoringService.readUsageMonitoringRequest();
 
-        SDFService sdfService = new SDFService(appInstance);
-        sdfService.buildGetResourceId();
+        GetResourceIdService getResourceIdService = new GetResourceIdService(appInstance);
+        getResourceIdService.buildGetResourceId();
         setWorkState(EState.W_GET_RESOURCE_ID);
     }
 
     @MessageRecieved(messageType = EState.W_GET_RESOURCE_ID)
     public void wGetResourceId() throws Exception {
-        SDFService sdfService = new SDFService(appInstance);
-        sdfService.readGetResourceId();
+        GetResourceIdService getResourceIdService = new GetResourceIdService(appInstance);
+        String resourceId = getResourceIdService.readGetResourceId();
 
         MongoDBService mongoDBService = null;
         EState nextState = null;
         try {
             mongoDBService = new MongoDBService(appInstance);
-            mongoDBService.insertTransaction();
+            mongoDBService.insertTransaction(resourceId);
 
+            //Application Logic wait mongodb process
             W_MONGODB_PROCESS_STATE mongodbProcessState = new W_MONGODB_PROCESS_STATE(mongoDBService);
             mongodbProcessState.dispatch();
 
-            nextState = mongodbProcessState.getPcefNextState();
+            nextState = mongodbProcessState.getUsageMonitoringState();
             if (EState.END.equals(nextState)) {
-                SACFService sacfService = new SACFService(appInstance);
+                UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
                 if (mongodbProcessState.isResponseSuccess()) {
-                    sacfService.buildResponseSACFSuccess();
+                    usageMonitoringService.buildResponseUsageMonitoringSuccess();
                 } else {
-                    sacfService.buildResponseSACFFail();
+                    usageMonitoringService.buildResponseUsageMonitoringFail();
                 }
             } else {
-                UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
+                OCFUsageMonitoringService OCFUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
                 if (EState.W_USAGE_MONITORING_START.equals(nextState)) {
-
-                    DBCursor transactionCursor = mongoDBService.findTransactionForFirstUsage();
-                    usageMonitoringService.buildUsageMonitoringStart();
+                    AFLog.d("State is Usage Monitoring First Usage");
+                    List<Resource> resourceList = mongoDBService.findTransactionWaitingOfProfile();
+                    OCFUsageMonitoringService.buildUsageMonitoringStart(resourceList);
                 } else if (EState.W_USAGE_MONITORING_UPDATE.equals(nextState)) {
-                    usageMonitoringService.buildUsageMonitoringUpdate();
+                    OCFUsageMonitoringService.buildUsageMonitoringUpdate();
                 }
             }
         } catch (Exception e) {
@@ -75,23 +79,44 @@ public class W_USAGE_MONITORING extends ComplexState {
 
     @MessageRecieved(messageType = EState.W_USAGE_MONITORING_START)
     public void wUsageMonitoringStart() throws Exception {
-        UsageMonitoringService usageMonitoringStartService = new UsageMonitoringService(appInstance);
-        usageMonitoringStartService.readUsageMonitoringStart();
+        OCFUsageMonitoringService umStartService = new OCFUsageMonitoringService(appInstance);
+        umStartService.readUsageMonitoringStart();
 
-        //Receive Quota and Policy
-        MongoDBService mongoDBService = new MongoDBService(appInstance);
-        mongoDBService.insertQuota();
+        MongoDBService mongoDBService = null;
+        try {
+            mongoDBService = new MongoDBService(appInstance);
+            UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
 
-        //update col transaction
-        mongoDBService.updateMonitoringKeyTransaction();
+            if (umStartService.receiveQuotaAndPolicy()) {
+                mongoDBService.insertQuota();
 
-        //update col lockprocess
-        mongoDBService.updateProcessingLockProcess();
+                //update col transaction
+                mongoDBService.updateMonitoringKeyTransaction();
 
-        SACFService sacfService = new SACFService(appInstance);
-        sacfService.buildResponseSACFSuccess();
+                //update col lockprocess
+                mongoDBService.updateProcessingLockProcess();
+
+
+                usageMonitoringService.buildResponseUsageMonitoringSuccess();
+            } else {
+
+                // update col transaction
+
+                usageMonitoringService.buildResponseUsageMonitoringFail();
+            }
+
+        } catch (Exception e) {
+
+
+        } finally {
+            if (mongoDBService != null) {
+                mongoDBService.closeConnection();
+            }
+
+        }
+
+
         setWorkState(EState.END);
-
     }
 
 

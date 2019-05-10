@@ -1,4 +1,4 @@
-package phoebe.eqx.pcef.enums;
+package phoebe.eqx.pcef.enums.state;
 
 public enum EState {
     BEGIN,

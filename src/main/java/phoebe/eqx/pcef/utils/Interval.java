@@ -36,5 +36,9 @@ public class Interval {
         }
     }
 
+    public void reset() {
+        retry = 0;
+    }
+
 
 }

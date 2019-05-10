@@ -3,18 +3,19 @@ package phoebe.eqx.pcef.services;
 import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.core.exceptions.ResponseErrorException;
 import phoebe.eqx.pcef.core.exceptions.TimeoutException;
-import phoebe.eqx.pcef.core.logs.summary.SummaryLog;
 import phoebe.eqx.pcef.enums.Operation;
 import phoebe.eqx.pcef.enums.stats.EStatCmd;
 import phoebe.eqx.pcef.enums.stats.EStatMode;
 import phoebe.eqx.pcef.instance.AppInstance;
-import phoebe.eqx.pcef.instance.TestResponseData;
+import phoebe.eqx.pcef.message.builder.MessagePool;
+import phoebe.eqx.pcef.message.builder.req.GetResourceIdRequest;
+import phoebe.eqx.pcef.utils.MessageFlow;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 import phoebe.eqx.pcef.utils.ValidateMessage;
 
-public class SDFService extends PCEFService {
+public class GetResourceIdService extends PCEFService {
 
-    public SDFService(AppInstance appInstance) {
+    public GetResourceIdService(AppInstance appInstance) {
         super(appInstance);
     }
 
@@ -26,23 +27,27 @@ public class SDFService extends PCEFService {
             // logic build
             String data = "test data";
 
+            GetResourceIdRequest getResourceIdRequest = new GetResourceIdRequest();
+
             //build message
-            EquinoxRawData equinoxRawData = msgPool.getHTTPTest(data, invokeId);
+            MessagePool messagePool = new MessagePool(abstractAF);
+            EquinoxRawData equinoxRawData = messagePool.getResourceIdRequest(getResourceIdRequest, invokeId);
 
             //add raw data to list
-            invokeExternal(equinoxRawData, Operation.GetResourceId, msgPool.getRequestObj());
+            invokeExternal(equinoxRawData, Operation.GetResourceId, messagePool.getRequestObj());
 
             //increase stat
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.PCEF_RECEIVE_TEST_DATA);
 
-
+            PCEFUtils.writeMessageFlow("Build Get Resource ID Request", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
         } catch (Exception e) {
-
+            PCEFUtils.writeMessageFlow("Build Get Resource ID Request", MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
         }
     }
 
 
-    public void readGetResourceId() {
+    public String readGetResourceId() {
+        String resourceId = null;
         try {
             //extract
             Operation operation = Operation.GetResourceId;
@@ -59,6 +64,9 @@ public class SDFService extends PCEFService {
             //summarylog res
 //            appInstance.setSummaryLogExternalResponse(operation, SummaryLog.getSummaryLogResponse(operation, testResponseData));
 
+            resourceId = "resourceId1234";
+
+            PCEFUtils.writeMessageFlow("Build Get Resource ID Request", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
         } catch (TimeoutException e) {
             // handle time out
         } catch (ResponseErrorException e) {
@@ -67,9 +75,11 @@ public class SDFService extends PCEFService {
             //increase stat fail
             //summarylog fail
             // read fail
+            PCEFUtils.writeMessageFlow("Build Get Resource ID Request", MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
 
         }
 
+        return resourceId;
     }
 
 

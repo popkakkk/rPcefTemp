@@ -1,4 +1,4 @@
-package phoebe.eqx.pcef.message.testmsg;
+package phoebe.eqx.pcef.message.builder.req;
 
 public class TestRequest {
 

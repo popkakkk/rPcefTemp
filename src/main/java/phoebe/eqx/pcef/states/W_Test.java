@@ -1,6 +1,6 @@
 package phoebe.eqx.pcef.states;
 
-import phoebe.eqx.pcef.enums.EState;
+import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.services.MyService;
 import phoebe.eqx.pcef.states.abs.ComplexState;

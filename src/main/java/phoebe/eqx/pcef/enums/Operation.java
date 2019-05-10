@@ -13,5 +13,8 @@ public enum Operation {
 
     //update
     UpdateCorrection,
-    UsageMonitoringUpdate
+    UsageMonitoringUpdate,
+
+    //response
+    Response
 }

@@ -16,9 +16,9 @@ public enum EConfig {
 
     //Collection name
     COLLECTION_TRANSACTION_NAME("collection-transaction-name", EConfigType.MANDATORY, null),
-    COLLECTION_PROFILE_NAME("collection-transaction-name", EConfigType.MANDATORY, null),
-    COLLECTION_QUOTA_NAME("collection-transaction-name", EConfigType.MANDATORY, null),
-    COLLECTION_LOCK_PROCESS_NAME("collection-lock-process-name", EConfigType.MANDATORY, null),
+    COLLECTION_PROFILE_NAME("collection-profile-name", EConfigType.MANDATORY, null),
+    COLLECTION_QUOTA_NAME("collection-quota-name", EConfigType.MANDATORY, null),
+
 
 
     /* Part 2 : Optional  */

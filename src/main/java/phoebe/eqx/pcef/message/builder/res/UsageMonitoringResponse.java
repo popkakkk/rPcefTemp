@@ -1,6 +1,6 @@
-package phoebe.eqx.pcef.message.res;
+package phoebe.eqx.pcef.message.builder.res;
 
-public class MeteringResponse {
+public class UsageMonitoringResponse {
     private String sessionId;
     private String rtid;
     private String tid;

@@ -34,4 +34,52 @@ public class Resource {
     public void setResourceName(String resourceName) {
         this.resourceName = resourceName;
     }
+
+    public String getResultCode() {
+        return resultCode;
+    }
+
+    public void setResultCode(String resultCode) {
+        this.resultCode = resultCode;
+    }
+
+    public String getResultDesc() {
+        return resultDesc;
+    }
+
+    public void setResultDesc(String resultDesc) {
+        this.resultDesc = resultDesc;
+    }
+
+    public String getMonitoringKey() {
+        return monitoringKey;
+    }
+
+    public void setMonitoringKey(String monitoringKey) {
+        this.monitoringKey = monitoringKey;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public QuotaByKey getQuotaByKey() {
+        return quotaByKey;
+    }
+
+    public void setQuotaByKey(QuotaByKey quotaByKey) {
+        this.quotaByKey = quotaByKey;
+    }
+
+    public RateLimitByKey getRateLimitByKey() {
+        return rateLimitByKey;
+    }
+
+    public void setRateLimitByKey(RateLimitByKey rateLimitByKey) {
+        this.rateLimitByKey = rateLimitByKey;
+    }
 }

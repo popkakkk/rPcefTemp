@@ -33,7 +33,6 @@
             <groupId>libs.mong-java</groupId>
             <artifactId>mongodb</artifactId>
             <version>3.8.2</version>
-
         </dependency>
         <dependency>
             <groupId>libs.ec-dev</groupId>
