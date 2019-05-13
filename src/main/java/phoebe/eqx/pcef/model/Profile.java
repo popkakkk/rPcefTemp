@@ -6,10 +6,11 @@ public class Profile {
     private String _id;
     private String userType;
     private String userValue;
-    private int isProcessing;
-    private int sequenceNumber;
+    private Integer isProcessing;
+    private Integer sequenceNumber; //$inc
     private String sessionId;
-    private Date appointmentData;
+
+    private Date appointmentDate;
 
 
     public String get_id() {
@@ -60,11 +61,19 @@ public class Profile {
         this.sessionId = sessionId;
     }
 
-    public Date getAppointmentData() {
-        return appointmentData;
+    public void setIsProcessing(Integer isProcessing) {
+        this.isProcessing = isProcessing;
     }
 
-    public void setAppointmentData(Date appointmentData) {
-        this.appointmentData = appointmentData;
+    public void setSequenceNumber(Integer sequenceNumber) {
+        this.sequenceNumber = sequenceNumber;
+    }
+
+    public Date getAppointmentDate() {
+        return appointmentDate;
+    }
+
+    public void setAppointmentDate(Date appointmentDate) {
+        this.appointmentDate = appointmentDate;
     }
 }

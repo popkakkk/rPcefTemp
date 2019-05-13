@@ -6,21 +6,21 @@ import java.util.ArrayList;
 
 public class UsageMonitoringStartRequest {
 
-    private ArrayList<Resource> resources = new ArrayList<Resource>();
     private String command;
     private String sessionId;
     private String tid;
     private String requestNumber;
+    private String actualTime;
     private String userType;
     private String userValue;
     private String status;
     private String devMessage;
+    private ArrayList<Resource> resources = new ArrayList<Resource>();
 
 
     public ArrayList<Resource> getResources() {
         return resources;
     }
-
 
 
     public String getCommand() {
@@ -53,6 +53,14 @@ public class UsageMonitoringStartRequest {
 
     public void setRequestNumber(String requestNumber) {
         this.requestNumber = requestNumber;
+    }
+
+    public String getActualTime() {
+        return actualTime;
+    }
+
+    public void setActualTime(String actualTime) {
+        this.actualTime = actualTime;
     }
 
     public String getUserType() {

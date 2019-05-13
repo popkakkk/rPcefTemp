@@ -3,7 +3,6 @@ package phoebe.eqx.pcef.core.data;
 import java.util.ArrayList;
 
 public class OCFUsageMonitoring {
-    private ArrayList<Resource> resources;
     private String command;
     private String sessionId;
     private String tid;
@@ -12,15 +11,8 @@ public class OCFUsageMonitoring {
     private String userValue;
     private String status;
     private String devMessage;
+    private ArrayList<Resource> resources;
 
-
-    public ArrayList<Resource> getResources() {
-        return resources;
-    }
-
-    public void setResources(ArrayList<Resource> resources) {
-        this.resources = resources;
-    }
 
     public String getCommand() {
         return command;
@@ -84,5 +76,13 @@ public class OCFUsageMonitoring {
 
     public void setDevMessage(String devMessage) {
         this.devMessage = devMessage;
+    }
+
+    public ArrayList<Resource> getResources() {
+        return resources;
+    }
+
+    public void setResources(ArrayList<Resource> resources) {
+        this.resources = resources;
     }
 }

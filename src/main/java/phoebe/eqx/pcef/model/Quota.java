@@ -1,5 +1,10 @@
 package phoebe.eqx.pcef.model;
 
+
+import phoebe.eqx.pcef.core.data.QuotaByKey;
+import phoebe.eqx.pcef.core.data.RateLimitByKey;
+import phoebe.eqx.pcef.core.data.ResourceQuota;
+
 import java.util.ArrayList;
 
 public class Quota {
@@ -8,13 +13,12 @@ public class Quota {
     private String userType;
     private String userValue;
     private String mainProcessing;
-    private String expirtDate;
+    private String expireDate;
     private String monitoringKey;
     private String counterId;
-    private String quota;
-    private String vt;
-    private String transactionPerTime;
-    private ArrayList<String> resource = new ArrayList<>();
+    private QuotaByKey quotaByKey;
+    private RateLimitByKey rateLimitByKey;
+    private ArrayList<ResourceQuota> resources = new ArrayList<>();
 
 
     public String get_id() {
@@ -49,12 +53,12 @@ public class Quota {
         this.mainProcessing = mainProcessing;
     }
 
-    public String getExpirtDate() {
-        return expirtDate;
+    public String getExpireDate() {
+        return expireDate;
     }
 
-    public void setExpirtDate(String expirtDate) {
-        this.expirtDate = expirtDate;
+    public void setExpireDate(String expireDate) {
+        this.expireDate = expireDate;
     }
 
     public String getMonitoringKey() {
@@ -73,35 +77,27 @@ public class Quota {
         this.counterId = counterId;
     }
 
-    public String getQuota() {
-        return quota;
+    public QuotaByKey getQuotaByKey() {
+        return quotaByKey;
     }
 
-    public void setQuota(String quota) {
-        this.quota = quota;
+    public void setQuotaByKey(QuotaByKey quotaByKey) {
+        this.quotaByKey = quotaByKey;
     }
 
-    public String getVt() {
-        return vt;
+    public RateLimitByKey getRateLimitByKey() {
+        return rateLimitByKey;
     }
 
-    public void setVt(String vt) {
-        this.vt = vt;
+    public void setRateLimitByKey(RateLimitByKey rateLimitByKey) {
+        this.rateLimitByKey = rateLimitByKey;
     }
 
-    public String getTransactionPerTime() {
-        return transactionPerTime;
+    public ArrayList<ResourceQuota> getResources() {
+        return resources;
     }
 
-    public void setTransactionPerTime(String transactionPerTime) {
-        this.transactionPerTime = transactionPerTime;
-    }
-
-    public ArrayList<String> getResource() {
-        return resource;
-    }
-
-    public void setResource(ArrayList<String> resource) {
-        this.resource = resource;
+    public void setResources(ArrayList<ResourceQuota> resources) {
+        this.resources = resources;
     }
 }

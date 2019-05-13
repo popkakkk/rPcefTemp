@@ -1,15 +1,19 @@
 package phoebe.eqx.pcef.states.L1;
 
 import ec02.af.utils.AFLog;
-import phoebe.eqx.pcef.core.data.Resource;
+import phoebe.eqx.pcef.core.data.OCFUsageMonitoring;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
+import phoebe.eqx.pcef.model.Quota;
+import phoebe.eqx.pcef.model.Transaction;
 import phoebe.eqx.pcef.services.*;
 import phoebe.eqx.pcef.states.mongodb.W_MONGODB_PROCESS_STATE;
 import phoebe.eqx.pcef.states.abs.ComplexState;
 import phoebe.eqx.pcef.states.abs.MessageRecieved;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class W_USAGE_MONITORING extends ComplexState {
 
@@ -55,8 +59,8 @@ public class W_USAGE_MONITORING extends ComplexState {
                 OCFUsageMonitoringService OCFUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
                 if (EState.W_USAGE_MONITORING_START.equals(nextState)) {
                     AFLog.d("State is Usage Monitoring First Usage");
-                    List<Resource> resourceList = mongoDBService.findTransactionWaitingOfProfile();
-                    OCFUsageMonitoringService.buildUsageMonitoringStart(resourceList);
+                    mongoDBService.findOtherStartTransaction();
+                    OCFUsageMonitoringService.buildUsageMonitoringStart();
                 } else if (EState.W_USAGE_MONITORING_UPDATE.equals(nextState)) {
                     OCFUsageMonitoringService.buildUsageMonitoringUpdate();
                 }
@@ -80,7 +84,7 @@ public class W_USAGE_MONITORING extends ComplexState {
     @MessageRecieved(messageType = EState.W_USAGE_MONITORING_START)
     public void wUsageMonitoringStart() throws Exception {
         OCFUsageMonitoringService umStartService = new OCFUsageMonitoringService(appInstance);
-        umStartService.readUsageMonitoringStart();
+        OCFUsageMonitoring usageMonitoringResponse = umStartService.readUsageMonitoringStart();
 
         MongoDBService mongoDBService = null;
         try {
@@ -88,26 +92,19 @@ public class W_USAGE_MONITORING extends ComplexState {
             UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
 
             if (umStartService.receiveQuotaAndPolicy()) {
-                mongoDBService.insertQuota();
-
-                //update col transaction
-                mongoDBService.updateMonitoringKeyTransaction();
-
-                //update col lockprocess
-                mongoDBService.updateProcessingLockProcess();
-
+                ArrayList<Quota> quotaMap = mongoDBService.insertQuotaStartFirstUsage(usageMonitoringResponse);
+                mongoDBService.updateTransaction(quotaMap);
+                mongoDBService.updateProfileUnLock();
 
                 usageMonitoringService.buildResponseUsageMonitoringSuccess();
             } else {
 
                 // update col transaction
-
                 usageMonitoringService.buildResponseUsageMonitoringFail();
             }
 
         } catch (Exception e) {
-
-
+            AFLog.d("wUsageMonitoringStart error:" + e.toString());
         } finally {
             if (mongoDBService != null) {
                 mongoDBService.closeConnection();

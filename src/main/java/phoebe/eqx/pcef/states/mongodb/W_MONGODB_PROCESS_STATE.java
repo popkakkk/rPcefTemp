@@ -36,7 +36,7 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
             if (!profileCursor.hasNext()) {
                 nextState = EMongoState.INSERT_PROFILE;
             } else {
-                if (mongoDBService.checkProfileIsProcessing(profileCursor)) {
+                if (mongoDBService.checkCanProcessProfile(profileCursor)) {
                     if (mongoDBService.firstTimeAndWaitProcessing()) {
                         // find Monitoring key
 //                            findMonitoringKeyState();

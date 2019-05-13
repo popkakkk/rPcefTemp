@@ -24,8 +24,8 @@ public class Transaction {
     private String app;
     private String clientId;
 
-    private String firstTime;
-    private String isActive;
+    private Integer firstTime;
+    private Integer isActive;
 
 
     public String getSessionId() {
@@ -132,19 +132,19 @@ public class Transaction {
         this.clientId = clientId;
     }
 
-    public String getFirstTime() {
+    public Integer getFirstTime() {
         return firstTime;
     }
 
-    public void setFirstTime(String firstTime) {
+    public void setFirstTime(Integer firstTime) {
         this.firstTime = firstTime;
     }
 
-    public String getIsActive() {
+    public Integer getIsActive() {
         return isActive;
     }
 
-    public void setIsActive(String isActive) {
+    public void setIsActive(Integer isActive) {
         this.isActive = isActive;
     }
 

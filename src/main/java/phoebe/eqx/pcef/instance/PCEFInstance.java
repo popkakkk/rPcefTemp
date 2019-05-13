@@ -4,11 +4,14 @@ import phoebe.eqx.pcef.core.data.OCFUsageMonitoring;
 import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
 import phoebe.eqx.pcef.model.Transaction;
 
+import java.util.List;
+
 public class PCEFInstance {
 
     private String sessionId; // from SACF
+    private String tid;// transaction id of instance
     private TestResponseData testResponseData;
-    private Transaction transaction;
+    private List<Transaction> transactions; //get[0] is transaction of instance
 
     private UsageMonitoringRequest usageMonitoringRequest;
     private OCFUsageMonitoring ocfUsageMonitoring;
@@ -49,11 +52,19 @@ public class PCEFInstance {
     }
 
 
-    public Transaction getTransaction() {
-        return transaction;
+    public String getTid() {
+        return tid;
     }
 
-    public void setTransaction(Transaction transaction) {
-        this.transaction = transaction;
+    public void setTid(String tid) {
+        this.tid = tid;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
     }
 }

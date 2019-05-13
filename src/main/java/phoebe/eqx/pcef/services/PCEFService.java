@@ -40,13 +40,15 @@ abstract public class PCEFService {
 
         EquinoxRawData equinoxRawData = invokeObject.getOperationRaw();
         Object result = null;
-        PCEFParser parser = new PCEFParser(equinoxRawData.getRawDataMessage());
+        PCEFParser parser = null;
         if (Operation.TestOperation.equals(operation)) {
             // parser class
             result = parser.translateTestResponseData();
         } else if (Operation.QueryDBPrivateID.equals(operation)) {
+            parser = new PCEFParser(equinoxRawData.getRawDataMessage());
             result = parser.translateUsageMonitoringResponse();
         } else if (Operation.UsageMonitoringStart.equals(operation)) {
+            parser = new PCEFParser(equinoxRawData.getRawDataAttribute("val"));
             result = parser.translateUsageMonitoringResponse();
         }
 
