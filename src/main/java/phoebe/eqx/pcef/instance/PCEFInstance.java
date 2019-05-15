@@ -4,6 +4,7 @@ import phoebe.eqx.pcef.core.data.OCFUsageMonitoring;
 import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
 import phoebe.eqx.pcef.model.Transaction;
 
+import java.util.Date;
 import java.util.List;
 
 public class PCEFInstance {
@@ -11,6 +12,7 @@ public class PCEFInstance {
     private String sessionId; // from SACF
     private String tid;// transaction id of instance
     private TestResponseData testResponseData;
+    private Date appointmentDate;
     private List<Transaction> transactions; //get[0] is transaction of instance
 
     private UsageMonitoringRequest usageMonitoringRequest;
@@ -66,5 +68,13 @@ public class PCEFInstance {
 
     public void setTransactions(List<Transaction> transactions) {
         this.transactions = transactions;
+    }
+
+    public Date getAppointmentDate() {
+        return appointmentDate;
+    }
+
+    public void setAppointmentDate(Date appointmentDate) {
+        this.appointmentDate = appointmentDate;
     }
 }

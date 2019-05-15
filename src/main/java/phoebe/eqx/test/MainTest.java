@@ -11,7 +11,8 @@ import java.io.PrintWriter;
 public class MainTest {
     public static void main(String[] args) {
         clearTheFile();
-        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/scene_test.xml", "", "");
+        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/scene_test_update.xml", "", "");
+//        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/scene_test.xml", "", "");
     }
 
     public static void clearTheFile() {

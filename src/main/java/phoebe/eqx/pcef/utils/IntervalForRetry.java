@@ -1,6 +1,6 @@
 package phoebe.eqx.pcef.utils;
 
-import phoebe.eqx.pcef.services.MongoDBService;
+import phoebe.eqx.pcef.services.mogodb.MongoDBService;
 
 public class IntervalForRetry {
 

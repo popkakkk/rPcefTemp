@@ -1,17 +1,25 @@
 package phoebe.eqx.pcef.states.mongodb;
 
 
+import com.google.gson.Gson;
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import com.mongodb.DuplicateKeyException;
 import phoebe.eqx.pcef.core.exceptions.TimeoutIntervalException;
 import phoebe.eqx.pcef.enums.EStatusLifeCycle;
 import phoebe.eqx.pcef.enums.state.EMongoState;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.Config;
-import phoebe.eqx.pcef.services.MongoDBService;
+import phoebe.eqx.pcef.model.Quota;
+import phoebe.eqx.pcef.services.mogodb.MongoDBService;
 import phoebe.eqx.pcef.states.mongodb.abs.MessageMongoRecieved;
 import phoebe.eqx.pcef.states.mongodb.abs.MongoState;
 import phoebe.eqx.pcef.utils.Interval;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class W_MONGODB_PROCESS_STATE extends MongoState {
 
@@ -38,8 +46,7 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
             } else {
                 if (mongoDBService.checkCanProcessProfile(profileCursor)) {
                     if (mongoDBService.firstTimeAndWaitProcessing()) {
-                        // find Monitoring key
-//                            findMonitoringKeyState();
+                        nextState = EMongoState.FIND_QUOTA_START_BY_RESOURCE;
                     } else {
                         DBCursor transactionCursor = mongoDBService.findTransactionByStatus(EStatusLifeCycle.Done.getName());
                         if (transactionCursor.hasNext()) {
@@ -57,6 +64,9 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
         } catch (TimeoutIntervalException e) {
             setResponseFail();
             nextState = EMongoState.END;
+        } catch (ParseException e) {
+
+
         }
 
         return nextState;
@@ -87,24 +97,59 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
     }
 
 
-    @MessageMongoRecieved(messageType = EMongoState.PROCESS_RESOURCE)
-    private void processResource() {
+    @MessageMongoRecieved(messageType = EMongoState.FIND_QUOTA_START_BY_RESOURCE)
+    public EMongoState findQuotaStartByResource() {
+        EMongoState nextState = null;
         try {
-            DBCursor monitoringKeyCursor = mongoDBService.findMonitoringKey();
-            if (!monitoringKeyCursor.hasNext()) {
-
+            DBCursor QuotaCursor = mongoDBService.findQuotaByResource();
+            if (!QuotaCursor.hasNext()) {
+                nextState = EMongoState.FIND_PROFILE_FOR_START_RESOURCE;
             } else {
-                if (!mongoDBService.checkMkIsProcessing(monitoringKeyCursor)) {
-                    intervalMkIsProcessing.waitInterval();
+                if (mongoDBService.checkMkCanProcess(QuotaCursor)) {
+                    Quota quota = new Gson().fromJson(new Gson().toJson(QuotaCursor.iterator().next()), Quota.class);
+
+                    boolean checkQuotaAvailable = mongoDBService.checkQuotaAvailable(quota);
+                    if (checkQuotaAvailable) {
+                        ArrayList<Quota> quotaList = new ArrayList<>();
+                        quotaList.add(quota);
+                        mongoDBService.updateTransactionSetQuota(quotaList);
+
+                        //response success
+                        setResponseSuccess();
+                    } else {
+                        //reserve
+
+                    }
+
 
                 } else {
-
-
+                    intervalMkIsProcessing.waitInterval();
+                    nextState = EMongoState.FIND_QUOTA_START_BY_RESOURCE;
                 }
             }
         } catch (Exception e) {
 
         }
+        return nextState;
+    }
+
+    @MessageMongoRecieved(messageType = EMongoState.FIND_PROFILE_FOR_START_RESOURCE)
+    public EMongoState findProfileForStartResource() {
+        EMongoState nextState = null;
+        try {
+            DBObject dbObject = mongoDBService.findAndModifyProfile();
+            if (dbObject != null) {
+                setUsageMonitoringState(EState.W_USAGE_MONITORING_UPDATE);
+                nextState = EMongoState.END;
+            } else {
+                //interval
+                nextState = EMongoState.FIND_PROFILE_FOR_START_RESOURCE;
+            }
+
+        } catch (Exception e) {
+
+        }
+        return nextState;
     }
 
 

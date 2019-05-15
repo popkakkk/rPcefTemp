@@ -47,7 +47,7 @@ abstract public class PCEFService {
         } else if (Operation.QueryDBPrivateID.equals(operation)) {
             parser = new PCEFParser(equinoxRawData.getRawDataMessage());
             result = parser.translateUsageMonitoringResponse();
-        } else if (Operation.UsageMonitoringStart.equals(operation)) {
+        } else if (Operation.UsageMonitoringStart.equals(operation)||Operation.UsageMonitoringUpdate.equals(operation)) {
             parser = new PCEFParser(equinoxRawData.getRawDataAttribute("val"));
             result = parser.translateUsageMonitoringResponse();
         }

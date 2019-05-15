@@ -5,15 +5,14 @@ import phoebe.eqx.pcef.core.data.OCFUsageMonitoring;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.model.Quota;
-import phoebe.eqx.pcef.model.Transaction;
-import phoebe.eqx.pcef.services.*;
+import phoebe.eqx.pcef.services.mogodb.MongoDBService;
+import phoebe.eqx.pcef.services.ocf.UsageMonitoringService;
+import phoebe.eqx.pcef.services.product.GetResourceIdService;
 import phoebe.eqx.pcef.states.mongodb.W_MONGODB_PROCESS_STATE;
 import phoebe.eqx.pcef.states.abs.ComplexState;
 import phoebe.eqx.pcef.states.abs.MessageRecieved;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class W_USAGE_MONITORING extends ComplexState {
 
@@ -24,7 +23,7 @@ public class W_USAGE_MONITORING extends ComplexState {
 
     @MessageRecieved(messageType = EState.BEGIN)
     public void begin() throws Exception {
-        UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
+        phoebe.eqx.pcef.services.sacf.UsageMonitoringService usageMonitoringService = new phoebe.eqx.pcef.services.sacf.UsageMonitoringService(appInstance);
         usageMonitoringService.readUsageMonitoringRequest();
 
         GetResourceIdService getResourceIdService = new GetResourceIdService(appInstance);
@@ -49,20 +48,21 @@ public class W_USAGE_MONITORING extends ComplexState {
 
             nextState = mongodbProcessState.getUsageMonitoringState();
             if (EState.END.equals(nextState)) {
-                UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
+                phoebe.eqx.pcef.services.sacf.UsageMonitoringService usageMonitoringService = new phoebe.eqx.pcef.services.sacf.UsageMonitoringService(appInstance);
                 if (mongodbProcessState.isResponseSuccess()) {
                     usageMonitoringService.buildResponseUsageMonitoringSuccess();
                 } else {
                     usageMonitoringService.buildResponseUsageMonitoringFail();
                 }
             } else {
-                OCFUsageMonitoringService OCFUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
+                UsageMonitoringService UsageMonitoringService = new UsageMonitoringService(appInstance);
                 if (EState.W_USAGE_MONITORING_START.equals(nextState)) {
                     AFLog.d("State is Usage Monitoring First Usage");
                     mongoDBService.findOtherStartTransaction();
-                    OCFUsageMonitoringService.buildUsageMonitoringStart();
+                    UsageMonitoringService.buildUsageMonitoringStart();
                 } else if (EState.W_USAGE_MONITORING_UPDATE.equals(nextState)) {
-                    OCFUsageMonitoringService.buildUsageMonitoringUpdate();
+                    mongoDBService.findOtherStartTransaction();
+                    UsageMonitoringService.buildUsageMonitoringUpdate();
                 }
             }
         } catch (Exception e) {
@@ -83,17 +83,53 @@ public class W_USAGE_MONITORING extends ComplexState {
 
     @MessageRecieved(messageType = EState.W_USAGE_MONITORING_START)
     public void wUsageMonitoringStart() throws Exception {
-        OCFUsageMonitoringService umStartService = new OCFUsageMonitoringService(appInstance);
+        UsageMonitoringService umStartService = new UsageMonitoringService(appInstance);
         OCFUsageMonitoring usageMonitoringResponse = umStartService.readUsageMonitoringStart();
 
         MongoDBService mongoDBService = null;
         try {
             mongoDBService = new MongoDBService(appInstance);
-            UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
+            phoebe.eqx.pcef.services.sacf.UsageMonitoringService usageMonitoringService = new phoebe.eqx.pcef.services.sacf.UsageMonitoringService(appInstance);
+            ArrayList<Quota> quotaResponseList = mongoDBService.getQuotaFromUsageMonitoringResponse(usageMonitoringResponse);
 
             if (umStartService.receiveQuotaAndPolicy()) {
-                ArrayList<Quota> quotaMap = mongoDBService.insertQuotaStartFirstUsage(usageMonitoringResponse);
-                mongoDBService.updateTransaction(quotaMap);
+                mongoDBService.insertQuotaStartFirstUsage(quotaResponseList);
+                mongoDBService.updateTransactionSetQuota(quotaResponseList);
+                mongoDBService.updateProfileUnLockInitial();
+
+                usageMonitoringService.buildResponseUsageMonitoringSuccess();
+            } else {
+
+                // update col transaction
+                usageMonitoringService.buildResponseUsageMonitoringFail();
+            }
+
+        } catch (Exception e) {
+            AFLog.d("wUsageMonitoringStart error:" + e.toString());
+        } finally {
+            if (mongoDBService != null) {
+                mongoDBService.closeConnection();
+            }
+
+        }
+        setWorkState(EState.END);
+    }
+
+
+    @MessageRecieved(messageType = EState.W_USAGE_MONITORING_UPDATE)
+    public void wUsageMonitoringUpdate() throws Exception {
+        UsageMonitoringService umStartService = new UsageMonitoringService(appInstance);
+        OCFUsageMonitoring usageMonitoringResponse = umStartService.readUsageMonitoringUpdate();
+
+        MongoDBService mongoDBService = null;
+        try {
+            mongoDBService = new MongoDBService(appInstance);
+            phoebe.eqx.pcef.services.sacf.UsageMonitoringService usageMonitoringService = new phoebe.eqx.pcef.services.sacf.UsageMonitoringService(appInstance);
+            ArrayList<Quota> quotaResponseList = mongoDBService.getQuotaFromUsageMonitoringResponse(usageMonitoringResponse);
+
+            if (umStartService.receiveQuotaAndPolicy()) {
+                mongoDBService.updateQuota(quotaResponseList);
+                mongoDBService.updateTransactionSetQuota(quotaResponseList);
                 mongoDBService.updateProfileUnLock();
 
                 usageMonitoringService.buildResponseUsageMonitoringSuccess();
@@ -111,10 +147,7 @@ public class W_USAGE_MONITORING extends ComplexState {
             }
 
         }
-
-
         setWorkState(EState.END);
+
     }
-
-
 }

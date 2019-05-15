@@ -1,4 +1,4 @@
-package phoebe.eqx.pcef.services;
+package phoebe.eqx.pcef.services.product;
 
 import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.core.exceptions.ResponseErrorException;
@@ -9,6 +9,7 @@ import phoebe.eqx.pcef.enums.stats.EStatMode;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.message.builder.MessagePool;
 import phoebe.eqx.pcef.message.builder.req.GetResourceIdRequest;
+import phoebe.eqx.pcef.services.PCEFService;
 import phoebe.eqx.pcef.utils.MessageFlow;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 import phoebe.eqx.pcef.utils.ValidateMessage;
