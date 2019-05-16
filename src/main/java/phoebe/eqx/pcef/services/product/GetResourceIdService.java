@@ -40,9 +40,9 @@ public class GetResourceIdService extends PCEFService {
             //increase stat
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.PCEF_RECEIVE_TEST_DATA);
 
-            PCEFUtils.writeMessageFlow("Build Get Resource ID Request", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Build Get ResourceResponse ID Request", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Build Get Resource ID Request", MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Build Get ResourceResponse ID Request", MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
         }
     }
 
@@ -67,7 +67,7 @@ public class GetResourceIdService extends PCEFService {
 
             resourceId = "resourceId1234";
 
-            PCEFUtils.writeMessageFlow("Build Get Resource ID Request", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Build Get ResourceResponse ID Request", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
         } catch (TimeoutException e) {
             // handle time out
         } catch (ResponseErrorException e) {
@@ -76,7 +76,7 @@ public class GetResourceIdService extends PCEFService {
             //increase stat fail
             //summarylog fail
             // read fail
-            PCEFUtils.writeMessageFlow("Build Get Resource ID Request", MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Build Get ResourceResponse ID Request", MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
 
         }
 

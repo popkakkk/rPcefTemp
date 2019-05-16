@@ -1,7 +1,7 @@
 package phoebe.eqx.pcef.core;
 
 import com.google.gson.Gson;
-import phoebe.eqx.pcef.core.data.OCFUsageMonitoring;
+import phoebe.eqx.pcef.core.data.UsageMonitoring;
 import phoebe.eqx.pcef.instance.TestResponseData;
 import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
 
@@ -17,8 +17,8 @@ public class PCEFParser {
         return new TestResponseData();
     }
 
-    public OCFUsageMonitoring translateUsageMonitoringResponse() {
-        return gson.fromJson(message, OCFUsageMonitoring.class);
+    public UsageMonitoring translateUsageMonitoringResponse() {
+        return gson.fromJson(message, UsageMonitoring.class);
     }
 
     public UsageMonitoringRequest translateUsageMonitoringRequest() {

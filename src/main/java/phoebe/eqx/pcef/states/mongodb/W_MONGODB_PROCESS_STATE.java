@@ -2,24 +2,21 @@ package phoebe.eqx.pcef.states.mongodb;
 
 
 import com.google.gson.Gson;
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.DuplicateKeyException;
 import phoebe.eqx.pcef.core.exceptions.TimeoutIntervalException;
+import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.enums.EStatusLifeCycle;
 import phoebe.eqx.pcef.enums.state.EMongoState;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.Config;
-import phoebe.eqx.pcef.model.Quota;
 import phoebe.eqx.pcef.services.mogodb.MongoDBService;
 import phoebe.eqx.pcef.states.mongodb.abs.MessageMongoRecieved;
 import phoebe.eqx.pcef.states.mongodb.abs.MongoState;
 import phoebe.eqx.pcef.utils.Interval;
 
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class W_MONGODB_PROCESS_STATE extends MongoState {
 
@@ -50,7 +47,7 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
                     } else {
                         DBCursor transactionCursor = mongoDBService.findTransactionByStatus(EStatusLifeCycle.Done.getName());
                         if (transactionCursor.hasNext()) {
-                            setResponseSuccess();
+                            responseSuccess();
                         } else {
                             // find Monitoring key
 //                            findMonitoringKeyState();
@@ -64,11 +61,7 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
         } catch (TimeoutIntervalException e) {
             setResponseFail();
             nextState = EMongoState.END;
-        } catch (ParseException e) {
-
-
         }
-
         return nextState;
     }
 
@@ -114,13 +107,17 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
                         quotaList.add(quota);
                         mongoDBService.updateTransactionSetQuota(quotaList);
 
-                        //response success
-                        setResponseSuccess();
+                        responseSuccess();
                     } else {
-                        //reserve
-
+                        DBObject findModQuota = mongoDBService.findAndModifyLockQuota(quota.getMonitoringKey());
+                        if (findModQuota != null) {
+                            setUsageMonitoringState(EState.W_USAGE_MONITORING_UPDATE);
+                            nextState = EMongoState.END;
+                        } else {
+                            //interval
+                            nextState = EMongoState.FIND_PROFILE_FOR_START_RESOURCE;
+                        }
                     }
-
 
                 } else {
                     intervalMkIsProcessing.waitInterval();
@@ -137,7 +134,7 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
     public EMongoState findProfileForStartResource() {
         EMongoState nextState = null;
         try {
-            DBObject dbObject = mongoDBService.findAndModifyProfile();
+            DBObject dbObject = mongoDBService.findAndModifyLockProfile();
             if (dbObject != null) {
                 setUsageMonitoringState(EState.W_USAGE_MONITORING_UPDATE);
                 nextState = EMongoState.END;
@@ -165,7 +162,7 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
         return responseSuccess;
     }
 
-    public void setResponseSuccess() {
+    public void responseSuccess() {
         setUsageMonitoringState(EState.END);
         this.responseSuccess = true;
     }

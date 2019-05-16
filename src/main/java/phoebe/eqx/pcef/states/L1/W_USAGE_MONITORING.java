@@ -1,10 +1,10 @@
 package phoebe.eqx.pcef.states.L1;
 
 import ec02.af.utils.AFLog;
-import phoebe.eqx.pcef.core.data.OCFUsageMonitoring;
+import phoebe.eqx.pcef.core.data.UsageMonitoring;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
-import phoebe.eqx.pcef.model.Quota;
+import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.services.mogodb.MongoDBService;
 import phoebe.eqx.pcef.services.ocf.UsageMonitoringService;
 import phoebe.eqx.pcef.services.product.GetResourceIdService;
@@ -55,14 +55,14 @@ public class W_USAGE_MONITORING extends ComplexState {
                     usageMonitoringService.buildResponseUsageMonitoringFail();
                 }
             } else {
-                UsageMonitoringService UsageMonitoringService = new UsageMonitoringService(appInstance);
+                UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
                 if (EState.W_USAGE_MONITORING_START.equals(nextState)) {
                     AFLog.d("State is Usage Monitoring First Usage");
                     mongoDBService.findOtherStartTransaction();
-                    UsageMonitoringService.buildUsageMonitoringStart();
+                    usageMonitoringService.buildUsageMonitoringStart();
                 } else if (EState.W_USAGE_MONITORING_UPDATE.equals(nextState)) {
                     mongoDBService.findOtherStartTransaction();
-                    UsageMonitoringService.buildUsageMonitoringUpdate();
+                    usageMonitoringService.buildUsageMonitoringUpdate();
                 }
             }
         } catch (Exception e) {
@@ -84,7 +84,7 @@ public class W_USAGE_MONITORING extends ComplexState {
     @MessageRecieved(messageType = EState.W_USAGE_MONITORING_START)
     public void wUsageMonitoringStart() throws Exception {
         UsageMonitoringService umStartService = new UsageMonitoringService(appInstance);
-        OCFUsageMonitoring usageMonitoringResponse = umStartService.readUsageMonitoringStart();
+        UsageMonitoring usageMonitoringResponse = umStartService.readUsageMonitoringStart();
 
         MongoDBService mongoDBService = null;
         try {
@@ -119,7 +119,7 @@ public class W_USAGE_MONITORING extends ComplexState {
     @MessageRecieved(messageType = EState.W_USAGE_MONITORING_UPDATE)
     public void wUsageMonitoringUpdate() throws Exception {
         UsageMonitoringService umStartService = new UsageMonitoringService(appInstance);
-        OCFUsageMonitoring usageMonitoringResponse = umStartService.readUsageMonitoringUpdate();
+        UsageMonitoring usageMonitoringResponse = umStartService.readUsageMonitoringUpdate();
 
         MongoDBService mongoDBService = null;
         try {

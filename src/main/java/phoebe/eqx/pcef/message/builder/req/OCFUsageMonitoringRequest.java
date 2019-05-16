@@ -1,10 +1,10 @@
 package phoebe.eqx.pcef.message.builder.req;
 
-import phoebe.eqx.pcef.core.data.Resource;
+import phoebe.eqx.pcef.core.data.ResourceRequest;
 
 import java.util.ArrayList;
 
-public class UsageMonitoringStartRequest {
+public class OCFUsageMonitoringRequest {
 
     private String command;
     private String sessionId;
@@ -15,12 +15,10 @@ public class UsageMonitoringStartRequest {
     private String userValue;
     private String status;
     private String devMessage;
-    private ArrayList<Resource> resources = new ArrayList<Resource>();
+    private ArrayList<ResourceRequest> resourceRequests = new ArrayList<>();
 
 
-    public ArrayList<Resource> getResources() {
-        return resources;
-    }
+
 
 
     public String getCommand() {
@@ -95,7 +93,11 @@ public class UsageMonitoringStartRequest {
         this.devMessage = devMessage;
     }
 
-    public void setResources(ArrayList<Resource> resources) {
-        this.resources = resources;
+    public ArrayList<ResourceRequest> getResourceRequests() {
+        return resourceRequests;
+    }
+
+    public void setResourceRequests(ArrayList<ResourceRequest> resourceRequests) {
+        this.resourceRequests = resourceRequests;
     }
 }

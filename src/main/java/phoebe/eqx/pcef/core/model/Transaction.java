@@ -1,4 +1,4 @@
-package phoebe.eqx.pcef.model;
+package phoebe.eqx.pcef.core.model;
 
 import java.util.Date;
 

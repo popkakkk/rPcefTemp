@@ -6,7 +6,7 @@ import ec02.af.utils.AFLog;
 public enum EConfig {
 
     /*Part 1 : Mandatory */
-    //Resource
+    //ResourceResponse
     RESOURCE_NAME_TEST("resource-name-test", EConfigType.MANDATORY, null),
 
     MONGODB_URL("mongodb-url", EConfigType.MANDATORY, null),

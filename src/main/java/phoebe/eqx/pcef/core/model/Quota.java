@@ -1,4 +1,4 @@
-package phoebe.eqx.pcef.model;
+package phoebe.eqx.pcef.core.model;
 
 
 import phoebe.eqx.pcef.core.data.QuotaByKey;
@@ -12,7 +12,7 @@ public class Quota {
     private String _id;
     private String userType;
     private String userValue;
-    private String mainProcessing;
+    private String processing;
     private String expireDate;
     private String monitoringKey;
     private String counterId;
@@ -45,12 +45,12 @@ public class Quota {
         this.userValue = userValue;
     }
 
-    public String getMainProcessing() {
-        return mainProcessing;
+    public String getProcessing() {
+        return processing;
     }
 
-    public void setMainProcessing(String mainProcessing) {
-        this.mainProcessing = mainProcessing;
+    public void setProcessing(String processing) {
+        this.processing = processing;
     }
 
     public String getExpireDate() {

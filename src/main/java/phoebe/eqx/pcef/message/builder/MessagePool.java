@@ -6,10 +6,8 @@ import ec02.af.data.AFDataFactory;
 import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.enums.config.EConfig;
-import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.message.builder.req.GetResourceIdRequest;
-import phoebe.eqx.pcef.message.builder.req.UsageMonitoringStartRequest;
-import phoebe.eqx.pcef.message.builder.req.TestRequest;
+import phoebe.eqx.pcef.message.builder.req.OCFUsageMonitoringRequest;
 import phoebe.eqx.pcef.message.builder.res.UsageMonitoringResponse;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 
@@ -47,8 +45,8 @@ public class MessagePool {
     }
 
 
-    public EquinoxRawData getUsageMonitoringStartRequest(UsageMonitoringStartRequest usageMonitoringStartRequest, String invokeId) {
-        String reqData = new Gson().toJson(usageMonitoringStartRequest);
+    public EquinoxRawData getUsageMonitoringStartRequest(OCFUsageMonitoringRequest OCFUsageMonitoringRequest, String invokeId) {
+        String reqData = new Gson().toJson(OCFUsageMonitoringRequest);
         EquinoxRawData rawData = AFDataFactory.createEquinoxRawData();
         this.requestObj = reqData;
         Map<String, String> map = new HashMap<>();
@@ -67,7 +65,7 @@ public class MessagePool {
 
 
     public EquinoxRawData getUsageMonitoringResponse(UsageMonitoringResponse usageMonitoringResponse, String invokeId) {
-        AFLog.d("Build OCFUsageMonitoring Response ");
+        AFLog.d("Build UsageMonitoring Response ");
         EquinoxRawData rawData = AFDataFactory.createEquinoxRawData();
         String data = new Gson().toJson(usageMonitoringResponse);
         this.requestObj = data;

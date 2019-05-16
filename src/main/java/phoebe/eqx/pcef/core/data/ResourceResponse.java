@@ -1,6 +1,6 @@
 package phoebe.eqx.pcef.core.data;
 
-public class Resource {
+public class ResourceResponse {
     private String rtid;
     private String resourceId;
     private String resourceName;
@@ -10,6 +10,7 @@ public class Resource {
     private String counterId;
     private QuotaByKey quotaByKey;
     private RateLimitByKey rateLimitByKey;
+
 
     public String getRtid() {
         return rtid;

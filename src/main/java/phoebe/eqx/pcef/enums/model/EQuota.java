@@ -4,7 +4,7 @@ public enum EQuota {
     _id,
     userType,
     userValue,
-    mainProcessing,
+    processing,
     expireDate,
     monitoringKey,
     counterId,
