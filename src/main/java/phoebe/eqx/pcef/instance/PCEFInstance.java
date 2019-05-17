@@ -1,9 +1,8 @@
 package phoebe.eqx.pcef.instance;
 
-import phoebe.eqx.pcef.core.data.ResourceResponse;
-import phoebe.eqx.pcef.core.data.UsageMonitoring;
 import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.core.model.Transaction;
+import phoebe.eqx.pcef.message.builder.req.OCFUsageMonitoringRequest;
 import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
 
 import java.util.ArrayList;
@@ -16,29 +15,25 @@ public class PCEFInstance {
     private String sessionId; // from SACF
 
     private TestResponseData testResponseData;
-    private Date appointmentDate;
+
     private Transaction transaction;
     private List<Transaction> otherStartTransactions = new ArrayList<>();
 
 
     private UsageMonitoringRequest usageMonitoringRequest;
-    private UsageMonitoring usageMonitoring;
 
-    private transient String ocfSessionId; // to OCF
+    private OCFUsageMonitoringRequest ocfUsageMonitoringRequest;
 
+    //Profile
+    private Integer sequenceNumber;
+    private Date appointmentDate;
+    private String ocfSessionId; // to OCF
 
+    //Commit Part
     private boolean quotaExhaust;
-    private Quota quotaCommit;
+    private Quota quotaToCommit;
     private transient Map<String, String> countUnitMap;
 
-
-    public UsageMonitoring getUsageMonitoring() {
-        return usageMonitoring;
-    }
-
-    public void setUsageMonitoring(UsageMonitoring usageMonitoring) {
-        this.usageMonitoring = usageMonitoring;
-    }
 
     public UsageMonitoringRequest getUsageMonitoringRequest() {
         return usageMonitoringRequest;
@@ -109,12 +104,12 @@ public class PCEFInstance {
         this.transaction = transaction;
     }
 
-    public Quota getQuotaCommit() {
-        return quotaCommit;
+    public Quota getQuotaToCommit() {
+        return quotaToCommit;
     }
 
-    public void setQuotaCommit(Quota quotaCommit) {
-        this.quotaCommit = quotaCommit;
+    public void setQuotaForCommit(Quota quotaCommit) {
+        this.quotaToCommit = quotaCommit;
     }
 
     public Map<String, String> getCountUnitMap() {
@@ -123,5 +118,29 @@ public class PCEFInstance {
 
     public void setCountUnitMap(Map<String, String> countUnitMap) {
         this.countUnitMap = countUnitMap;
+    }
+
+    public OCFUsageMonitoringRequest getOcfUsageMonitoringRequest() {
+        return ocfUsageMonitoringRequest;
+    }
+
+    public void setOcfUsageMonitoringRequest(OCFUsageMonitoringRequest ocfUsageMonitoringRequest) {
+        this.ocfUsageMonitoringRequest = ocfUsageMonitoringRequest;
+    }
+
+    public void increasSequenceNumber() {
+        sequenceNumber++;
+    }
+
+    public Integer getSequenceNumber() {
+        return sequenceNumber;
+    }
+
+    public void setSequenceNumber(Integer sequenceNumber) {
+        this.sequenceNumber = sequenceNumber;
+    }
+
+    public void setQuotaToCommit(Quota quotaToCommit) {
+        this.quotaToCommit = quotaToCommit;
     }
 }

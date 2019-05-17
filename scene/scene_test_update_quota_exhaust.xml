@@ -1,0 +1,97 @@
+<dummy-request>
+    <dummy-message id="1">
+        <EquinoxMessage from="mOCHKF.E11.0" via="mOCHKF.E11.0"
+                        session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615"
+                        timeout="10" ret="0" diag="">
+
+            <EquinoxRawData orig="mOCHKF.ES05.DAMOCLES.0" name="HTTP" invoke="1572653657" type="request" method="POST"
+                            url="/rpcef/api/v1/metering-method" ctype="text/plain" val="{
+	&quot;sessionId&quot;:&quot;SessionA123456781234679ACTIVE&quot;,
+	&quot;tid&quot;:&quot;tid-00000000004&quot;,
+	&quot;rtid&quot;:&quot;r-tid-00000000001&quot;,
+	&quot;actualTime&quot;:&quot;20181105174020&quot;,
+	&quot;app&quot;:&quot;Cookie Run&quot;,
+	&quot;clientId&quot;:&quot;cGdb4azinlmwq8N5FDGXvQNwUKC352vv2de8fyCUIiI&quot;,
+	&quot;privateId&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;,
+	&quot;resourceName&quot;:&quot;Send One Time Password&quot;
+}"
+                            to="mOCHKF.ES00" ret="0"/>
+            <EquinoxInstance>
+                <value val=""/>
+            </EquinoxInstance>
+        </EquinoxMessage>
+    </dummy-message>
+
+    <dummy-message id="2">
+        <EquinoxMessage from="mOCHKF.E11.0" via="mOCHKF.E11.0"
+                        session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615"
+                        timeout="10" ret="0" diag="">
+
+            <EquinoxRawData orig="mOCHKF.ES05.DAMOCLES.0" name="HTTP" invoke="getResourceId_" type="response" method="POST"
+                            url="" ctype="text/plain" val=""
+                            to="mOCHKF.ES00" ret="0"/>
+            <EquinoxInstance>
+                <value val=""/>
+            </EquinoxInstance>
+        </EquinoxMessage>
+    </dummy-message>
+
+    <dummy-message id="3">
+        <EquinoxMessage from="mOCHKF.E11.0" via="mOCHKF.E11.0"
+                        session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615"
+                        timeout="10" ret="0" diag="">
+
+            <EquinoxRawData orig="mOCHKF.ES05.DAMOCLES.0" name="HTTP" invoke="umUpdate_" type="response" method="POST"
+                            url="/rpcef/api/v1/metering-method" ctype="text/plain" val="{
+    &quot;command&quot;:&quot;usageMonitoringStart&quot;,
+    &quot;sessionId&quot;:&quot;SessionA1234567891234679ACTIVE&quot;,
+    &quot;tid&quot;:&quot;TRANSACTION001&quot;,
+    &quot;requestNumber&quot;:&quot;1&quot;,
+    &quot;userType&quot;:&quot;privateId&quot;,
+    &quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;,
+    &quot;status&quot;:&quot;207&quot;,
+   &quot;devMessage&quot;:&quot;PARTIAL_SUCCESS&quot;,
+    &quot;resources&quot;:[
+        {
+            &quot;resourceId&quot;:&quot;resourceId1234&quot;,
+            &quot;resourceName&quot;:&quot;API_A&quot;,
+           &quot;rtid&quot;:&quot;R-TRAN-001&quot;,
+            &quot;resultCode&quot;:&quot;20000&quot;,
+            &quot;resultDesc&quot;:&quot;SUCCESS&quot;,
+            &quot;monitoringKey&quot;:&quot;1002&quot;,
+           &quot;counterId&quot;:&quot;4001000001&quot;,
+            &quot;quotaByKey&quot;:{
+                &quot;unitType&quot;:&quot;unit&quot;,
+                &quot;unit&quot;:&quot;100&quot;,
+                &quot;validityTime&quot;:&quot;3600&quot;
+            },
+            &quot;rateLimitByKey&quot;:{
+                &quot;transactionPerTime&quot;:&quot;100|60&quot;
+            }
+        },
+        {
+            &quot;resourceId&quot;:&quot;resourceId12345&quot;,
+            &quot;resourceName&quot;:&quot;API_A&quot;,
+           &quot;rtid&quot;:&quot;R-TRAN-001&quot;,
+            &quot;resultCode&quot;:&quot;20000&quot;,
+            &quot;resultDesc&quot;:&quot;SUCCESS&quot;,
+            &quot;counterId&quot;:&quot;4001000001&quot;,
+            &quot;monitoringKey&quot;:&quot;1002&quot;,
+            &quot;quotaByKey&quot;:{
+                &quot;unitType&quot;:&quot;unit&quot;,
+                &quot;unit&quot;:&quot;100&quot;,
+                &quot;validityTime&quot;:&quot;3600&quot;
+            },
+            &quot;rateLimitByKey&quot;:{
+                &quot;transactionPerTime&quot;:&quot;100|60&quot;
+            }
+          }
+    ]
+}"
+                            to="mOCHKF.ES00" ret="0"/>
+            <EquinoxInstance>
+                <value val=""/>
+            </EquinoxInstance>
+        </EquinoxMessage>
+    </dummy-message>
+   </dummy-request>

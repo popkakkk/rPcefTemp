@@ -1,18 +1,21 @@
 package phoebe.eqx.pcef.states.L1;
 
 import ec02.af.utils.AFLog;
-import phoebe.eqx.pcef.core.data.UsageMonitoring;
+import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
+import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.core.model.Quota;
+import phoebe.eqx.pcef.services.UsageMonitoringService;
 import phoebe.eqx.pcef.services.mogodb.MongoDBService;
-import phoebe.eqx.pcef.services.ocf.UsageMonitoringService;
-import phoebe.eqx.pcef.services.product.GetResourceIdService;
+import phoebe.eqx.pcef.services.OCFUsageMonitoringService;
+import phoebe.eqx.pcef.services.GetResourceIdService;
 import phoebe.eqx.pcef.states.mongodb.W_MONGODB_PROCESS_STATE;
 import phoebe.eqx.pcef.states.abs.ComplexState;
 import phoebe.eqx.pcef.states.abs.MessageRecieved;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class W_USAGE_MONITORING extends ComplexState {
 
@@ -23,7 +26,7 @@ public class W_USAGE_MONITORING extends ComplexState {
 
     @MessageRecieved(messageType = EState.BEGIN)
     public void begin() throws Exception {
-        phoebe.eqx.pcef.services.sacf.UsageMonitoringService usageMonitoringService = new phoebe.eqx.pcef.services.sacf.UsageMonitoringService(appInstance);
+        UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
         usageMonitoringService.readUsageMonitoringRequest();
 
         GetResourceIdService getResourceIdService = new GetResourceIdService(appInstance);
@@ -48,21 +51,24 @@ public class W_USAGE_MONITORING extends ComplexState {
 
             nextState = mongodbProcessState.getUsageMonitoringState();
             if (EState.END.equals(nextState)) {
-                phoebe.eqx.pcef.services.sacf.UsageMonitoringService usageMonitoringService = new phoebe.eqx.pcef.services.sacf.UsageMonitoringService(appInstance);
+                UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
                 if (mongodbProcessState.isResponseSuccess()) {
                     usageMonitoringService.buildResponseUsageMonitoringSuccess();
                 } else {
                     usageMonitoringService.buildResponseUsageMonitoringFail();
                 }
             } else {
-                UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
+                OCFUsageMonitoringService OCFUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
                 if (EState.W_USAGE_MONITORING_START.equals(nextState)) {
                     AFLog.d("State is Usage Monitoring First Usage");
-                    mongoDBService.findOtherStartTransaction();
-                    usageMonitoringService.buildUsageMonitoringStart();
+                    List<Transaction> otherTransactionStartList = mongoDBService.findOtherStartTransaction();
+                    appInstance.getPcefInstance().getOtherStartTransactions().addAll(otherTransactionStartList);
+                    OCFUsageMonitoringService.buildUsageMonitoringStart();
                 } else if (EState.W_USAGE_MONITORING_UPDATE.equals(nextState)) {
-                    mongoDBService.findOtherStartTransaction();
-                    usageMonitoringService.buildUsageMonitoringUpdate();
+                    List<Transaction> otherTransactionStartList = mongoDBService.findOtherStartTransaction();
+                    mongoDBService.filterTransactionConfirmIsNewResource(otherTransactionStartList);
+                    appInstance.getPcefInstance().getOtherStartTransactions().addAll(otherTransactionStartList);
+                    OCFUsageMonitoringService.buildUsageMonitoringUpdate();
                 }
             }
         } catch (Exception e) {
@@ -83,29 +89,28 @@ public class W_USAGE_MONITORING extends ComplexState {
 
     @MessageRecieved(messageType = EState.W_USAGE_MONITORING_START)
     public void wUsageMonitoringStart() throws Exception {
-        UsageMonitoringService umStartService = new UsageMonitoringService(appInstance);
-        UsageMonitoring usageMonitoringResponse = umStartService.readUsageMonitoringStart();
+        OCFUsageMonitoringService umStartService = new OCFUsageMonitoringService(appInstance);
+        OCFUsageMonitoringResponse OCFUsageMonitoringResponse = umStartService.readUsageMonitoringStart();
 
         MongoDBService mongoDBService = null;
         try {
             mongoDBService = new MongoDBService(appInstance);
-            phoebe.eqx.pcef.services.sacf.UsageMonitoringService usageMonitoringService = new phoebe.eqx.pcef.services.sacf.UsageMonitoringService(appInstance);
-            ArrayList<Quota> quotaResponseList = mongoDBService.getQuotaFromUsageMonitoringResponse(usageMonitoringResponse);
+            UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
+            ArrayList<Quota> quotaResponseList = mongoDBService.getQuotaFromUsageMonitoringResponse(OCFUsageMonitoringResponse);
 
-            if (umStartService.receiveQuotaAndPolicy()) {
-                mongoDBService.insertQuotaStartFirstUsage(quotaResponseList);
-                mongoDBService.updateTransactionSetQuota(quotaResponseList);
+            if (umStartService.receiveQuotaAndPolicy(OCFUsageMonitoringResponse)) {
+                mongoDBService.insertQuotaFirstUsage(quotaResponseList);
+                mongoDBService.updateTransaction(quotaResponseList);
                 mongoDBService.updateProfileUnLockInitial();
 
                 usageMonitoringService.buildResponseUsageMonitoringSuccess();
             } else {
-
                 // update col transaction
                 usageMonitoringService.buildResponseUsageMonitoringFail();
             }
 
         } catch (Exception e) {
-            AFLog.d("wUsageMonitoringStart error:" + e.toString());
+            AFLog.d("wUsageMonitoringStart error:" + e.getStackTrace()[0]);
         } finally {
             if (mongoDBService != null) {
                 mongoDBService.closeConnection();
@@ -118,18 +123,18 @@ public class W_USAGE_MONITORING extends ComplexState {
 
     @MessageRecieved(messageType = EState.W_USAGE_MONITORING_UPDATE)
     public void wUsageMonitoringUpdate() throws Exception {
-        UsageMonitoringService umStartService = new UsageMonitoringService(appInstance);
-        UsageMonitoring usageMonitoringResponse = umStartService.readUsageMonitoringUpdate();
+        OCFUsageMonitoringService umStartService = new OCFUsageMonitoringService(appInstance);
+        OCFUsageMonitoringResponse OCFUsageMonitoringResponse = umStartService.readUsageMonitoringUpdate();
 
         MongoDBService mongoDBService = null;
         try {
             mongoDBService = new MongoDBService(appInstance);
-            phoebe.eqx.pcef.services.sacf.UsageMonitoringService usageMonitoringService = new phoebe.eqx.pcef.services.sacf.UsageMonitoringService(appInstance);
-            ArrayList<Quota> quotaResponseList = mongoDBService.getQuotaFromUsageMonitoringResponse(usageMonitoringResponse);
+            UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
+            ArrayList<Quota> quotaResponseList = mongoDBService.getQuotaFromUsageMonitoringResponse(OCFUsageMonitoringResponse);
 
-            if (umStartService.receiveQuotaAndPolicy()) {
+            if (umStartService.receiveQuotaAndPolicy(OCFUsageMonitoringResponse)) {
                 mongoDBService.updateQuota(quotaResponseList);
-                mongoDBService.updateTransactionSetQuota(quotaResponseList);
+                mongoDBService.updateTransaction(quotaResponseList);
                 mongoDBService.updateProfileUnLock();
 
                 usageMonitoringService.buildResponseUsageMonitoringSuccess();
@@ -140,7 +145,7 @@ public class W_USAGE_MONITORING extends ComplexState {
             }
 
         } catch (Exception e) {
-            AFLog.d("wUsageMonitoringStart error:" + e.toString());
+            AFLog.d("wUsageMonitoringStart error:" + e.getStackTrace()[0]);
         } finally {
             if (mongoDBService != null) {
                 mongoDBService.closeConnection();

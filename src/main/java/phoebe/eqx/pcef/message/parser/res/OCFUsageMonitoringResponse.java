@@ -1,8 +1,10 @@
-package phoebe.eqx.pcef.core.data;
+package phoebe.eqx.pcef.message.parser.res;
+
+import phoebe.eqx.pcef.core.data.ResourceResponse;
 
 import java.util.ArrayList;
 
-public class UsageMonitoring {
+public class OCFUsageMonitoringResponse {
     private String command;
     private String sessionId;
     private String tid;
@@ -11,7 +13,7 @@ public class UsageMonitoring {
     private String userValue;
     private String status;
     private String devMessage;
-    private ArrayList<ResourceResponse> resourceResponses;
+    private ArrayList<ResourceResponse> resources;
 
 
     public String getCommand() {
@@ -78,11 +80,11 @@ public class UsageMonitoring {
         this.devMessage = devMessage;
     }
 
-    public ArrayList<ResourceResponse> getResourceResponses() {
-        return resourceResponses;
+    public ArrayList<ResourceResponse> getResources() {
+        return resources;
     }
 
-    public void setResourceResponses(ArrayList<ResourceResponse> resourceResponses) {
-        this.resourceResponses = resourceResponses;
+    public void setResources(ArrayList<ResourceResponse> resources) {
+        this.resources = resources;
     }
 }

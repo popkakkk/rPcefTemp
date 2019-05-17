@@ -6,14 +6,15 @@ import phoebe.eqx.pcef.core.data.RateLimitByKey;
 import phoebe.eqx.pcef.core.data.ResourceQuota;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Quota {
 
     private String _id;
     private String userType;
     private String userValue;
-    private String processing;
-    private String expireDate;
+    private Integer processing;
+    private Date expireDate;
     private String monitoringKey;
     private String counterId;
     private QuotaByKey quotaByKey;
@@ -45,19 +46,19 @@ public class Quota {
         this.userValue = userValue;
     }
 
-    public String getProcessing() {
+    public Integer getProcessing() {
         return processing;
     }
 
-    public void setProcessing(String processing) {
+    public void setProcessing(Integer processing) {
         this.processing = processing;
     }
 
-    public String getExpireDate() {
+    public Date getExpireDate() {
         return expireDate;
     }
 
-    public void setExpireDate(String expireDate) {
+    public void setExpireDate(Date expireDate) {
         this.expireDate = expireDate;
     }
 

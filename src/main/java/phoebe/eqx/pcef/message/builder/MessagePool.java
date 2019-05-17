@@ -64,8 +64,8 @@ public class MessagePool {
     }
 
 
-    public EquinoxRawData getUsageMonitoringResponse(UsageMonitoringResponse usageMonitoringResponse, String invokeId) {
-        AFLog.d("Build UsageMonitoring Response ");
+    public EquinoxRawData getUsageMonitoringResponse(UsageMonitoringResponse usageMonitoringResponse, String invokeId, String timeout) {
+        AFLog.d("Build OCFUsageMonitoringResponse Response ");
         EquinoxRawData rawData = AFDataFactory.createEquinoxRawData();
         String data = new Gson().toJson(usageMonitoringResponse);
         this.requestObj = data;
@@ -75,7 +75,7 @@ public class MessagePool {
         map.put("ctype", "text/plain");
         map.put("to", PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_TEST));
         map.put("oid", "0.0.17.1218.8.7.0");
-        map.put("timeout", PCEFUtils.getWarmConfig(abstractAF, EConfig.TIMEOUT_TEST));
+        map.put("timeout", timeout);
 
         map.put("invoke", invokeId);
 

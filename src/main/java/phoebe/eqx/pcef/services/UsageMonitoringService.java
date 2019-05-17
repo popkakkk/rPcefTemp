@@ -1,4 +1,4 @@
-package phoebe.eqx.pcef.services.sacf;
+package phoebe.eqx.pcef.services;
 
 import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.core.PCEFParser;
@@ -9,6 +9,8 @@ import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
 import phoebe.eqx.pcef.services.PCEFService;
 import phoebe.eqx.pcef.utils.MessageFlow;
 import phoebe.eqx.pcef.utils.PCEFUtils;
+
+import java.util.Date;
 
 public class UsageMonitoringService extends PCEFService {
 
@@ -68,7 +70,11 @@ public class UsageMonitoringService extends PCEFService {
 
             //build message
             MessagePool messagePool = new MessagePool(abstractAF);
-            EquinoxRawData equinoxRawData = messagePool.getUsageMonitoringResponse(usageMonitoringResponse, invokeId);
+            Date currentDate = new Date();
+            Date appointmentDate = appInstance.getPcefInstance().getAppointmentDate();
+            String timeout = String.valueOf(appointmentDate.compareTo(currentDate));
+            EquinoxRawData equinoxRawData = messagePool.getUsageMonitoringResponse(usageMonitoringResponse, invokeId, timeout);
+
             appInstance.getOutList().add(equinoxRawData);
             appInstance.setFinish(true);
 

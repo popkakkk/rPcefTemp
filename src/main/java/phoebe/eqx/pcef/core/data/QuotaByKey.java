@@ -2,8 +2,8 @@ package phoebe.eqx.pcef.core.data;
 
 public class QuotaByKey {
     private String unitType;
-    private String unit;
-    private String validityTime;
+    private Integer unit;
+    private Integer validityTime;
 
 
     public String getUnitType() {
@@ -14,19 +14,19 @@ public class QuotaByKey {
         this.unitType = unitType;
     }
 
-    public String getUnit() {
+    public Integer getUnit() {
         return unit;
     }
 
-    public void setUnit(String unit) {
+    public void setUnit(Integer unit) {
         this.unit = unit;
     }
 
-    public String getValidityTime() {
+    public Integer getValidityTime() {
         return validityTime;
     }
 
-    public void setValidityTime(String validityTime) {
+    public void setValidityTime(Integer validityTime) {
         this.validityTime = validityTime;
     }
 }

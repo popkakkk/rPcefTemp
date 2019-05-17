@@ -15,7 +15,7 @@ public class OCFUsageMonitoringRequest {
     private String userValue;
     private String status;
     private String devMessage;
-    private ArrayList<ResourceRequest> resourceRequests = new ArrayList<>();
+    private ArrayList<ResourceRequest> resources = new ArrayList<>();
 
 
 
@@ -93,11 +93,11 @@ public class OCFUsageMonitoringRequest {
         this.devMessage = devMessage;
     }
 
-    public ArrayList<ResourceRequest> getResourceRequests() {
-        return resourceRequests;
+    public ArrayList<ResourceRequest> getResources() {
+        return resources;
     }
 
-    public void setResourceRequests(ArrayList<ResourceRequest> resourceRequests) {
-        this.resourceRequests = resourceRequests;
+    public void setResources(ArrayList<ResourceRequest> resources) {
+        this.resources = resources;
     }
 }

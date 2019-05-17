@@ -9,6 +9,7 @@ import phoebe.eqx.pcef.core.logs.summary.SummaryLogDetail;
 import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.enums.Operation;
+import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ public class AppInstance {
     private String requestLog;
     private String responseLog;
 
+
     //------- transient ---------------------
     private transient boolean hasRequest;
     private transient String reqMessage;
@@ -41,6 +43,8 @@ public class AppInstance {
     private transient ArrayList<EquinoxRawData> outList = new ArrayList<>();
     private transient boolean finish;
     private transient AbstractAF abstractAF;
+
+
 
 
     public synchronized void create(String reqMessage, String invoke, ERequestType requestType) {
@@ -211,4 +215,5 @@ public class AppInstance {
         return requestInvokeId;
     }
 
- }
+
+}

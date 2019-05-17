@@ -1,4 +1,4 @@
-package phoebe.eqx.pcef.services.product;
+package phoebe.eqx.pcef.services;
 
 import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.core.exceptions.ResponseErrorException;
@@ -9,7 +9,6 @@ import phoebe.eqx.pcef.enums.stats.EStatMode;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.message.builder.MessagePool;
 import phoebe.eqx.pcef.message.builder.req.GetResourceIdRequest;
-import phoebe.eqx.pcef.services.PCEFService;
 import phoebe.eqx.pcef.utils.MessageFlow;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 import phoebe.eqx.pcef.utils.ValidateMessage;
@@ -65,7 +64,7 @@ public class GetResourceIdService extends PCEFService {
             //summarylog res
 //            appInstance.setSummaryLogExternalResponse(operation, SummaryLog.getSummaryLogResponse(operation, testResponseData));
 
-            resourceId = "resourceId1234";
+            resourceId = "resourceId12345";
 
             PCEFUtils.writeMessageFlow("Build Get ResourceResponse ID Request", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
         } catch (TimeoutException e) {

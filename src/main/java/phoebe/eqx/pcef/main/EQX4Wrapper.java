@@ -63,10 +63,10 @@ public class EQX4Wrapper {
     public static ECDialogue callActionProcess(EquinoxPropertiesAF equinoxProperties, AbstractAF abstractAF, ArrayList<EquinoxRawData> equinoxRawDatas, AppInstance appInstance) {
         EquinoxPropertiesAF eqxPropOut = AFDataFactory.createEquinoxProperties();
         try {
-            if (appInstance == null) {
+            /*if (appInstance == null) {
                 throw new Exception("Instance is null");
             }
-
+*/
             AFLog.d("--------------------- [ Start Before Process ] ---------------------");
             //handle incoming message
             boolean process = beforeProcess(equinoxProperties, abstractAF, equinoxRawDatas, appInstance);
@@ -90,13 +90,24 @@ public class EQX4Wrapper {
 
     public static String composeInstance(AppInstance appInstance) {
         try {
-            /*
-             * * encode logic
-             * */
-            String str = gson.toJson(appInstance);
-            byte[] bytes = str.getBytes();
-            byte[] zipBytes = Zip.compressBytes(bytes);
-            return Base64.getEncoder().encodeToString(zipBytes);
+
+            boolean response = false;
+            List<EquinoxRawData> outList = appInstance.getOutList();
+            if (outList.size() == 1) {
+                if (outList.get(0).getType().equals("response")) {
+                    response = true;
+                }
+            }
+
+            if (response) {
+                return null;
+            } else {
+                String str = gson.toJson(appInstance);
+                byte[] bytes = str.getBytes();
+                byte[] zipBytes = Zip.compressBytes(bytes);
+                return Base64.getEncoder().encodeToString(zipBytes);
+            }
+
         } catch (Exception e) {
             AFLog.e("Compose instance error", e);
             return "";
@@ -249,13 +260,16 @@ public class EQX4Wrapper {
 
 
     private static int calculateMinQueryTimeout(List<InvokeObject> invokeObjects) {
-        int timeout = 10;
+        Integer timeout = null;
         for (InvokeObject invokeObject : invokeObjects) {
-            if (invokeObject.getOperation() != null) {
-                timeout = Math.min(timeout, Integer.parseInt(invokeObject.getOperationRawReq().getRawDataAttribute("timeout")));
+            int timeoutRaw = Integer.parseInt(invokeObject.getOperationRawReq().getRawDataAttribute("timeout"));
+            if (timeout != null) {
+                timeout = Math.min(timeout, timeoutRaw);
+            } else {
+                timeout = timeoutRaw;
             }
         }
-        return timeout;
+        return (timeout == null) ? 10 : timeout;
     }
 
 

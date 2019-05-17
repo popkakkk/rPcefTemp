@@ -1,35 +1,49 @@
-package phoebe.eqx.pcef.services.ocf;
+package phoebe.eqx.pcef.services;
 
 import ec02.data.interfaces.EquinoxRawData;
+import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
 import phoebe.eqx.pcef.core.data.ResourceRequest;
-import phoebe.eqx.pcef.core.data.UsageMonitoring;
-import phoebe.eqx.pcef.core.data.ResourceResponse;
 import phoebe.eqx.pcef.core.exceptions.ResponseErrorException;
 import phoebe.eqx.pcef.core.exceptions.TimeoutException;
 import phoebe.eqx.pcef.core.model.Quota;
+import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.Operation;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.instance.PCEFInstance;
 import phoebe.eqx.pcef.message.builder.MessagePool;
 import phoebe.eqx.pcef.message.builder.req.OCFUsageMonitoringRequest;
-import phoebe.eqx.pcef.core.model.Transaction;
-import phoebe.eqx.pcef.services.PCEFService;
 import phoebe.eqx.pcef.utils.MessageFlow;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 import phoebe.eqx.pcef.utils.ValidateMessage;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class UsageMonitoringService extends PCEFService {
-    public UsageMonitoringService(AppInstance appInstance) {
+public class OCFUsageMonitoringService extends PCEFService {
+    public OCFUsageMonitoringService(AppInstance appInstance) {
         super(appInstance);
     }
 
 
-    public boolean receiveQuotaAndPolicy() {
+    public boolean receiveQuotaAndPolicy(OCFUsageMonitoringResponse OCFUsageMonitoringResponse) {
+
+        List<String> resourceIdResponseList = new ArrayList<>();
+
+        OCFUsageMonitoringResponse.getResources().forEach(resourceResponse -> resourceIdResponseList.add(resourceResponse.getResourceId()));
+
+        List<ResourceRequest> resourceRequestList = appInstance.getPcefInstance().getOcfUsageMonitoringRequest().getResources();
+        for (ResourceRequest resourceRequest : resourceRequestList) {
+            if (appInstance.getPcefInstance().isQuotaExhaust()) {
+                String rr = resourceRequest.getReportingReason();
+                if (rr.equals("1")) {
+                    continue;
+                }
+            }
+            if (!resourceIdResponseList.contains(resourceRequest.getResourceId())) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -39,7 +53,7 @@ public class UsageMonitoringService extends PCEFService {
     }
 
     private String generateTransactionId() {
-        return "transactionIdFromPCEF";
+        return "transactionId" + appInstance.getPcefInstance().getSequenceNumber();
     }
 
 
@@ -55,9 +69,6 @@ public class UsageMonitoringService extends PCEFService {
             appInstance.getPcefInstance().setOcfSessionId(sessionId);
             umStartRequest.setSessionId(sessionId);//generate
 
-            umStartRequest.setTid(generateTransactionId()); //generate
-            umStartRequest.setRequestNumber("1"); // #1 = start
-
             List<Transaction> transactionList = new ArrayList<>();
             transactionList.add(appInstance.getPcefInstance().getTransaction());
 
@@ -72,28 +83,41 @@ public class UsageMonitoringService extends PCEFService {
     private void buildUsageMonitoring(OCFUsageMonitoringRequest umRequest, Operation operation, String invokeId, List<Transaction> transactionList) throws Exception {
 
         PCEFInstance pcefInstance = appInstance.getPcefInstance();
-        Transaction transaction = pcefInstance.getOtherStartTransactions().get(0);
+        Transaction transaction = pcefInstance.getTransaction();
 
         umRequest.setActualTime(transaction.getActualTime());
         umRequest.setUserType(transaction.getUserType());
         umRequest.setUserValue(transaction.getUserValue());
 
+        pcefInstance.increasSequenceNumber();
+        umRequest.setTid(generateTransactionId());
+        umRequest.setRequestNumber(String.valueOf(pcefInstance.getSequenceNumber()));
+
+
+        //index(0) must is this transaction
         transactionList.addAll(appInstance.getPcefInstance().getOtherStartTransactions());
 
-        Collections.copy(transactionList, pcefInstance.getOtherStartTransactions());
-        if (!pcefInstance.isQuotaExhaust()) {
-            transactionList.add(transaction);
-        }
 
         //set all resource initial
-        transactionList.forEach(t -> {
-            ResourceRequest resourceRequest = new ResourceRequest();
-            resourceRequest.setResourceId(t.getResourceId());
-            resourceRequest.setResourceName(t.getResourceName());
-            resourceRequest.setRtid(t.getRtid());
-            umRequest.getResourceRequests().add(resourceRequest);
-        });
+        List<String> resourceIdList = new ArrayList<>();
+        for (Transaction t : transactionList) {
+            String resourceId = t.getResourceId();
+            if (!resourceIdList.contains(resourceId)) {
+                ResourceRequest resourceRequest = new ResourceRequest();
+                resourceRequest.setResourceId(resourceId);
+                resourceRequest.setResourceName(t.getResourceName());
+                resourceRequest.setRtid(t.getRtid());
 
+                //add resources
+                umRequest.getResources().add(resourceRequest);
+
+                //for check duplicate resourceId
+                resourceIdList.add(resourceId);
+            }
+
+        }
+
+        appInstance.getPcefInstance().setOcfUsageMonitoringRequest(umRequest);
 
         MessagePool messagePool = new MessagePool(abstractAF);
         EquinoxRawData equinoxRawData = messagePool.getUsageMonitoringStartRequest(umRequest, invokeId);
@@ -111,6 +135,7 @@ public class UsageMonitoringService extends PCEFService {
             resourceRequest.setRtid(appInstance.getPcefInstance().getTransaction().getRtid());
             resourceRequest.setUnitType("unit");
             resourceRequest.setUsedUnit(countUnitMap.get(resourceQuota.getResourceId()));
+            resourceRequest.setReportingReason("0");
             resourceRequestList.add(resourceRequest);
         });
         return resourceRequestList;
@@ -118,24 +143,24 @@ public class UsageMonitoringService extends PCEFService {
 
     public void buildUsageMonitoringUpdate() {
         try {
+            PCEFInstance pcefInstance = appInstance.getPcefInstance();
             Operation operation = Operation.UsageMonitoringUpdate;
             String invokeId = "umUpdate_";
 
             OCFUsageMonitoringRequest umStartRequest = new OCFUsageMonitoringRequest();
             umStartRequest.setCommand("usageMonitoringUpdate");
-            umStartRequest.setSessionId(appInstance.getPcefInstance().getOcfSessionId());
-            umStartRequest.setTid(generateTransactionId());
-//                umStartRequest.setRequestNumber("1"); //
+            umStartRequest.setSessionId(pcefInstance.getOcfSessionId());
+
 
             List<Transaction> transactionStartList = new ArrayList<>();
-            if (appInstance.getPcefInstance().isQuotaExhaust()) {
-                //update commit
-                Quota quotaCommit = appInstance.getPcefInstance().getQuotaCommit();
-                Map<String, String> countUnitMap = appInstance.getPcefInstance().getCountUnitMap();
-                umStartRequest.setResourceRequests(getResourceCommitRequest(quotaCommit, countUnitMap));
+            if (pcefInstance.isQuotaExhaust()) {//update commit
+                //set unit to Resource
+                Quota quotaCommit = pcefInstance.getQuotaToCommit();
+                Map<String, String> countUnitMap = pcefInstance.getCountUnitMap();
+                umStartRequest.setResources(getResourceCommitRequest(quotaCommit, countUnitMap));
             } else {
                 //update initial
-                transactionStartList.add(appInstance.getPcefInstance().getTransaction());
+                transactionStartList.add(pcefInstance.getTransaction());
             }
 
             buildUsageMonitoring(umStartRequest, operation, invokeId, transactionStartList);
@@ -146,14 +171,14 @@ public class UsageMonitoringService extends PCEFService {
     }
 
 
-    public UsageMonitoring readUsageMonitoringStart() throws Exception {
+    public OCFUsageMonitoringResponse readUsageMonitoringStart() throws Exception {
 
         try {
             Operation operation = Operation.UsageMonitoringStart;
 
             //extract
-            UsageMonitoring usageMonitoring = (UsageMonitoring) extractResponse(operation);
-//            this.appInstance.getPcefInstance().setUsageMonitoring(UsageMonitoring);
+            OCFUsageMonitoringResponse OCFUsageMonitoringResponse = (OCFUsageMonitoringResponse) extractResponse(operation);
+//            this.appInstance.getPcefInstance().setUsageMonitoring(OCFUsageMonitoringResponse);
 
             //validate
             ValidateMessage.validateTestData();
@@ -165,7 +190,7 @@ public class UsageMonitoringService extends PCEFService {
 //            appInstance.setSummaryLogExternalResponse(Operation.TestOperation, SummaryLog.getSummaryLogResponse(Operation.TestOperation, testResponseData));
 
             PCEFUtils.writeMessageFlow("Read Usage Monitoring Start Response", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
-            return usageMonitoring;
+            return OCFUsageMonitoringResponse;
         } catch (TimeoutException e) {
             // handle time out
             throw e;
@@ -185,14 +210,14 @@ public class UsageMonitoringService extends PCEFService {
 
     }
 
-    public UsageMonitoring readUsageMonitoringUpdate() throws Exception {
+    public OCFUsageMonitoringResponse readUsageMonitoringUpdate() throws Exception {
 
         try {
             Operation operation = Operation.UsageMonitoringUpdate;
 
             //extract
-            UsageMonitoring usageMonitoring = (UsageMonitoring) extractResponse(operation);
-//            this.appInstance.getPcefInstance().setUsageMonitoring(UsageMonitoring);
+            OCFUsageMonitoringResponse OCFUsageMonitoringResponse = (OCFUsageMonitoringResponse) extractResponse(operation);
+//            this.appInstance.getPcefInstance().setUsageMonitoring(OCFUsageMonitoringResponse);
 
             //validate
             ValidateMessage.validateTestData();
@@ -204,7 +229,7 @@ public class UsageMonitoringService extends PCEFService {
 //            appInstance.setSummaryLogExternalResponse(Operation.TestOperation, SummaryLog.getSummaryLogResponse(Operation.TestOperation, testResponseData));
 
             PCEFUtils.writeMessageFlow("Read Usage Monitoring Update Response", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
-            return usageMonitoring;
+            return OCFUsageMonitoringResponse;
         } catch (TimeoutException e) {
             // handle time out
             throw e;

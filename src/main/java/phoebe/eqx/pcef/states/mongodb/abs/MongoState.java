@@ -15,7 +15,9 @@ public abstract class MongoState {
         while (continueWork) {
             Class clazz = getClass();
             Method method = findMethod(clazz, nextState);
-            nextState = (EMongoState) method.invoke(this);
+
+            EMongoState state = (EMongoState) method.invoke(this);
+            nextState = (state == null) ? EMongoState.END : state;
             continueWork = !EMongoState.END.equals(nextState);
         }
     }
@@ -38,10 +40,10 @@ public abstract class MongoState {
     }
 
     public void setNextState(EMongoState nextState) {
-    /*    if (nextState == null) {
+        if (nextState == null) {
             this.nextState = EMongoState.END;
-        } else {*/
-        this.nextState = nextState;
-//        }
+        } else {
+            this.nextState = nextState;
+        }
     }
 }
