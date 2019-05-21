@@ -5,6 +5,7 @@ import com.mongodb.DBObject;
 import phoebe.eqx.pcef.enums.state.EMongoState;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.Config;
+import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 import phoebe.eqx.pcef.services.mogodb.MongoDBService;
 import phoebe.eqx.pcef.states.mongodb.abs.MessageMongoRecieved;
 import phoebe.eqx.pcef.states.mongodb.abs.MongoState;
@@ -13,11 +14,11 @@ import phoebe.eqx.pcef.utils.Interval;
 public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
 
 
-    public W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE(MongoDBService mongoDBService) {
-        this.mongoDBService = mongoDBService;
+    public W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE(MongoDBConnect dbConnect) {
+        this.dbConnect = dbConnect;
     }
 
-    private MongoDBService mongoDBService;
+    private MongoDBConnect dbConnect;
     private EState usageMonitoringState;
     private boolean responseSuccess;
 
@@ -30,8 +31,8 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
     public EMongoState checkProfileAppoinmentDate() {
         EMongoState nextState = null;
         try {
-            if (mongoDBService.findProfileTimeForAppointmentDate()) {
-                DBObject dbObject = mongoDBService.findAndModifyLockProfile();
+            if (dbConnect.getProfileService().findProfileTimeForAppointmentDate()) {
+                DBObject dbObject = dbConnect.getProfileService().findAndModifyLockProfile();
                 if (dbObject != null) {
                     nextState = EMongoState.FIND_QUOTA_EXPIRE;
                 } else {
@@ -55,8 +56,8 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
     public EMongoState findQuotaExpire() {
         EMongoState nextState = null;
         try {
-            if (mongoDBService.findQuotaExpire()) {
-                DBObject dbObject = mongoDBService.findAndModifyLockQuotaExpire();
+            if (dbConnect.getQuotaService().findQuotaExpire()) {
+                DBObject dbObject = dbConnect.getQuotaService().findAndModifyLockQuotaExpire();
                 if (dbObject != null) {
                     nextState = EMongoState.FIND_USAGE_RESOURCE;
                 } else {
@@ -81,7 +82,7 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
     public EMongoState findUsageResource() {
         EMongoState nextState = null;
         try {
-            if (mongoDBService.findTransactionDoneGroupByResourceQuotaExpire().size() > 0) {
+            if (dbConnect.getTransactionService().findTransactionDoneGroupByResourceQuotaExpire().size() > 0) {
                 setUsageMonitoringState(EState.W_USAGE_MONITORING_UPDATE);
                 nextState = EMongoState.END;
             } else {
