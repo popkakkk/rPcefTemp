@@ -9,6 +9,9 @@ import phoebe.eqx.pcef.enums.config.EConfig;
 import phoebe.eqx.pcef.enums.stats.EStatCmd;
 import phoebe.eqx.pcef.enums.stats.EStatMode;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -86,6 +89,13 @@ public class PCEFUtils {
     }
 
     public static String getValueFromJson(String key, String json) {
+        Type type = new TypeToken<Map<String, Object>>() {
+        }.getType();
+        Map<String, String> map = new GsonBuilder().create().fromJson(json, type);
+        return map.get(key);
+    }
+
+    public static String getObjecFromJson(String key, String json) {
         Type type = new TypeToken<Map<String, Object>>() {
         }.getType();
         Map<String, String> map = new GsonBuilder().create().fromJson(json, type);

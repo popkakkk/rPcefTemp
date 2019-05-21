@@ -1,5 +1,6 @@
 package phoebe.eqx.pcef.instance;
 
+import phoebe.eqx.pcef.core.model.Profile;
 import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.message.builder.req.OCFUsageMonitoringRequest;
@@ -14,7 +15,10 @@ public class PCEFInstance {
 
     private String sessionId; // from SACF
 
+    private Date startTime = new Date();
+
     private TestResponseData testResponseData;
+    private Profile profile;
 
     private Transaction transaction;
     private List<Transaction> otherStartTransactions = new ArrayList<>();
@@ -32,7 +36,10 @@ public class PCEFInstance {
     //Commit Part
     private boolean quotaExhaust;
     private Quota quotaToCommit;
-    private transient Map<String, String> countUnitMap;
+    private transient Map<String, Integer> countUnitMap;
+
+
+    private Quota quotaExpire;
 
 
     public UsageMonitoringRequest getUsageMonitoringRequest() {
@@ -112,11 +119,11 @@ public class PCEFInstance {
         this.quotaToCommit = quotaCommit;
     }
 
-    public Map<String, String> getCountUnitMap() {
+    public Map<String, Integer> getCountUnitMap() {
         return countUnitMap;
     }
 
-    public void setCountUnitMap(Map<String, String> countUnitMap) {
+    public void setCountUnitMap(Map<String, Integer> countUnitMap) {
         this.countUnitMap = countUnitMap;
     }
 
@@ -142,5 +149,25 @@ public class PCEFInstance {
 
     public void setQuotaToCommit(Quota quotaToCommit) {
         this.quotaToCommit = quotaToCommit;
+    }
+
+    public Profile getProfile() {
+        return profile;
+    }
+
+    public void setProfile(Profile profile) {
+        this.profile = profile;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public Quota getQuotaExpire() {
+        return quotaExpire;
+    }
+
+    public void setQuotaExpire(Quota quotaExpire) {
+        this.quotaExpire = quotaExpire;
     }
 }

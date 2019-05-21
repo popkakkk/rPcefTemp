@@ -18,6 +18,7 @@ import phoebe.eqx.pcef.core.data.InvokeObject;
 import phoebe.eqx.pcef.enums.EEvent;
 import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.instance.AppInstance;
+import phoebe.eqx.pcef.states.L1.W_E11_TIMEOUT;
 import phoebe.eqx.pcef.states.L1.W_USAGE_MONITORING;
 import phoebe.eqx.pcef.states.abs.State;
 import phoebe.eqx.pcef.utils.*;
@@ -154,14 +155,21 @@ public class EQX4Wrapper {
 
             /***** Timeout and retry timeout *****/
             if (equinoxPropertiesAF.isTimeout()) {
-                InvokeManager invokeManager = appInstance.getInvokeManager();
-                if (!invokeManager.retryTimeout(appInstance)) {
-                    //set event timeout
-                    invokeManager.setEventTimeout();
+
+                /**Check E11 timeout vt exhaust**/
+                if (appInstance.getInvokeManager() == null) { //invokeObject == null is no waiting external response
+                    appInstance.create("", "", ERequestType.E11_TIMEOUT);
                 } else {
-                    //retry success
-                    process = false;
+                    InvokeManager invokeManager = appInstance.getInvokeManager();
+                    if (!invokeManager.retryTimeout(appInstance)) {
+                        //set event timeout
+                        invokeManager.setEventTimeout();
+                    } else {
+                        //retry success
+                        process = false;
+                    }
                 }
+
             }
 
         } catch (Exception e) {
@@ -197,6 +205,10 @@ public class EQX4Wrapper {
             switch (requestType) {
                 case USAGE_MONITORING:
                     state = new W_USAGE_MONITORING(appInstance);
+                    break;
+                case E11_TIMEOUT:
+                    state = new W_E11_TIMEOUT(appInstance);
+                    break;
             }
             if (state != null) {
                 state.dispatch();

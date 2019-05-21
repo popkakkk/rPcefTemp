@@ -25,8 +25,7 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
     }
 
     private MongoDBService mongoDBService;
-    private EState usageMonitoringState;
-    private boolean responseSuccess;
+
 
     private boolean waitForProcess;
     private boolean lockByMyTransaction;
@@ -173,26 +172,5 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
     }
 
 
-    public EState getUsageMonitoringState() {
-        return usageMonitoringState;
-    }
 
-    public void setUsageMonitoringState(EState usageMonitoringState) {
-        this.usageMonitoringState = usageMonitoringState;
-    }
-
-    public boolean isResponseSuccess() {
-        return responseSuccess;
-    }
-
-    public void setResponseSuccess() {
-        setUsageMonitoringState(EState.END);
-        this.responseSuccess = true;
-    }
-
-
-    public void setResponseFail() {
-        setUsageMonitoringState(EState.END);
-        this.responseSuccess = false;
-    }
 }

@@ -8,10 +8,19 @@ import phoebe.eqx.pcef.enums.stats.EStatCmd;
 import phoebe.eqx.pcef.enums.stats.EStatMode;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.message.builder.MessagePool;
-import phoebe.eqx.pcef.message.builder.req.GetResourceIdRequest;
+import phoebe.eqx.pcef.message.parser.res.product.GetResourceIdResponse;
 import phoebe.eqx.pcef.utils.MessageFlow;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 import phoebe.eqx.pcef.utils.ValidateMessage;
+import phoebe.eqx.pcef.utils.erd.ERDData;
+import phoebe.eqx.pcef.utils.erd.ERDHeader;
+import phoebe.eqx.pcef.utils.erd.Header;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.List;
 
 public class GetResourceIdService extends PCEFService {
 
@@ -25,13 +34,29 @@ public class GetResourceIdService extends PCEFService {
             String invokeId = "getResourceId_" /*+ PCEFUtils.getDate(0).getTime() + PCEFUtils.randomNumber3Digit()*/;
 
             // logic build
-            String data = "test data";
+            StringWriter erdHeaderWriter = new StringWriter();
 
-            GetResourceIdRequest getResourceIdRequest = new GetResourceIdRequest();
+            JAXBContext context = JAXBContext.newInstance(ERDHeader.class);
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+
+
+            List<Header> headers = Arrays.asList(
+                    new Header("Content-Type", "application/json"),
+                    new Header("x-app-name", "Singularity"),
+                    new Header("x-channel", "WEB"),
+                    new Header("x-transaction-id", appInstance.getPcefInstance().getUsageMonitoringRequest().getTid()),
+                    new Header("x-auth-role", "SI"),
+                    new Header("x-user-request", appInstance.getPcefInstance().getUsageMonitoringRequest().getTid())
+            );
+
+            ERDHeader erdHeader = new ERDHeader();
+            erdHeader.setHeaders(headers);
+            marshaller.marshal(erdHeader, erdHeaderWriter);
 
             //build message
             MessagePool messagePool = new MessagePool(abstractAF);
-            EquinoxRawData equinoxRawData = messagePool.getResourceIdRequest(getResourceIdRequest, invokeId);
+            EquinoxRawData equinoxRawData = messagePool.getResourceIdRequest(erdHeaderWriter.toString(), invokeId);
 
             //add raw data to list
             invokeExternal(equinoxRawData, Operation.GetResourceId, messagePool.getRequestObj());
@@ -52,8 +77,8 @@ public class GetResourceIdService extends PCEFService {
             //extract
             Operation operation = Operation.GetResourceId;
 
-            /*TestResponseData testResponseData = (TestResponseData) extractResponse(operation);
-            this.appInstance.getPcefInstance().setTestResponseData(testResponseData);*/
+            GetResourceIdResponse getResourceIdResponse = (GetResourceIdResponse) extractResponse(operation);
+
 
             //validate
             ValidateMessage.validateTestData();
@@ -64,9 +89,9 @@ public class GetResourceIdService extends PCEFService {
             //summarylog res
 //            appInstance.setSummaryLogExternalResponse(operation, SummaryLog.getSummaryLogResponse(operation, testResponseData));
 
-            resourceId = "resourceId12345";
+            resourceId = getResourceIdResponse.getResultData().getProducts().get(0).getProductId(); // get index = 0
 
-            PCEFUtils.writeMessageFlow("Build Get ResourceResponse ID Request", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Read Get ResourceResponse ID Response", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
         } catch (TimeoutException e) {
             // handle time out
         } catch (ResponseErrorException e) {
@@ -75,7 +100,7 @@ public class GetResourceIdService extends PCEFService {
             //increase stat fail
             //summarylog fail
             // read fail
-            PCEFUtils.writeMessageFlow("Build Get ResourceResponse ID Request", MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Read Get ResourceResponse ID Response", MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
 
         }
 

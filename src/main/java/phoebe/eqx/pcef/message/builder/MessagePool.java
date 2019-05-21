@@ -6,7 +6,6 @@ import ec02.af.data.AFDataFactory;
 import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.enums.config.EConfig;
-import phoebe.eqx.pcef.message.builder.req.GetResourceIdRequest;
 import phoebe.eqx.pcef.message.builder.req.OCFUsageMonitoringRequest;
 import phoebe.eqx.pcef.message.builder.res.UsageMonitoringResponse;
 import phoebe.eqx.pcef.utils.PCEFUtils;
@@ -26,14 +25,14 @@ public class MessagePool {
     }
 
 
-    public EquinoxRawData getResourceIdRequest(GetResourceIdRequest getResourceIdRequest, String invokeId) {
-        String reqData = new Gson().toJson(getResourceIdRequest);
+    public EquinoxRawData getResourceIdRequest(String data, String invokeId) {
+        String reqData = data;
         EquinoxRawData rawData = AFDataFactory.createEquinoxRawData();
         this.requestObj = reqData;
         Map<String, String> map = new HashMap<>();
         map.put("name", "HTTP");
         map.put("type", "request");
-        map.put("ctype", "text/plain");
+        map.put("ctype", "text/json");
         map.put("to", PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_TEST));
         map.put("oid", "0.0.17.1218.8.7.0");
         map.put("timeout", PCEFUtils.getWarmConfig(abstractAF, EConfig.TIMEOUT_TEST));

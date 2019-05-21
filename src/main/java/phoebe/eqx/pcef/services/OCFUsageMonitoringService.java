@@ -125,7 +125,7 @@ public class OCFUsageMonitoringService extends PCEFService {
     }
 
 
-    private ArrayList<ResourceRequest> getResourceCommitRequest(Quota quotaCommit, Map<String, String> countUnitMap) {
+    private ArrayList<ResourceRequest> getResourceCommitRequest(Quota quotaCommit, Map<String, Integer> countUnitMap) {
         ArrayList<ResourceRequest> resourceRequestList = new ArrayList<>();
         quotaCommit.getResources().forEach(resourceQuota -> {
             ResourceRequest resourceRequest = new ResourceRequest();
@@ -134,7 +134,7 @@ public class OCFUsageMonitoringService extends PCEFService {
             resourceRequest.setMonitoringKey(quotaCommit.getMonitoringKey());
             resourceRequest.setRtid(appInstance.getPcefInstance().getTransaction().getRtid());
             resourceRequest.setUnitType("unit");
-            resourceRequest.setUsedUnit(countUnitMap.get(resourceQuota.getResourceId()));
+            resourceRequest.setUsedUnit(String.valueOf(countUnitMap.get(resourceQuota.getResourceId())));
             resourceRequest.setReportingReason("0");
             resourceRequestList.add(resourceRequest);
         });
@@ -156,7 +156,7 @@ public class OCFUsageMonitoringService extends PCEFService {
             if (pcefInstance.isQuotaExhaust()) {//update commit
                 //set unit to Resource
                 Quota quotaCommit = pcefInstance.getQuotaToCommit();
-                Map<String, String> countUnitMap = pcefInstance.getCountUnitMap();
+                Map<String, Integer> countUnitMap = pcefInstance.getCountUnitMap();
                 umStartRequest.setResources(getResourceCommitRequest(quotaCommit, countUnitMap));
             } else {
                 //update initial

@@ -5,6 +5,7 @@ import com.mongodb.*;
 import com.mongodb.client.MongoDatabase;
 import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.data.ResourceResponse;
+import phoebe.eqx.pcef.enums.config.EConfig;
 import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
 import phoebe.eqx.pcef.core.data.ResourceQuota;
 import phoebe.eqx.pcef.enums.EStatusLifeCycle;
@@ -350,6 +351,10 @@ public class MongoDBService {
         return findAndModify(Config.COLLECTION_QUOTA_NAME, query, update);
     }
 
+    public DBObject findAndModifyLockQuotaExpire() {
+        return findAndModifyLockQuota(appInstance.getPcefInstance().getQuotaExpire().getMonitoringKey());
+    }
+
 
     //---- Quota function----------------------------------------------------------------------------------------------
 
@@ -534,6 +539,54 @@ public class MongoDBService {
     }
 */
 
+    public boolean findQuotaExpire() {
+        Date currentTime = appInstance.getPcefInstance().getStartTime();
+
+        BasicDBObject search = new BasicDBObject();
+        search.put(EQuota.expireDate.name(), new BasicDBObject("$lte", currentTime));
+        DBCursor dbCursor = findByQuery(EConfig.COLLECTION_QUOTA_NAME.getConfigName(), search);
+
+        if (dbCursor.hasNext()) {//expire
+            DBObject dbObject = dbCursor.next();
+            Quota quota = gson.fromJson(gson.toJson(dbObject), Quota.class);
+            appInstance.getPcefInstance().setQuotaExpire(quota);
+
+            AFLog.d("expireDate :" + quota.getExpireDate());
+            AFLog.d("currentTime = " + currentTime);
+            return true;
+        } else {
+            AFLog.d("quota not found");
+        }
+
+        return false;
+    }
+
+
+    public boolean findProfileTimeForAppointmentDate() {
+
+
+        Date currentTime = appInstance.getPcefInstance().getStartTime();
+        BasicDBObject search = new BasicDBObject();
+        search.put(EProfile.appointmentDate.name(), new BasicDBObject("$lte", currentTime));
+
+        DBCursor dbCursor = findByQuery(EConfig.COLLECTION_PROFILE_NAME.getConfigName(), search);
+        if (dbCursor.hasNext()) {//expire
+            DBObject dbObject = dbCursor.next();
+            Profile profile = gson.fromJson(gson.toJson(dbObject), Profile.class);
+            appInstance.getPcefInstance().setProfile(profile);
+
+            AFLog.d("userValue :" + profile.getUserValue());
+            AFLog.d("appointmentDate :" + profile.getAppointmentDate());
+            AFLog.d("currentTime = :" + currentTime);
+
+            return true;
+        } else {
+            AFLog.d("profile not found");
+        }
+
+        return false;
+    }
+
     public Date calMinExpireDate(List<BasicDBObject> quotaBasicObjectList) {
         Date minDate = null;
         for (BasicDBObject basicDBObject : quotaBasicObjectList) {
@@ -603,8 +656,12 @@ public class MongoDBService {
 
     }
 
-    public boolean checkQuotaAvailable(Quota quota) {
+    public Map<String, Integer> findTransactionDoneGroupByResourceQuotaExpire() {
+        return findTransactionDoneGroupByResource(appInstance.getPcefInstance().getQuotaExpire());
+    }
 
+
+    public Map<String, Integer> findTransactionDoneGroupByResource(Quota quota) {
         BasicDBObject match = new BasicDBObject();
         match.put(ETransaction.monitoringKey.name(), quota.getMonitoringKey());
         match.put(ETransaction.status.name(), EStatusLifeCycle.Done.getName());
@@ -613,24 +670,29 @@ public class MongoDBService {
         group.put("_id", "$" + ETransaction.resourceId.name());
         group.put("count", new BasicDBObject("$sum", 1));
 
-        Iterator<DBObject> groupTransactionByResourceIterator = aggregateMatch(Config.COLLECTION_TRANSACTION_NAME, match, group).iterator();
+        Map<String, Integer> countUnitByResourceMap = new HashMap<>();
+        Iterator<DBObject> transactionGroupByResourceIterator = aggregateMatch(Config.COLLECTION_TRANSACTION_NAME, match, group).iterator();
+        while (transactionGroupByResourceIterator.hasNext()) {
+            DBObject dbObject = transactionGroupByResourceIterator.next();
 
-        int sumTransaction = 0;
-        Map<String, String> countUnitMap = new HashMap<>();
-        while (groupTransactionByResourceIterator.hasNext()) {
-            DBObject dbObject = groupTransactionByResourceIterator.next();
-
-            Integer count = (int) Double.parseDouble(dbObject.get("count").toString());
+            int count = (int) Double.parseDouble(dbObject.get("count").toString());
             String resourceId = dbObject.get("_id").toString();
 
             if (appInstance.getPcefInstance().getTransaction().getResourceId().equals(resourceId)) {
                 count += 1;//resource of this transaction
             }
 
-            sumTransaction += count;
-
-            countUnitMap.put(resourceId, String.valueOf(count));
+            countUnitByResourceMap.put(resourceId, count);
         }
+        appInstance.getPcefInstance().setCountUnitMap(countUnitByResourceMap);
+
+        return countUnitByResourceMap;
+    }
+
+    public boolean checkQuotaAvailable(Quota quota) {
+
+        Map<String, Integer> countUnitByResourceMap = findTransactionDoneGroupByResource(quota);
+        int sumTransaction = countUnitByResourceMap.values().stream().mapToInt(count -> count).sum();
 
         int quotaUnit = quota.getQuotaByKey().getUnit();
         if (quotaUnit > sumTransaction) {
@@ -639,12 +701,10 @@ public class MongoDBService {
         } else {
             AFLog.d("Quota Exhaust");
             appInstance.getPcefInstance().setQuotaExhaust(true);
-            appInstance.getPcefInstance().setCountUnitMap(countUnitMap);
             appInstance.getPcefInstance().setQuotaForCommit(quota);
             return false;
         }
     }
-
 
     private void writeQueryLog(String action, String collection, String condition) {
         AFLog.d("[Query] " + action + " " + collection + ", condition =" + condition);
