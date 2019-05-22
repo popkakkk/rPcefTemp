@@ -3,35 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="32471aa2-7896-4ac1-ad25-14aadc9e8f5d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CustomLog/PreReleasedTest.log" beforeDir="false" afterPath="$PROJECT_DIR$/CustomLog/PreReleasedTest.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conf/rPCEF.EC02.0.0" beforeDir="false" afterPath="$PROJECT_DIR$/conf/rPCEF.EC02.0.0" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/log/rPCEF.EC02LIB.0.0.log" beforeDir="false" afterPath="$PROJECT_DIR$/log/rPCEF.EC02LIB.0.0.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scene/scene_test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/scene/scene_test.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scene/scene_test_update_new_resource.xml" beforeDir="false" afterPath="$PROJECT_DIR$/scene/scene_test_update_new_quota.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/enums/Operation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/enums/Operation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/enums/config/EConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/enums/config/EConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/instance/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/instance/Config.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/instance/InvokeManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/instance/InvokeManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/instance/PCEFInstance.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/instance/PCEFInstance.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/main/EQX4Wrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/main/EQX4Wrapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/message/builder/MessagePool.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/message/builder/MessagePool.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/message/parser/req/UsageMonitoringRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/message/parser/req/UsageMonitoringRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/services/GetResourceIdService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/services/GetResourceIdService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/services/OCFUsageMonitoringService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/services/OCFUsageMonitoringService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/services/PCEFService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/services/PCEFService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/services/UsageMonitoringService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/services/UsageMonitoringService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/services/mogodb/MongoDBConnect.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/services/mogodb/MongoDBConnect.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/services/mogodb/MongoDBService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/services/mogodb/MongoDBService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/services/mogodb/ProfileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/services/mogodb/ProfileService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/services/mogodb/QuotaService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/services/mogodb/QuotaService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/services/mogodb/TransactionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/services/mogodb/TransactionService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/states/L1/W_E11_TIMEOUT.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/states/L1/W_E11_TIMEOUT.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/states/L1/W_USAGE_MONITORING.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/states/L1/W_USAGE_MONITORING.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/states/mongodb/W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/states/mongodb/W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/states/mongodb/W_MONGODB_PROCESS_STATE.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/states/mongodb/W_MONGODB_PROCESS_STATE.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/states/mongodb/abs/MongoState.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/pcef/states/mongodb/abs/MongoState.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/phoebe/eqx/test/MainTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/phoebe/eqx/test/MainTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/META-INF/rPCEF.kotlin_module" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/phoebe/eqx/pcef/enums/Operation.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/phoebe/eqx/pcef/enums/Operation.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/phoebe/eqx/pcef/enums/config/EConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/phoebe/eqx/pcef/enums/config/EConfig.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/phoebe/eqx/pcef/instance/Config.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/phoebe/eqx/pcef/instance/Config.class" afterDir="false" />
@@ -42,7 +13,6 @@
       <change beforePath="$PROJECT_DIR$/target/classes/phoebe/eqx/pcef/services/PCEFService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/phoebe/eqx/pcef/services/PCEFService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/phoebe/eqx/pcef/states/L1/W_USAGE_MONITORING.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/phoebe/eqx/pcef/states/L1/W_USAGE_MONITORING.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/phoebe/eqx/test/MainTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/phoebe/eqx/test/MainTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/phoebe/eqx/pcef/service/MongoDBTest.class" beforeDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -300,138 +270,6 @@
             <path>
               <item name="rPCEF" type="b2602c69:ProjectViewProjectNode" />
               <item name="rPCEF" type="462c0819:PsiDirectoryNode" />
-              <item name="conf" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="rPCEF" type="b2602c69:ProjectViewProjectNode" />
-              <item name="rPCEF" type="462c0819:PsiDirectoryNode" />
-              <item name="log" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="rPCEF" type="b2602c69:ProjectViewProjectNode" />
-              <item name="rPCEF" type="462c0819:PsiDirectoryNode" />
-              <item name="scene" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="rPCEF" type="b2602c69:ProjectViewProjectNode" />
-              <item name="rPCEF" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="rPCEF" type="b2602c69:ProjectViewProjectNode" />
-              <item name="rPCEF" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="rPCEF" type="b2602c69:ProjectViewProjectNode" />
-              <item name="rPCEF" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="rPCEF" type="b2602c69:ProjectViewProjectNode" />
-              <item name="rPCEF" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="eqx" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="rPCEF" type="b2602c69:ProjectViewProjectNode" />
-              <item name="rPCEF" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="eqx" type="462c0819:PsiDirectoryNode" />
-              <item name="pcef" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="rPCEF" type="b2602c69:ProjectViewProjectNode" />
-              <item name="rPCEF" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="eqx" type="462c0819:PsiDirectoryNode" />
-              <item name="pcef" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="rPCEF" type="b2602c69:ProjectViewProjectNode" />
-              <item name="rPCEF" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="eqx" type="462c0819:PsiDirectoryNode" />
-              <item name="pcef" type="462c0819:PsiDirectoryNode" />
-              <item name="message" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="rPCEF" type="b2602c69:ProjectViewProjectNode" />
-              <item name="rPCEF" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="eqx" type="462c0819:PsiDirectoryNode" />
-              <item name="pcef" type="462c0819:PsiDirectoryNode" />
-              <item name="message" type="462c0819:PsiDirectoryNode" />
-              <item name="builder" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="rPCEF" type="b2602c69:ProjectViewProjectNode" />
-              <item name="rPCEF" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="eqx" type="462c0819:PsiDirectoryNode" />
-              <item name="pcef" type="462c0819:PsiDirectoryNode" />
-              <item name="services" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="rPCEF" type="b2602c69:ProjectViewProjectNode" />
-              <item name="rPCEF" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="eqx" type="462c0819:PsiDirectoryNode" />
-              <item name="pcef" type="462c0819:PsiDirectoryNode" />
-              <item name="services" type="462c0819:PsiDirectoryNode" />
-              <item name="mogodb" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="rPCEF" type="b2602c69:ProjectViewProjectNode" />
-              <item name="rPCEF" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="eqx" type="462c0819:PsiDirectoryNode" />
-              <item name="pcef" type="462c0819:PsiDirectoryNode" />
-              <item name="states" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="rPCEF" type="b2602c69:ProjectViewProjectNode" />
-              <item name="rPCEF" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="eqx" type="462c0819:PsiDirectoryNode" />
-              <item name="pcef" type="462c0819:PsiDirectoryNode" />
-              <item name="states" type="462c0819:PsiDirectoryNode" />
-              <item name="L1" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="rPCEF" type="b2602c69:ProjectViewProjectNode" />
-              <item name="rPCEF" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="eqx" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="rPCEF" type="b2602c69:ProjectViewProjectNode" />
-              <item name="rPCEF" type="462c0819:PsiDirectoryNode" />
               <item name="target" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -455,7 +293,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1558498374358" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1558498968613" />
     <property name="last_opened_file_path" value="$USER_HOME$/Desktop/New folder/AAF" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -659,7 +497,7 @@
       <workItem from="1557970538746" duration="40408000" />
       <workItem from="1558058315603" duration="18596000" />
       <workItem from="1558082959369" duration="4965000" />
-      <workItem from="1558385563088" duration="43808000" />
+      <workItem from="1558385563088" duration="44402000" />
     </task>
     <task id="LOCAL-00001" summary="temp">
       <created>1556766534001</created>
@@ -724,7 +562,14 @@
       <option name="project" value="LOCAL" />
       <updated>1558431999249</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="fix get resource id">
+      <created>1558498424833</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1558498424833</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -748,11 +593,10 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="392636000" />
+    <option name="totallyTimeSpent" value="393230000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Designer" order="0" />
       <window_info id="UI Designer" order="1" />
@@ -760,7 +604,7 @@
       <window_info id="Favorites" order="3" side_tool="true" />
       <window_info id="Image Layers" order="4" />
       <window_info id="Structure" order="5" side_tool="true" weight="0.25" />
-      <window_info content_ui="combo" id="Project" order="6" weight="0.46438172" />
+      <window_info active="true" content_ui="combo" id="Project" order="6" visible="true" weight="0.46438172" />
       <window_info anchor="bottom" id="Version Control" order="0" weight="0.32954547" />
       <window_info anchor="bottom" id="Terminal" order="1" weight="0.32954547" />
       <window_info anchor="bottom" id="Database Changes" order="2" />
@@ -829,7 +673,8 @@
     <MESSAGE value="change new flow" />
     <MESSAGE value="uu" />
     <MESSAGE value="mongo connect" />
-    <option name="LAST_COMMIT_MESSAGE" value="mongo connect" />
+    <MESSAGE value="fix get resource id" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix get resource id" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
