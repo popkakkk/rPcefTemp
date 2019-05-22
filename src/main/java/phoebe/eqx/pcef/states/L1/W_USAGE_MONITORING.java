@@ -101,7 +101,7 @@ public class W_USAGE_MONITORING extends ComplexState {
             if (umStartService.receiveQuotaAndPolicy(OCFUsageMonitoringResponse)) {
                 dbConnect.getQuotaService().insertQuotaFirstUsage(quotaResponseList);
                 dbConnect.getTransactionService().updateTransaction(quotaResponseList);
-                dbConnect.getProfileService().updateProfileUnLockInitial();
+                dbConnect.getProfileService().updateProfileUnLockInitial(dbConnect.getQuotaService().getMinExpireDate());
 
                 usageMonitoringService.buildResponseUsageMonitoringSuccess();
             } else {
@@ -130,12 +130,13 @@ public class W_USAGE_MONITORING extends ComplexState {
         try {
             dbConnect = new MongoDBConnect(appInstance);
             UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
+
             ArrayList<Quota> quotaResponseList = dbConnect.getQuotaService().getQuotaFromUsageMonitoringResponse(OCFUsageMonitoringResponse);
 
             if (umStartService.receiveQuotaAndPolicy(OCFUsageMonitoringResponse)) {
                 dbConnect.getQuotaService().updateQuota(quotaResponseList);
                 dbConnect.getTransactionService().updateTransaction(quotaResponseList);
-                dbConnect.getProfileService().updateProfileUnLock();
+                dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
 
                 usageMonitoringService.buildResponseUsageMonitoringSuccess();
             } else {

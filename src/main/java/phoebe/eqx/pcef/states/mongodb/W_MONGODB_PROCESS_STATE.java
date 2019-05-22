@@ -16,6 +16,7 @@ import phoebe.eqx.pcef.states.mongodb.abs.MongoState;
 import phoebe.eqx.pcef.utils.Interval;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class W_MONGODB_PROCESS_STATE extends MongoState {
@@ -26,7 +27,7 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
     }
 
     private MongoDBConnect dbConnect;
-
+    private boolean responseSuccess;
 
     private boolean waitForProcess;
     private boolean lockByMyTransaction;
@@ -88,12 +89,12 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
                     Quota quota = new Gson().fromJson(new Gson().toJson(QuotaCursor.iterator().next()), Quota.class);
 
                     //count
-                    Map<String, Integer> countUnitByResourceMap = dbConnect.getTransactionService().findTransactionDoneGroupByResource(quota);
+                    ArrayList<Quota> myQuotaToList = new ArrayList<>();
+                    myQuotaToList.add(quota);
+                    Map<String, Integer> countUnitByResourceMap = dbConnect.getTransactionService().findTransactionDoneGroupByResource(myQuotaToList);
                     boolean checkQuotaAvailable = dbConnect.getQuotaService().checkQuotaAvailable(quota, countUnitByResourceMap);
                     if (checkQuotaAvailable) {
-                        ArrayList<Quota> quotaList = new ArrayList<>();
-                        quotaList.add(quota);
-                        dbConnect.getTransactionService().updateTransaction(quotaList);
+                        dbConnect.getTransactionService().updateTransaction(myQuotaToList);
 
                         setResponseSuccess();
                     } else {
@@ -132,7 +133,7 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
                         nextState = EMongoState.END;
                     } else {
                         if (dbConnect.getTransactionService().findMyTransactionDone()) {
-                            dbConnect.getProfileService().updateProfileUnLock();
+                            dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
                             setResponseSuccess();
                         } else {
                             nextState = EMongoState.FIND_QUOTA_BY_RESOURCE;
@@ -173,5 +174,19 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
         return nextState;
     }
 
+    public boolean isResponseSuccess() {
+        return responseSuccess;
+    }
+
+    public void setResponseSuccess() {
+        setUsageMonitoringState(EState.END);
+        this.responseSuccess = true;
+    }
+
+
+    public void setResponseFail() {
+        setUsageMonitoringState(EState.END);
+        this.responseSuccess = false;
+    }
 
 }

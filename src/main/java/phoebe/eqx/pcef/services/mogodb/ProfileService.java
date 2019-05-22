@@ -5,6 +5,7 @@ import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.model.Profile;
 import phoebe.eqx.pcef.enums.config.EConfig;
 import phoebe.eqx.pcef.enums.model.EProfile;
+import phoebe.eqx.pcef.enums.model.EQuota;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
@@ -15,22 +16,18 @@ import java.util.Date;
 
 public class ProfileService extends MongoDBService {
 
-    private Date minExpireDate;
-    private boolean haveNewQuota;
-
-
 
     public ProfileService(AppInstance appInstance, MongoClient mongoClient) {
-        super(appInstance, mongoClient);
+        super(appInstance, mongoClient,Config.COLLECTION_PROFILE_NAME);
     }
 
     public void insertProfile() {
         try {
             UsageMonitoringRequest usageMonitoringRequest = appInstance.getPcefInstance().getUsageMonitoringRequest();
             Profile profile = new Profile();
-            profile.set_id(usageMonitoringRequest.getPrivateId());
+            profile.set_id(usageMonitoringRequest.getUserValue());
             profile.setUserType("privateId");
-            profile.setUserValue(usageMonitoringRequest.getPrivateId());
+            profile.setUserValue(usageMonitoringRequest.getUserValue());
             profile.setIsProcessing(1);
 
             int firstNumber = 0;
@@ -59,7 +56,7 @@ public class ProfileService extends MongoDBService {
     public DBCursor findProfileByPrivateId() {
 
         try {
-            String privateId = appInstance.getPcefInstance().getUsageMonitoringRequest().getPrivateId();
+            String privateId = appInstance.getPcefInstance().getUsageMonitoringRequest().getUserValue();
             BasicDBObject searchQuery = new BasicDBObject();
             searchQuery.put(EProfile._id.name(), privateId);
 
@@ -100,15 +97,21 @@ public class ProfileService extends MongoDBService {
     }
 
 
-    public void updateProfileUnLockInitial() {
+    public void updateProfileUnLockInitial(Date quotaMinExpireDate) throws Exception {
         BasicDBObject updateQuery = new BasicDBObject();
-        updateQuery.put(EProfile.appointmentDate.name(), minExpireDate);
+
+        if (quotaMinExpireDate == null) {
+            throw new Exception("appointment date null");
+        }
+
+        updateQuery.put(EProfile.appointmentDate.name(), quotaMinExpireDate);
+        appInstance.getPcefInstance().setAppointmentDate(quotaMinExpireDate);
         updateQuery.put(EProfile.sessionId.name(), appInstance.getPcefInstance().getOcfSessionId());
         updateProfileUnlock(updateQuery);
     }
 
 
-    public void updateProfileUnLock() {
+    public void updateProfileUnLock(boolean haveNewQuota, Date minExpireDate) {
         BasicDBObject updateQuery = new BasicDBObject();
         if (haveNewQuota) {
             if (minExpireDate.before(appInstance.getPcefInstance().getAppointmentDate())) {
@@ -131,6 +134,7 @@ public class ProfileService extends MongoDBService {
 
         return findAndModify(Config.COLLECTION_PROFILE_NAME, query, update);
     }
+
     public boolean findProfileTimeForAppointmentDate() {
 
 
@@ -138,7 +142,7 @@ public class ProfileService extends MongoDBService {
         BasicDBObject search = new BasicDBObject();
         search.put(EProfile.appointmentDate.name(), new BasicDBObject("$lte", currentTime));
 
-        DBCursor dbCursor = findByQuery(EConfig.COLLECTION_PROFILE_NAME.getConfigName(), search);
+        DBCursor dbCursor = findByQuery(Config.COLLECTION_PROFILE_NAME, search);
         if (dbCursor.hasNext()) {//expire
             DBObject dbObject = dbCursor.next();
             Profile profile = gson.fromJson(gson.toJson(dbObject), Profile.class);
@@ -156,4 +160,8 @@ public class ProfileService extends MongoDBService {
         return false;
     }
 
+    public void removeProfile(String privateId) {
+        BasicDBObject delete = new BasicDBObject(EProfile._id.name(), privateId);
+        db.getCollection(Config.COLLECTION_TRANSACTION_NAME).remove(delete);
+    }
 }

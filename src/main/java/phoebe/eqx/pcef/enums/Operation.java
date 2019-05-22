@@ -14,6 +14,7 @@ public enum Operation {
     //update
     UpdateCorrection,
     UsageMonitoringUpdate,
+    UsageMonitoringStop,
 
     //response
     Response

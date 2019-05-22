@@ -1,5 +1,6 @@
 package phoebe.eqx.pcef.services;
 
+import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
 import phoebe.eqx.pcef.core.data.ResourceRequest;
@@ -41,6 +42,7 @@ public class OCFUsageMonitoringService extends PCEFService {
                 }
             }
             if (!resourceIdResponseList.contains(resourceRequest.getResourceId())) {
+                AFLog.d("resourceId:"+resourceRequest.getResourceId() + "dont have quota receive");
                 return false;
             }
         }

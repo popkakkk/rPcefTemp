@@ -13,6 +13,7 @@ import ec02.data.interfaces.ESxxData;
 import ec02.data.interfaces.EquinoxPropertiesAF;
 import ec02.data.interfaces.EquinoxRawData;
 import org.apache.commons.lang3.StringUtils;
+import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.instance.InvokeManager;
 import phoebe.eqx.pcef.core.data.InvokeObject;
 import phoebe.eqx.pcef.enums.EEvent;
@@ -101,13 +102,14 @@ public class EQX4Wrapper {
             }
 
             if (response) {
-                return null;
-            } else {
-                String str = gson.toJson(appInstance);
-                byte[] bytes = str.getBytes();
-                byte[] zipBytes = Zip.compressBytes(bytes);
-                return Base64.getEncoder().encodeToString(zipBytes);
+                appInstance = new AppInstance();//clear
             }
+
+            String str = gson.toJson(appInstance);
+            byte[] bytes = str.getBytes();
+            byte[] zipBytes = Zip.compressBytes(bytes);
+            return Base64.getEncoder().encodeToString(zipBytes);
+
 
         } catch (Exception e) {
             AFLog.e("Compose instance error", e);
@@ -134,7 +136,7 @@ public class EQX4Wrapper {
                     if (name.equalsIgnoreCase("http")
                             && cType.equalsIgnoreCase("text/plain")
                             && method.equalsIgnoreCase("post")
-                            && url.equalsIgnoreCase("/rpcef/api/v1/metering-method")) {
+                            && url.equalsIgnoreCase(Config.URL_USAGE_MONITORING)) {
                         //String cmd = PCEFUtils.getValueFromJson("command", val);
 
                         String val = rawData.getRawDataAttribute("val");
@@ -172,8 +174,14 @@ public class EQX4Wrapper {
 
             }
 
+            ERequestType requestType = appInstance.getRequestType();
+            AFLog.d("[Request Type]: " + requestType);
+            if (requestType == null) {
+                throw new Exception("Unknown request Type from message");
+            }
+
         } catch (Exception e) {
-            AFLog.e("Before process error", e);
+            AFLog.d("Before process error" + e.getStackTrace()[0]);
             process = false;
         }
         return process;
@@ -199,7 +207,7 @@ public class EQX4Wrapper {
         try {
             appInstance.setAbstractAF(abstractAF);
             ERequestType requestType = appInstance.getRequestType();
-            AFLog.d("[Request Type]: " + requestType);
+
 
             State state = null;
             switch (requestType) {

@@ -13,14 +13,15 @@ public class MongoDBService {
 
     protected AppInstance appInstance;
     protected DB db;
+    protected String collectionName;
 
     public Gson gson = new Gson();
 
 
-
-    public MongoDBService(AppInstance appInstance, MongoClient mongoClient) {
+    public MongoDBService(AppInstance appInstance, MongoClient mongoClient, String collectionName) {
         this.db = mongoClient.getDB(Config.MY_DB_NAME);
         this.appInstance = appInstance;
+        this.collectionName = collectionName;
     }
 
 

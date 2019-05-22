@@ -7,6 +7,7 @@ import phoebe.eqx.pcef.enums.Operation;
 import phoebe.eqx.pcef.enums.stats.EStatCmd;
 import phoebe.eqx.pcef.enums.stats.EStatMode;
 import phoebe.eqx.pcef.instance.AppInstance;
+import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.message.builder.MessagePool;
 import phoebe.eqx.pcef.message.parser.res.product.GetResourceIdResponse;
 import phoebe.eqx.pcef.utils.MessageFlow;
@@ -28,6 +29,11 @@ public class GetResourceIdService extends PCEFService {
         super(appInstance);
     }
 
+
+    private String generateTransactionId() {
+        return "t-" + PCEFUtils.getDate(0).getTime() + PCEFUtils.randomNumber3Digit();
+    }
+
     public void buildGetResourceId() {
         try {
             //create invokeId
@@ -41,13 +47,16 @@ public class GetResourceIdService extends PCEFService {
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
 
+            String url = Config.URL_PRODUCT + "?category=IoT&page=1&limit=20&sort=id&order=desc" + "&keyword=" + appInstance.getPcefInstance().getUsageMonitoringRequest().getResourceName();
+
+
             List<Header> headers = Arrays.asList(
                     new Header("Content-Type", "application/json"),
                     new Header("x-app-name", "Singularity"),
                     new Header("x-channel", "WEB"),
-                    new Header("x-transaction-id", appInstance.getPcefInstance().getUsageMonitoringRequest().getTid()),
+                    new Header("x-transaction-id", generateTransactionId()), //gen to product
                     new Header("x-auth-role", "SI"),
-                    new Header("x-user-request", appInstance.getPcefInstance().getUsageMonitoringRequest().getTid())
+                    new Header("x-user-request", appInstance.getPcefInstance().getUsageMonitoringRequest().getUserValue())
             );
 
             ERDHeader erdHeader = new ERDHeader();
@@ -56,13 +65,13 @@ public class GetResourceIdService extends PCEFService {
 
             //build message
             MessagePool messagePool = new MessagePool(abstractAF);
-            EquinoxRawData equinoxRawData = messagePool.getResourceIdRequest(erdHeaderWriter.toString(), invokeId);
+            EquinoxRawData equinoxRawData = messagePool.getResourceIdRequest(erdHeaderWriter.toString(), invokeId,url);
 
             //add raw data to list
             invokeExternal(equinoxRawData, Operation.GetResourceId, messagePool.getRequestObj());
 
             //increase stat
-            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.PCEF_RECEIVE_TEST_DATA);
+//            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.PCEF_RECEIVE_TEST_DATA);
 
             PCEFUtils.writeMessageFlow("Build Get ResourceResponse ID Request", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
         } catch (Exception e) {
@@ -91,7 +100,7 @@ public class GetResourceIdService extends PCEFService {
 
             resourceId = getResourceIdResponse.getResultData().getProducts().get(0).getProductId(); // get index = 0
 
-            PCEFUtils.writeMessageFlow("Read Get ResourceResponse ID Response", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Read Get ResourceResponse ID Response :" + resourceId, MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
         } catch (TimeoutException e) {
             // handle time out
         } catch (ResponseErrorException e) {

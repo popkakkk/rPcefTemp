@@ -39,7 +39,7 @@ public class PCEFInstance {
     private transient Map<String, Integer> countUnitMap;
 
 
-    private Quota quotaExpire;
+    private List<Quota> quotaExpire;
 
 
     public UsageMonitoringRequest getUsageMonitoringRequest() {
@@ -163,11 +163,11 @@ public class PCEFInstance {
         return startTime;
     }
 
-    public Quota getQuotaExpire() {
+    public List<Quota> getQuotaExpire() {
         return quotaExpire;
     }
 
-    public void setQuotaExpire(Quota quotaExpire) {
+    public void setQuotaExpire(List<Quota> quotaExpire) {
         this.quotaExpire = quotaExpire;
     }
 }

@@ -1,28 +1,24 @@
 package phoebe.eqx.pcef.message.parser.req;
 
 public class UsageMonitoringRequest {
+    private String command;
     private String sessionId;
     private String tid;
     private String rtid;
     private String actualTime;
     private String app;
     private String clientId;
-    private String privateId;
+    private String userType;
+    private String userValue;
     private String resourceName;
 
 
-    public UsageMonitoringRequest() {
+    public String getCommand() {
+        return command;
     }
 
-    public UsageMonitoringRequest(String sessionId, String tid, String rtid, String actualTime, String app, String clientId, String privateId, String resourceName) {
-        this.sessionId = sessionId;
-        this.tid = tid;
-        this.rtid = rtid;
-        this.actualTime = actualTime;
-        this.app = app;
-        this.clientId = clientId;
-        this.privateId = privateId;
-        this.resourceName = resourceName;
+    public void setCommand(String command) {
+        this.command = command;
     }
 
     public String getSessionId() {
@@ -73,12 +69,20 @@ public class UsageMonitoringRequest {
         this.clientId = clientId;
     }
 
-    public String getPrivateId() {
-        return privateId;
+    public String getUserType() {
+        return userType;
     }
 
-    public void setPrivateId(String privateId) {
-        this.privateId = privateId;
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
+
+    public String getUserValue() {
+        return userValue;
+    }
+
+    public void setUserValue(String userValue) {
+        this.userValue = userValue;
     }
 
     public String getResourceName() {

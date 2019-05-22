@@ -24,10 +24,11 @@ public class QuotaService extends MongoDBService {
 
     private Date minExpireDate;
     private boolean haveNewQuota;
+    List<Quota> quotaExpireList = new ArrayList<>();
 
 
     public QuotaService(AppInstance appInstance, MongoClient mongoClient) {
-        super(appInstance, mongoClient);
+        super(appInstance, mongoClient,Config.COLLECTION_QUOTA_NAME);
     }
 
 
@@ -95,6 +96,12 @@ public class QuotaService extends MongoDBService {
         this.minExpireDate = calMinExpireDate(quotaBasicObjectList);
     }
 
+
+    public void removeQuota(String privateId) {
+        BasicDBObject delete = new BasicDBObject(EQuota.userValue.name(), privateId);
+        db.getCollection(Config.COLLECTION_QUOTA_NAME).remove(delete);
+    }
+
     public void updateQuota(ArrayList<Quota> quotaResponses) {
 
         PCEFInstance pcefInstance = appInstance.getPcefInstance();
@@ -104,8 +111,6 @@ public class QuotaService extends MongoDBService {
 
         //##check mk change by resourceId request
         if (pcefInstance.isQuotaExhaust()) {
-
-
             String oldMk = pcefInstance.getQuotaToCommit().getMonitoringKey();
             String newMk = null;
 
@@ -172,34 +177,45 @@ public class QuotaService extends MongoDBService {
     }
 
 
-    public DBCursor findQuotaByTransaction(Transaction transaction) {
+    private DBCursor findQuotaByTransaction(Transaction transaction) {
         BasicDBObject searchQuery = new BasicDBObject();
         searchQuery.put(EQuota.userValue.name(), transaction.getUserValue());
         searchQuery.put(EQuota.resources.name(), new BasicDBObject("$elemMatch", new BasicDBObject("resourceId", transaction.getResourceId())));
         return findByQuery(Config.COLLECTION_QUOTA_NAME, searchQuery);
     }
 
+    private List<Quota> getQuotaListFromDBCursor(DBCursor quotaCursor) {
+        List<Quota> quotaList = new ArrayList<>();
+        while (quotaCursor.hasNext()) {
+            DBObject dbObject = quotaCursor.next();
+            Quota quota = gson.fromJson(gson.toJson(dbObject), Quota.class);
+            AFLog.d("mk:" + quota.getMonitoringKey() + ",expireDate :" + quota.getExpireDate());
+            quotaList.add(quota);
+        }
+        return quotaList;
+    }
 
-    public boolean findQuotaExpire() {
+
+    public List<Quota> findAllQuotaByPrivateId() {
+        BasicDBObject search = new BasicDBObject();
+        search.put(EQuota.userValue.name(), appInstance.getPcefInstance().getProfile().getUserValue());
+        DBCursor dbCursor = findByQuery(Config.COLLECTION_QUOTA_NAME, search);
+        return getQuotaListFromDBCursor(dbCursor);
+    }
+
+    public List<Quota> findQuotaExpire() {
         Date currentTime = appInstance.getPcefInstance().getStartTime();
 
         BasicDBObject search = new BasicDBObject();
+        search.put(EQuota.userValue.name(), appInstance.getPcefInstance().getProfile().getUserValue());
         search.put(EQuota.expireDate.name(), new BasicDBObject("$lte", currentTime));
-        DBCursor dbCursor = findByQuery(EConfig.COLLECTION_QUOTA_NAME.getConfigName(), search);
+        DBCursor dbCursor = findByQuery(Config.COLLECTION_QUOTA_NAME, search);
+        AFLog.d("currentTime = " + currentTime);
+        List<Quota> quotaExpireList = getQuotaListFromDBCursor(dbCursor);
+        this.quotaExpireList = quotaExpireList;
+        appInstance.getPcefInstance().setQuotaExpire(quotaExpireList);
 
-        if (dbCursor.hasNext()) {//expire
-            DBObject dbObject = dbCursor.next();
-            Quota quota = gson.fromJson(gson.toJson(dbObject), Quota.class);
-            appInstance.getPcefInstance().setQuotaExpire(quota);
-
-            AFLog.d("expireDate :" + quota.getExpireDate());
-            AFLog.d("currentTime = " + currentTime);
-            return true;
-        } else {
-            AFLog.d("quota not found");
-        }
-
-        return false;
+        return quotaExpireList;
     }
 
 
@@ -261,8 +277,25 @@ public class QuotaService extends MongoDBService {
         return findAndModify(Config.COLLECTION_QUOTA_NAME, query, update);
     }
 
-    public DBObject findAndModifyLockQuotaExpire() {
-        return findAndModifyLockQuota(appInstance.getPcefInstance().getQuotaExpire().getMonitoringKey());
+
+    public boolean findAndModifyLockQuotaExpire() {
+        boolean canProcess = true;
+        for (Quota quota : appInstance.getPcefInstance().getQuotaExpire()) {
+            if (quota.getProcessing() == 1) {
+                continue;
+            }
+
+            //processing 0 --> 1
+            DBObject dbObject = findAndModifyLockQuota(quota.getMonitoringKey());
+            if (dbObject != null) {
+                //success
+                quota.setProcessing(1);
+            } else {
+                //not success do waiting
+                canProcess = false;
+            }
+        }
+        return canProcess;
     }
 
     public Date getMinExpireDate() {
@@ -271,5 +304,9 @@ public class QuotaService extends MongoDBService {
 
     public boolean isHaveNewQuota() {
         return haveNewQuota;
+    }
+
+    public List<Quota> getQuotaExpireList() {
+        return quotaExpireList;
     }
 }

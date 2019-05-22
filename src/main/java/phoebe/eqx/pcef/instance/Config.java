@@ -6,8 +6,9 @@ import phoebe.eqx.pcef.enums.config.EConfig;
 import phoebe.eqx.pcef.enums.config.EConfigType;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 
+import javax.print.DocFlavor;
+
 public class Config {
-    public static String TEST_CONFIG;
     public static String MONGODB_URL;
     public static String MY_DB_NAME;
     public static int INTERVAL_PROCESSING;
@@ -18,9 +19,23 @@ public class Config {
     public static String COLLECTION_PROFILE_NAME;
     public static String COLLECTION_QUOTA_NAME;
 
+    public static String URL_USAGE_MONITORING;
+    public static String URL_PRODUCT;
+
+    public static String RESOURCE_NAME_OCF;
+    public static String RESOURCE_NAME_PRODUCT;
+    public static String RESOURCE_NAME_SACF;
+
+
+    public static String TIMEOUT_OCF;
+    public static String TIMEOUT_PRODUCT;
+
+    public static int RETRY_OCF_USAGE_MONITORING;
+    public static int RETRY_PRODUCT_GET_RESOURCE_ID;
+
 
     public static void loadConfiguration(AbstractAF abstractAF) {
-        TEST_CONFIG = PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_TEST);
+
         MONGODB_URL = PCEFUtils.getWarmConfig(abstractAF, EConfig.MONGODB_URL);
         MY_DB_NAME = PCEFUtils.getWarmConfig(abstractAF, EConfig.MONGODB_DATABASE_NAME);
         INTERVAL_PROCESSING = Integer.parseInt(PCEFUtils.getWarmConfig(abstractAF, EConfig.INTERVAL_PROCESSING));
@@ -28,6 +43,20 @@ public class Config {
         COLLECTION_PROFILE_NAME = PCEFUtils.getWarmConfig(abstractAF, EConfig.COLLECTION_PROFILE_NAME);
         COLLECTION_QUOTA_NAME = PCEFUtils.getWarmConfig(abstractAF, EConfig.COLLECTION_QUOTA_NAME);
         COLLECTION_TRANSACTION_NAME = PCEFUtils.getWarmConfig(abstractAF, EConfig.COLLECTION_TRANSACTION_NAME);
+
+        URL_USAGE_MONITORING = PCEFUtils.getWarmConfig(abstractAF, EConfig.URL_USAGE_MONITORING);
+        URL_PRODUCT = PCEFUtils.getWarmConfig(abstractAF, EConfig.URL_PRODUCT);
+
+        RESOURCE_NAME_OCF = PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_OCF);
+        RESOURCE_NAME_PRODUCT = PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_PRODUCT);
+        RESOURCE_NAME_SACF = PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_SACF);
+
+
+        TIMEOUT_OCF = PCEFUtils.getWarmConfig(abstractAF, EConfig.TIMEOUT_OCF);
+        TIMEOUT_PRODUCT = PCEFUtils.getWarmConfig(abstractAF, EConfig.TIMEOUT_PRODUCT);
+
+        RETRY_OCF_USAGE_MONITORING = Integer.parseInt(PCEFUtils.getWarmConfig(abstractAF, EConfig.RETRY_OCF_USAGE_MONITORING));
+        RETRY_PRODUCT_GET_RESOURCE_ID = Integer.parseInt(PCEFUtils.getWarmConfig(abstractAF, EConfig.RETRY_PRODUCT_GET_RESOURCE_ID));
 
 
     }

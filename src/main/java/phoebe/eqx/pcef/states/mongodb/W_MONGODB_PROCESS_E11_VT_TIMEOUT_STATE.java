@@ -20,7 +20,6 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
 
     private MongoDBConnect dbConnect;
     private EState usageMonitoringState;
-    private boolean responseSuccess;
 
 
     private Interval interval = new Interval(Config.RETRY_PROCESSING, Config.INTERVAL_PROCESSING);
@@ -28,7 +27,7 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
     private Interval intervalMkIsProcessing = new Interval(Config.RETRY_PROCESSING, Config.INTERVAL_PROCESSING);
 
     @MessageMongoRecieved(messageType = EMongoState.BEGIN)
-    public EMongoState checkProfileAppoinmentDate() {
+    public EMongoState checkProfileAppointmentDate() {
         EMongoState nextState = null;
         try {
             if (dbConnect.getProfileService().findProfileTimeForAppointmentDate()) {
@@ -56,9 +55,9 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
     public EMongoState findQuotaExpire() {
         EMongoState nextState = null;
         try {
-            if (dbConnect.getQuotaService().findQuotaExpire()) {
-                DBObject dbObject = dbConnect.getQuotaService().findAndModifyLockQuotaExpire();
-                if (dbObject != null) {
+            if (dbConnect.getQuotaService().findQuotaExpire().size() > 0) {
+                boolean modProcessing = dbConnect.getQuotaService().findAndModifyLockQuotaExpire();
+                if (modProcessing) {
                     nextState = EMongoState.FIND_USAGE_RESOURCE;
                 } else {
                     //interval
@@ -68,6 +67,8 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
             } else {
                 // set Profile appointmentDate = (now - appointment)
                 // no
+
+
                 nextState = EMongoState.END;
             }
 
@@ -84,16 +85,17 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
         try {
             if (dbConnect.getTransactionService().findTransactionDoneGroupByResourceQuotaExpire().size() > 0) {
                 setUsageMonitoringState(EState.W_USAGE_MONITORING_UPDATE);
-                nextState = EMongoState.END;
             } else {
+                int quotaAllSize = dbConnect.getQuotaService().getQuotaExpireList().size();
+                int quotaExpireSize = dbConnect.getQuotaService().findAllQuotaByPrivateId().size();
 
-                //count size of quota
-
-                //
-                setUsageMonitoringState(EState.W_USAGE_MONITORING_STOP);
-                nextState = EMongoState.END;
+                if (quotaAllSize > quotaExpireSize) {
+                    setUsageMonitoringState(EState.W_USAGE_MONITORING_UPDATE);
+                } else if (quotaAllSize == quotaExpireSize) {
+                    setUsageMonitoringState(EState.W_USAGE_MONITORING_STOP);
+                }
             }
-
+            nextState = EMongoState.END;
 
         } catch (Exception e) {
 

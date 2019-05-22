@@ -3,7 +3,6 @@ package phoebe.eqx.pcef.states.L1;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.services.OCFUsageMonitoringService;
-import phoebe.eqx.pcef.services.UsageMonitoringService;
 import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 import phoebe.eqx.pcef.states.abs.ComplexState;
 import phoebe.eqx.pcef.states.abs.MessageRecieved;
@@ -29,15 +28,11 @@ public class W_E11_TIMEOUT extends ComplexState {
 
             nextState = mongodbProcessState.getUsageMonitoringState();
             if (EState.END.equals(nextState)) {
-                UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
-                if (mongodbProcessState.isResponseSuccess()) {
-
-                } else {
-
-                }
+                //no
             } else {
                 OCFUsageMonitoringService OCFUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
                 if (EState.W_USAGE_MONITORING_STOP.equals(nextState)) {
+                    //build stop
 
                 } else if (EState.W_USAGE_MONITORING_UPDATE.equals(nextState)) {
 
@@ -54,9 +49,36 @@ public class W_E11_TIMEOUT extends ComplexState {
                 nextState = EState.END;
             }
         }
-
         setWorkState(nextState);
+    }
 
+
+    @MessageRecieved(messageType = EState.W_USAGE_MONITORING_STOP)
+    public void wUsageMonitoringStop() throws Exception {
+        MongoDBConnect dbConnect = null;
+
+        try {
+            dbConnect = new MongoDBConnect(appInstance);
+
+            String privateId = appInstance.getPcefInstance().getProfile().getUserValue();
+
+            //stop by privateId
+            dbConnect.getTransactionService().updateTransactionIsActive(privateId);
+            dbConnect.getQuotaService().removeQuota(privateId);
+            dbConnect.getProfileService().removeProfile(privateId);
+
+            //end
+
+
+        } catch (Exception e) {
+
+
+        } finally {
+            if (dbConnect != null) {
+                dbConnect.closeConnection();
+            }
+        }
+        setWorkState(EState.END);
     }
 
 

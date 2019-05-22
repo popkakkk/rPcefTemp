@@ -54,15 +54,22 @@
         </AFLOG>
 
         <!-- resource name -->
-        <resource-name-test value = "PCEF.ES99.0.0" />
         <resource-name-ocf value="PCEF.ES04.OCF"/>
+        <resource-name-sacf value="PCEF.ES05.SACF"/>
+        <resource-name-product value="PCEF.ES04.PRODUCT"/>
 
         <!-- timeout -->
-        <timeout-test value = "4" />
         <timeout-ocf value = "4" />
+        <timeout-product value = "4" />
 
         <!-- retry timeout -->
-        <retry-ocf-usage-monitoring-start value="1"/>
+        <retry-ocf-usage-monitoring value="1"/>
+        <retry-product-get-resource-id value="1"/>
+
+
+        <url-usage-monitoring value="/rpcef/v1/metering-method"/>
+        <url-product value="http://10.138.36.232:9081/marketplace/v1/products"/>
+
 
 
 

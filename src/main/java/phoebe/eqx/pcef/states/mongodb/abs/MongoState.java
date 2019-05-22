@@ -9,9 +9,7 @@ import java.lang.reflect.Method;
 public abstract class MongoState {
 
     private EMongoState nextState = EMongoState.BEGIN;
-
     private EState usageMonitoringState;
-    private boolean responseSuccess;
 
 
     public void dispatch() throws Exception {
@@ -60,19 +58,6 @@ public abstract class MongoState {
         this.usageMonitoringState = usageMonitoringState;
     }
 
-    public boolean isResponseSuccess() {
-        return responseSuccess;
-    }
 
-    public void setResponseSuccess() {
-        setUsageMonitoringState(EState.END);
-        this.responseSuccess = true;
-    }
-
-
-    public void setResponseFail() {
-        setUsageMonitoringState(EState.END);
-        this.responseSuccess = false;
-    }
 
 }

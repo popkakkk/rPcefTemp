@@ -6,6 +6,7 @@ import ec02.af.data.AFDataFactory;
 import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.enums.config.EConfig;
+import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.message.builder.req.OCFUsageMonitoringRequest;
 import phoebe.eqx.pcef.message.builder.res.UsageMonitoringResponse;
 import phoebe.eqx.pcef.utils.PCEFUtils;
@@ -25,17 +26,19 @@ public class MessagePool {
     }
 
 
-    public EquinoxRawData getResourceIdRequest(String data, String invokeId) {
+    public EquinoxRawData getResourceIdRequest(String data, String invokeId, String url) {
         String reqData = data;
         EquinoxRawData rawData = AFDataFactory.createEquinoxRawData();
         this.requestObj = reqData;
         Map<String, String> map = new HashMap<>();
+        map.put("url", url);
         map.put("name", "HTTP");
+        map.put("method", "GET");
         map.put("type", "request");
-        map.put("ctype", "text/json");
-        map.put("to", PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_TEST));
+        map.put("ctype", "application/json");
+        map.put("to", Config.RESOURCE_NAME_PRODUCT);
         map.put("oid", "0.0.17.1218.8.7.0");
-        map.put("timeout", PCEFUtils.getWarmConfig(abstractAF, EConfig.TIMEOUT_TEST));
+        map.put("timeout", Config.TIMEOUT_PRODUCT);
         map.put("invoke", invokeId);
 
         rawData.setRawDataAttributes(map);
@@ -52,9 +55,9 @@ public class MessagePool {
         map.put("name", "HTTP");
         map.put("type", "request");
         map.put("ctype", "text/plain");
-        map.put("to", PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_TEST));
+        map.put("to", Config.RESOURCE_NAME_OCF);
         map.put("oid", "0.0.17.1218.8.7.0");
-        map.put("timeout", PCEFUtils.getWarmConfig(abstractAF, EConfig.TIMEOUT_TEST));
+        map.put("timeout", Config.TIMEOUT_OCF);
         map.put("invoke", invokeId);
 
         rawData.setRawDataAttributes(map);
@@ -72,7 +75,7 @@ public class MessagePool {
         map.put("name", "HTTP");
         map.put("type", "response");
         map.put("ctype", "text/plain");
-        map.put("to", PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_TEST));
+        map.put("to", Config.RESOURCE_NAME_SACF);
         map.put("oid", "0.0.17.1218.8.7.0");
         map.put("timeout", timeout);
 

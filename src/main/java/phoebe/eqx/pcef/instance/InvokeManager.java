@@ -20,6 +20,9 @@ public class InvokeManager {
         String invoke = rawData.getInvoke();
         for (InvokeObject invokeObject : list) {
             if (invoke.equals(invokeObject.getInvokeId())) {
+                AFLog.d("raw data :" + rawData);
+                AFLog.d("set event :" + event);
+
                 invokeObject.setEvent(event);
                 invokeObject.setOperationRaw(rawData);
             }
@@ -79,13 +82,13 @@ public class InvokeManager {
     }
 
 
-
     private int retrieveRetryNumber(Operation operation) {
         try {
-            int retryNumber = 1;
-            if (null == operation) {
-                retryNumber = Integer.parseInt(Config.TEST_CONFIG);
-
+            int retryNumber = 0;
+            if (Operation.GetResourceId.equals(operation)) {
+                retryNumber = Config.RETRY_PRODUCT_GET_RESOURCE_ID;
+            } else if (Operation.UsageMonitoringStart.equals(operation) || Operation.UsageMonitoringUpdate.equals(operation) || Operation.UsageMonitoringStop.equals(operation)) {
+                retryNumber = Config.RETRY_OCF_USAGE_MONITORING;
             }
 
             AFLog.d("Operation[" + operation + "] has configured retryTimeout number as " + retryNumber);

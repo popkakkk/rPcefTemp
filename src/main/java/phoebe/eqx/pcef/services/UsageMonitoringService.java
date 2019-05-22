@@ -76,14 +76,17 @@ public class UsageMonitoringService extends PCEFService {
             EquinoxRawData equinoxRawData = messagePool.getUsageMonitoringResponse(usageMonitoringResponse, invokeId, timeout);
 
             appInstance.getOutList().add(equinoxRawData);
-            appInstance.setFinish(true);
+//            appInstance.setFinish(true);
 
             //increase stat
 //            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.PCEF_RECEIVE_TEST_DATA);
 
 
-        } catch (Exception e) {
+            PCEFUtils.writeMessageFlow("Build Usage Monitoring Response Success", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
 
+
+        } catch (Exception e) {
+            PCEFUtils.writeMessageFlow("Build Usage Monitoring Response Success -" + e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
         }
 
 

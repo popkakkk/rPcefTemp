@@ -54,10 +54,7 @@ abstract public class PCEFService {
             parser = new PCEFParser(equinoxRawData.getRawDataMessage());
             result = parser.translateGetResourceId();
         }
-
-
         return result;
-
     }
 
 
