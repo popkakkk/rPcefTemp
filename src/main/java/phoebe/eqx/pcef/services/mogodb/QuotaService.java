@@ -9,9 +9,9 @@ import phoebe.eqx.pcef.core.data.ResourceQuota;
 import phoebe.eqx.pcef.core.data.ResourceResponse;
 import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.core.model.Transaction;
-import phoebe.eqx.pcef.enums.config.EConfig;
 import phoebe.eqx.pcef.enums.model.EQuota;
 import phoebe.eqx.pcef.instance.AppInstance;
+
 import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.instance.PCEFInstance;
 import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
@@ -24,11 +24,12 @@ public class QuotaService extends MongoDBService {
 
     private Date minExpireDate;
     private boolean haveNewQuota;
-    List<Quota> quotaExpireList = new ArrayList<>();
+
+    private List<Quota> quotaExpireList = new ArrayList<>();
 
 
     public QuotaService(AppInstance appInstance, MongoClient mongoClient) {
-        super(appInstance, mongoClient,Config.COLLECTION_QUOTA_NAME);
+        super(appInstance, mongoClient, Config.COLLECTION_QUOTA_NAME);
     }
 
 
@@ -65,7 +66,7 @@ public class QuotaService extends MongoDBService {
                     quota.setRateLimitByKey(resourceResponse.getRateLimitByKey());
 
                     Calendar calendar = Calendar.getInstance();
-                    calendar.add(Calendar.MINUTE, resourceResponse.getQuotaByKey().getValidityTime());
+                    calendar.add(Calendar.SECOND, resourceResponse.getQuotaByKey().getValidityTime());
                     quota.setExpireDate(calendar.getTime());
                 }
                 quota.getResources().add(resourceQuota);
@@ -92,14 +93,60 @@ public class QuotaService extends MongoDBService {
 
     public void insertQuotaFirstUsage(ArrayList<Quota> quotaResponses) {
         List<BasicDBObject> quotaBasicObjectList = getQuotaToBasicObjectList(quotaResponses);
-        insertManyByObject(Config.COLLECTION_QUOTA_NAME, quotaBasicObjectList);
+        insertManyByObject(quotaBasicObjectList);
         this.minExpireDate = calMinExpireDate(quotaBasicObjectList);
     }
 
 
     public void removeQuota(String privateId) {
         BasicDBObject delete = new BasicDBObject(EQuota.userValue.name(), privateId);
-        db.getCollection(Config.COLLECTION_QUOTA_NAME).remove(delete);
+        db.getCollection(collectionName).remove(delete);
+    }
+
+
+    private void deleteOldQuota(Quota oldQuota, List<Quota> quotaResponses) {
+
+        String oldMk = oldQuota.getMonitoringKey();
+        String newMk = null;
+
+        //find new mk response by resourceId request
+        for (Quota quota : quotaResponses) {
+            if (newMk != null) {
+                break;
+            }
+            for (ResourceQuota rsQuotaResponse : quota.getResources()) {
+                if (oldQuota.getResources().get(0).getResourceId().equals(rsQuotaResponse.getResourceId())) { //[0] = check by some resource id from old quota
+                    newMk = quota.getMonitoringKey();
+                    break;
+                }
+            }
+        }
+
+
+        //old quota --> delete
+        String action = "do not delete";
+        if (!oldMk.equals(newMk)) {
+            deleteQuotaByKey(oldMk);
+            action = "delete";
+        }
+        AFLog.d("Old MK: " + oldMk + ",New MK: " + newMk + ",Action: " + action);
+    }
+
+    private void deleteQuotaByKey(String key) {
+        db.getCollection(collectionName).remove(new BasicDBObject(EQuota._id.name(), key));
+
+    }
+
+
+    public Map<String, String> getResourceIdMapMk(List<Quota> quotas) {
+        Map<String, String> resourceIdMapMk = new HashMap<>();
+        for (Quota quota : quotas) {
+            for (ResourceQuota resourceQuota : quota.getResources()) {
+                resourceIdMapMk.put(resourceQuota.getResourceId(), quota.getMonitoringKey());
+            }
+        }
+
+        return resourceIdMapMk;
     }
 
     public void updateQuota(ArrayList<Quota> quotaResponses) {
@@ -109,56 +156,84 @@ public class QuotaService extends MongoDBService {
         List<BasicDBObject> quotaBasicObjectList = getQuotaToBasicObjectList(quotaResponses);
         List<BasicDBObject> newQuotaList = new ArrayList<>();
 
-        //##check mk change by resourceId request
-        if (pcefInstance.isQuotaExhaust()) {
-            String oldMk = pcefInstance.getQuotaToCommit().getMonitoringKey();
-            String newMk = null;
+     /*
+        if (pcefInstance.doCommit()) {
+            Quota quotaExhaust = appInstance.getPcefInstance().getCommitPart().getQuotaExhaust();
+            List<Quota> quotaExpireList = appInstance.getPcefInstance().getCommitPart().getQuotaExpireList();
 
-            //find new mk response by resourceId request
-            for (Quota quota : quotaResponses) {
-                if (newMk != null) {
-                    break;
-                }
-                for (ResourceQuota resourceQuota : quota.getResources()) {
-                    if (pcefInstance.getTransaction().getResourceId().equals(resourceQuota.getResourceId())) {
-                        newMk = quota.getMonitoringKey();
-                        break;
-                    }
-                }
+            if (quotaExhaust != null) {
+                deleteOldQuota(quotaExhaust, quotaResponses);
+            } else if (quotaExpireList.size() > 0) {
+                quotaExpireList.forEach(quota -> deleteOldQuota(quota, quotaResponses));
             }
+        }*/
 
-            if (!oldMk.equals(newMk)) {
-                //old quota --> delete
-                db.getCollection(Config.COLLECTION_QUOTA_NAME).remove(new BasicDBObject(EQuota._id.name(), oldMk));
+
+        List<Quota> quotaCommits = new ArrayList<>();
+        if (pcefInstance.doCommit()) {
+            Quota quotaExhaust = appInstance.getPcefInstance().getCommitPart().getQuotaExhaust();
+            List<Quota> quotaExpireList = appInstance.getPcefInstance().getCommitPart().getQuotaExpireList();
+
+            if (quotaExhaust != null) {
+                quotaCommits.add(quotaExhaust);
+            } else if (quotaExpireList.size() > 0) {
+                quotaCommits.addAll(quotaExpireList);
             }
         }
 
-        //## update quota
-        for (BasicDBObject quotaBasicObject : quotaBasicObjectList) {
-            String newMk = quotaBasicObject.get(EQuota.monitoringKey.name()).toString();
+        List<String> mkResponses = new ArrayList<>();
+        quotaResponses.forEach(quota -> mkResponses.add(quota.getMonitoringKey()));
 
-            if (quotaBasicObject.get(EQuota.quotaByKey.name()) != null) {
-                //new quota --> insert
-                insertByQuery(Config.COLLECTION_QUOTA_NAME, quotaBasicObject);
-                newQuotaList.add(quotaBasicObject);
-
+        //##delete old quota
+        List<String> mkUpdateCounter = new ArrayList<>();
+        for (Quota quota : quotaCommits) {
+            String mk = quota.getMonitoringKey();
+            if (!mkResponses.contains(mk)) {
+                deleteQuotaByKey(mk);
             } else {
-                // exist quota --> update
+                mkUpdateCounter.add(mk);
+            }
+        }
+
+
+        //##insert and update quota
+        for (BasicDBObject quotaBasicObject : quotaBasicObjectList) {
+            String mk = quotaBasicObject.get(EQuota.monitoringKey.name()).toString();
+
+            if (quotaBasicObject.get(EQuota.quotaByKey.name()) != null) {  //receive new quota
+                if (!pcefInstance.doCommit()) {
+                    //new quota --> insert
+                    insertByQuery(quotaBasicObject);
+                } else {
+                    if (!mkUpdateCounter.contains(mk)) {
+                        //new quota --> insert
+                        insertByQuery(quotaBasicObject);
+                    } else {
+                        //new counter -->update set
+                        BasicDBObject search = new BasicDBObject();
+                        search.put(EQuota._id.name(), mk);
+                        updateSetByQuery(search, quotaBasicObject);
+                    }
+                }
+                newQuotaList.add(quotaBasicObject);
+            } else {
+                // exist quota --> update push
                 BasicDBObject search = new BasicDBObject();
-                search.put(EQuota._id.name(), newMk);
-                db.getCollection(Config.COLLECTION_QUOTA_NAME).update(search, new BasicDBObject("$push"
+                search.put(EQuota._id.name(), mk);
+                db.getCollection(collectionName).update(search, new BasicDBObject("$push"
                         , new BasicDBObject(EQuota.resources.name()
-                        , new BasicDBObject("$each", quotaBasicObject.get(EQuota.resources.name())))));
+                        , new BasicDBObject("$each", EQuota.resources.name()))));
 
             }
         }
 
         if (newQuotaList.size() > 0) {
             this.haveNewQuota = true;
-            minExpireDate = findQuotaGetMinimumExpireDate();
+            this.minExpireDate = findQuotaGetMinimumExpireDate();
         }
 
     }
+
 
     public void filterTransactionConfirmIsNewResource(List<Transaction> otherTransaction) {
         int index = 0;
@@ -171,17 +246,11 @@ public class QuotaService extends MongoDBService {
         }
     }
 
-
-    public DBCursor findQuotaByThisTransaction() {
-        return findQuotaByTransaction(appInstance.getPcefInstance().getTransaction());
-    }
-
-
-    private DBCursor findQuotaByTransaction(Transaction transaction) {
+    public DBCursor findQuotaByTransaction(Transaction transaction) {
         BasicDBObject searchQuery = new BasicDBObject();
-        searchQuery.put(EQuota.userValue.name(), transaction.getUserValue());
+        searchQuery.put(EQuota.userValue.name(), appInstance.getPcefInstance().getProfile().getUserValue());
         searchQuery.put(EQuota.resources.name(), new BasicDBObject("$elemMatch", new BasicDBObject("resourceId", transaction.getResourceId())));
-        return findByQuery(Config.COLLECTION_QUOTA_NAME, searchQuery);
+        return findByQuery(searchQuery);
     }
 
     private List<Quota> getQuotaListFromDBCursor(DBCursor quotaCursor) {
@@ -199,7 +268,7 @@ public class QuotaService extends MongoDBService {
     public List<Quota> findAllQuotaByPrivateId() {
         BasicDBObject search = new BasicDBObject();
         search.put(EQuota.userValue.name(), appInstance.getPcefInstance().getProfile().getUserValue());
-        DBCursor dbCursor = findByQuery(Config.COLLECTION_QUOTA_NAME, search);
+        DBCursor dbCursor = findByQuery(search);
         return getQuotaListFromDBCursor(dbCursor);
     }
 
@@ -209,17 +278,17 @@ public class QuotaService extends MongoDBService {
         BasicDBObject search = new BasicDBObject();
         search.put(EQuota.userValue.name(), appInstance.getPcefInstance().getProfile().getUserValue());
         search.put(EQuota.expireDate.name(), new BasicDBObject("$lte", currentTime));
-        DBCursor dbCursor = findByQuery(Config.COLLECTION_QUOTA_NAME, search);
-        AFLog.d("currentTime = " + currentTime);
-        List<Quota> quotaExpireList = getQuotaListFromDBCursor(dbCursor);
-        this.quotaExpireList = quotaExpireList;
-        appInstance.getPcefInstance().setQuotaExpire(quotaExpireList);
 
-        return quotaExpireList;
+        DBCursor dbCursor = findByQuery(search);
+
+        AFLog.d("currentTime = " + currentTime);
+        return getQuotaListFromDBCursor(dbCursor);
+
+
     }
 
 
-    public Date calMinExpireDate(List<BasicDBObject> quotaBasicObjectList) {
+    private Date calMinExpireDate(List<BasicDBObject> quotaBasicObjectList) {
         Date minDate = null;
         for (BasicDBObject basicDBObject : quotaBasicObjectList) {
             Date date = (Date) basicDBObject.get(EQuota.expireDate.name());
@@ -235,7 +304,7 @@ public class QuotaService extends MongoDBService {
     }
 
 
-    public boolean checkQuotaAvailable(Quota quota, Map<String, Integer> countUnitByResourceMap) {
+ /*   public boolean checkQuotaAvailable(Quota quota, Map<String, Integer> countUnitByResourceMap, CommitPart commitPart) {
         int sumTransaction = countUnitByResourceMap.values().stream().mapToInt(count -> count).sum();
 
         int quotaUnit = quota.getQuotaByKey().getUnit();
@@ -244,15 +313,16 @@ public class QuotaService extends MongoDBService {
             return true;
         } else {
             AFLog.d("Quota Exhaust");
-            appInstance.getPcefInstance().setQuotaExhaust(true);
-            appInstance.getPcefInstance().setQuotaForCommit(quota);
+
+            commitPart.setQuotaExhaust(quota);
+            appInstance.getPcefInstance().setCommitPart(commitPart);
             return false;
         }
-    }
+    }*/
 
 
     public Date findQuotaGetMinimumExpireDate() {
-        String privateId = appInstance.getPcefInstance().getTransaction().getUserValue();
+        String privateId = appInstance.getPcefInstance().getProfile().getUserValue();
 
         BasicDBObject match = new BasicDBObject();
         match.put(EQuota.userValue.name(), privateId);
@@ -262,7 +332,7 @@ public class QuotaService extends MongoDBService {
         group.put("minExpireDate", new BasicDBObject("$min", "$" + EQuota.expireDate.name()));
 
         //find minimum
-        return (Date) aggregateMatch(Config.COLLECTION_QUOTA_NAME, match, group).iterator().next().get("minExpireDate");
+        return (Date) aggregateMatch(match, group).iterator().next().get("minExpireDate");
     }
 
 
@@ -274,13 +344,13 @@ public class QuotaService extends MongoDBService {
         BasicDBObject update = new BasicDBObject();
         update.put(EQuota.processing.name(), 1);//lock
 
-        return findAndModify(Config.COLLECTION_QUOTA_NAME, query, update);
+        return findAndModify(query, update);
     }
 
 
     public boolean findAndModifyLockQuotaExpire() {
         boolean canProcess = true;
-        for (Quota quota : appInstance.getPcefInstance().getQuotaExpire()) {
+        for (Quota quota : quotaExpireList) {
             if (quota.getProcessing() == 1) {
                 continue;
             }
@@ -308,5 +378,9 @@ public class QuotaService extends MongoDBService {
 
     public List<Quota> getQuotaExpireList() {
         return quotaExpireList;
+    }
+
+    public void setQuotaExpireList(List<Quota> quotaExpireList) {
+        this.quotaExpireList = quotaExpireList;
     }
 }

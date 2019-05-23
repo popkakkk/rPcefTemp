@@ -1,45 +1,43 @@
 package phoebe.eqx.pcef.instance;
 
 import phoebe.eqx.pcef.core.model.Profile;
-import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.message.builder.req.OCFUsageMonitoringRequest;
+import phoebe.eqx.pcef.message.parser.req.GyRARRequest;
+import phoebe.eqx.pcef.message.parser.req.RefundManagementRequest;
 import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class PCEFInstance {
 
     private String sessionId; // from SACF
-
     private Date startTime = new Date();
 
-    private TestResponseData testResponseData;
-    private Profile profile;
+    private UsageMonitoringRequest usageMonitoringRequest;
+    private GyRARRequest gyRARRequest;
+    private RefundManagementRequest refundManagementRequest;
 
+
+    private Profile profile;
     private Transaction transaction;
     private List<Transaction> otherStartTransactions = new ArrayList<>();
 
 
-    private UsageMonitoringRequest usageMonitoringRequest;
-
     private OCFUsageMonitoringRequest ocfUsageMonitoringRequest;
 
-    //Profile
-    private Integer sequenceNumber;
-    private Date appointmentDate;
-    private String ocfSessionId; // to OCF
 
     //Commit Part
-    private boolean quotaExhaust;
-    private Quota quotaToCommit;
-    private transient Map<String, Integer> countUnitMap;
+    private CommitPart commitPart;
 
-
-    private List<Quota> quotaExpire;
+    public boolean doCommit() {
+        if (commitPart != null) {
+            return commitPart.getQuotaExpireList().size() > 0;
+        }
+        return false;
+    }
 
 
     public UsageMonitoringRequest getUsageMonitoringRequest() {
@@ -59,16 +57,6 @@ public class PCEFInstance {
         this.sessionId = sessionId;
     }
 
-
-    public TestResponseData getTestResponseData() {
-        return testResponseData;
-    }
-
-    public void setTestResponseData(TestResponseData testResponseData) {
-        this.testResponseData = testResponseData;
-    }
-
-
     public List<Transaction> getOtherStartTransactions() {
         return otherStartTransactions;
     }
@@ -76,32 +64,6 @@ public class PCEFInstance {
     public void setOtherStartTransactions(List<Transaction> otherStartTransactions) {
         this.otherStartTransactions = otherStartTransactions;
     }
-
-    public Date getAppointmentDate() {
-        return appointmentDate;
-    }
-
-    public void setAppointmentDate(Date appointmentDate) {
-        this.appointmentDate = appointmentDate;
-    }
-
-
-    public String getOcfSessionId() {
-        return ocfSessionId;
-    }
-
-    public void setOcfSessionId(String ocfSessionId) {
-        this.ocfSessionId = ocfSessionId;
-    }
-
-    public boolean isQuotaExhaust() {
-        return quotaExhaust;
-    }
-
-    public void setQuotaExhaust(boolean quotaExhaust) {
-        this.quotaExhaust = quotaExhaust;
-    }
-
 
     public Transaction getTransaction() {
         return transaction;
@@ -111,21 +73,6 @@ public class PCEFInstance {
         this.transaction = transaction;
     }
 
-    public Quota getQuotaToCommit() {
-        return quotaToCommit;
-    }
-
-    public void setQuotaForCommit(Quota quotaCommit) {
-        this.quotaToCommit = quotaCommit;
-    }
-
-    public Map<String, Integer> getCountUnitMap() {
-        return countUnitMap;
-    }
-
-    public void setCountUnitMap(Map<String, Integer> countUnitMap) {
-        this.countUnitMap = countUnitMap;
-    }
 
     public OCFUsageMonitoringRequest getOcfUsageMonitoringRequest() {
         return ocfUsageMonitoringRequest;
@@ -135,21 +82,6 @@ public class PCEFInstance {
         this.ocfUsageMonitoringRequest = ocfUsageMonitoringRequest;
     }
 
-    public void increasSequenceNumber() {
-        sequenceNumber++;
-    }
-
-    public Integer getSequenceNumber() {
-        return sequenceNumber;
-    }
-
-    public void setSequenceNumber(Integer sequenceNumber) {
-        this.sequenceNumber = sequenceNumber;
-    }
-
-    public void setQuotaToCommit(Quota quotaToCommit) {
-        this.quotaToCommit = quotaToCommit;
-    }
 
     public Profile getProfile() {
         return profile;
@@ -163,11 +95,32 @@ public class PCEFInstance {
         return startTime;
     }
 
-    public List<Quota> getQuotaExpire() {
-        return quotaExpire;
+
+    public CommitPart getCommitPart() {
+        return commitPart;
     }
 
-    public void setQuotaExpire(List<Quota> quotaExpire) {
-        this.quotaExpire = quotaExpire;
+    public void setCommitPart(CommitPart commitPart) {
+        this.commitPart = commitPart;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public GyRARRequest getGyRARRequest() {
+        return gyRARRequest;
+    }
+
+    public void setGyRARRequest(GyRARRequest gyRARRequest) {
+        this.gyRARRequest = gyRARRequest;
+    }
+
+    public RefundManagementRequest getRefundManagementRequest() {
+        return refundManagementRequest;
+    }
+
+    public void setRefundManagementRequest(RefundManagementRequest refundManagementRequest) {
+        this.refundManagementRequest = refundManagementRequest;
     }
 }

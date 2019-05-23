@@ -2,6 +2,7 @@ package phoebe.eqx.pcef.services;
 
 import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.core.PCEFParser;
+import phoebe.eqx.pcef.enums.EStatusResponse;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.message.builder.MessagePool;
 import phoebe.eqx.pcef.message.builder.res.UsageMonitoringResponse;
@@ -13,27 +14,6 @@ import phoebe.eqx.pcef.utils.PCEFUtils;
 import java.util.Date;
 
 public class UsageMonitoringService extends PCEFService {
-
-    private enum Status {
-
-        SUCCESS("200", "Success"),
-        FAIL("500", "Error");
-        private String code;
-        private String description;
-
-        Status(String code, String description) {
-            this.code = code;
-            this.description = description;
-        }
-
-        public String getCode() {
-            return code;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-    }
 
 
     public UsageMonitoringService(AppInstance appInstance) {
@@ -65,13 +45,17 @@ public class UsageMonitoringService extends PCEFService {
 
             // logic build
             UsageMonitoringResponse usageMonitoringResponse = new UsageMonitoringResponse();
-            usageMonitoringResponse.setStatus(Status.SUCCESS.getCode());
-            usageMonitoringResponse.setDevMessage(Status.SUCCESS.getDescription());
+            usageMonitoringResponse.setCommand("usageMonitoring");
+            usageMonitoringResponse.setStatus(EStatusResponse.SUCCESS.getCode());
+            usageMonitoringResponse.setDevMessage(EStatusResponse.SUCCESS.getDescription());
+            usageMonitoringResponse.setTid(appInstance.getPcefInstance().getTransaction().getTid());
+            usageMonitoringResponse.setRtid(appInstance.getPcefInstance().getTransaction().getRtid());
+            usageMonitoringResponse.setSessionId(appInstance.getPcefInstance().getTransaction().getSessionId());
 
             //build message
             MessagePool messagePool = new MessagePool(abstractAF);
             Date currentDate = new Date();
-            Date appointmentDate = appInstance.getPcefInstance().getAppointmentDate();
+            Date appointmentDate = appInstance.getPcefInstance().getProfile().getAppointmentDate();
             String timeout = String.valueOf(appointmentDate.compareTo(currentDate));
             EquinoxRawData equinoxRawData = messagePool.getUsageMonitoringResponse(usageMonitoringResponse, invokeId, timeout);
 

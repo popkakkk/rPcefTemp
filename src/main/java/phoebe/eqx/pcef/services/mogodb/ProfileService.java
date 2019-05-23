@@ -3,9 +3,7 @@ package phoebe.eqx.pcef.services.mogodb;
 import com.mongodb.*;
 import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.model.Profile;
-import phoebe.eqx.pcef.enums.config.EConfig;
 import phoebe.eqx.pcef.enums.model.EProfile;
-import phoebe.eqx.pcef.enums.model.EQuota;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
@@ -18,7 +16,7 @@ public class ProfileService extends MongoDBService {
 
 
     public ProfileService(AppInstance appInstance, MongoClient mongoClient) {
-        super(appInstance, mongoClient,Config.COLLECTION_PROFILE_NAME);
+        super(appInstance, mongoClient, Config.COLLECTION_PROFILE_NAME);
     }
 
     public void insertProfile() {
@@ -32,9 +30,10 @@ public class ProfileService extends MongoDBService {
 
             int firstNumber = 0;
             profile.setSequenceNumber(firstNumber);
-            appInstance.getPcefInstance().setSequenceNumber(firstNumber);
+            appInstance.getPcefInstance().setProfile(profile);
 
-            insertByObject(Config.COLLECTION_PROFILE_NAME, profile);
+
+            insertByObject(profile);
             PCEFUtils.writeMessageFlow("Insert Profile", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
         } catch (DuplicateKeyException e) {
             PCEFUtils.writeMessageFlow("Insert Profile Duplicate Key", MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
@@ -60,19 +59,22 @@ public class ProfileService extends MongoDBService {
             BasicDBObject searchQuery = new BasicDBObject();
             searchQuery.put(EProfile._id.name(), privateId);
 
-            DBCursor dbCursor = findByQuery(Config.COLLECTION_PROFILE_NAME, searchQuery);
+            DBCursor dbCursor = findByQuery(searchQuery);
 
 
             if (dbCursor.hasNext()) {
                 DBObject profileDbObject = dbCursor.iterator().next();
 
-                Date appointmentDate = (Date) profileDbObject.get(EProfile.appointmentDate.name());
+                Profile profile = gson.fromJson(gson.toJson(profileDbObject), Profile.class);
+                appInstance.getPcefInstance().setProfile(profile);
+
+                /*Date appointmentDate = (Date) profileDbObject.get(EProfile.appointmentDate.name());
                 String sessionId = (String) profileDbObject.get(EProfile.sessionId.name());
                 Integer sequenceNumber = (Integer) profileDbObject.get(EProfile.sequenceNumber.name());
 
                 appInstance.getPcefInstance().setAppointmentDate(appointmentDate);
                 appInstance.getPcefInstance().setOcfSessionId(sessionId);
-                appInstance.getPcefInstance().setSequenceNumber(sequenceNumber);
+                appInstance.getPcefInstance().setSequenceNumber(sequenceNumber);*/
 
                 PCEFUtils.writeMessageFlow("Find Profile by privateId [Found]", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
             } else {
@@ -87,13 +89,13 @@ public class ProfileService extends MongoDBService {
 
     private void updateProfileUnlock(BasicDBObject updateQuery) {
         updateQuery.put(EProfile.isProcessing.name(), 0);//unlock
-        updateQuery.put(EProfile.sequenceNumber.name(), appInstance.getPcefInstance().getSequenceNumber());
+        updateQuery.put(EProfile.sequenceNumber.name(), appInstance.getPcefInstance().getProfile().getSequenceNumber());
 
         BasicDBObject searchQuery = new BasicDBObject();
-        searchQuery.put(EProfile.userValue.name(), appInstance.getPcefInstance().getTransaction().getUserValue());
+        searchQuery.put(EProfile.userValue.name(), appInstance.getPcefInstance().getProfile().getUserValue());
         searchQuery.put(EProfile.isProcessing.name(), 1);
 
-        updateSetByQuery(Config.COLLECTION_PROFILE_NAME, searchQuery, updateQuery);
+        updateSetByQuery(searchQuery, updateQuery);
     }
 
 
@@ -105,8 +107,8 @@ public class ProfileService extends MongoDBService {
         }
 
         updateQuery.put(EProfile.appointmentDate.name(), quotaMinExpireDate);
-        appInstance.getPcefInstance().setAppointmentDate(quotaMinExpireDate);
-        updateQuery.put(EProfile.sessionId.name(), appInstance.getPcefInstance().getOcfSessionId());
+        appInstance.getPcefInstance().getProfile().setAppointmentDate(quotaMinExpireDate);
+        updateQuery.put(EProfile.sessionId.name(), appInstance.getPcefInstance().getProfile().getSessionId());
         updateProfileUnlock(updateQuery);
     }
 
@@ -114,17 +116,15 @@ public class ProfileService extends MongoDBService {
     public void updateProfileUnLock(boolean haveNewQuota, Date minExpireDate) {
         BasicDBObject updateQuery = new BasicDBObject();
         if (haveNewQuota) {
-            if (minExpireDate.before(appInstance.getPcefInstance().getAppointmentDate())) {
+            if (minExpireDate.before(appInstance.getPcefInstance().getProfile().getAppointmentDate())) {
                 updateQuery.put(EProfile.appointmentDate.name(), minExpireDate);
-                appInstance.getPcefInstance().setAppointmentDate(minExpireDate);
+                appInstance.getPcefInstance().getProfile().setAppointmentDate(minExpireDate);
             }
         }
         updateProfileUnlock(updateQuery);
     }
 
-    public DBObject findAndModifyLockProfile() {
-
-        String privateId = appInstance.getPcefInstance().getTransaction().getUserValue();
+    public DBObject findAndModifyLockProfile(String privateId) {
         BasicDBObject query = new BasicDBObject();
         query.put(EProfile.userValue.name(), privateId);
         query.put(EProfile.isProcessing.name(), 0);
@@ -132,17 +132,15 @@ public class ProfileService extends MongoDBService {
         BasicDBObject update = new BasicDBObject();
         update.put(EProfile.isProcessing.name(), 1);//lock
 
-        return findAndModify(Config.COLLECTION_PROFILE_NAME, query, update);
+        return findAndModify(query, update);
     }
 
-    public boolean findProfileTimeForAppointmentDate() {
-
-
+    public boolean findProfileItsAppointmentTime() {
         Date currentTime = appInstance.getPcefInstance().getStartTime();
         BasicDBObject search = new BasicDBObject();
         search.put(EProfile.appointmentDate.name(), new BasicDBObject("$lte", currentTime));
 
-        DBCursor dbCursor = findByQuery(Config.COLLECTION_PROFILE_NAME, search);
+        DBCursor dbCursor = findByQuery(search);
         if (dbCursor.hasNext()) {//expire
             DBObject dbObject = dbCursor.next();
             Profile profile = gson.fromJson(gson.toJson(dbObject), Profile.class);

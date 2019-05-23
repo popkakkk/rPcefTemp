@@ -2,6 +2,8 @@ package phoebe.eqx.pcef.states.mongodb.abs;
 
 import phoebe.eqx.pcef.enums.state.EMongoState;
 import phoebe.eqx.pcef.enums.state.EState;
+import phoebe.eqx.pcef.instance.AppInstance;
+import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 
 import java.lang.reflect.Method;
 
@@ -10,7 +12,13 @@ public abstract class MongoState {
 
     private EMongoState nextState = EMongoState.BEGIN;
     private EState usageMonitoringState;
+    protected AppInstance appInstance;
+    protected MongoDBConnect dbConnect;
 
+    public MongoState(AppInstance appInstance, MongoDBConnect dbConnect) {
+        this.appInstance = appInstance;
+        this.dbConnect = dbConnect;
+    }
 
     public void dispatch() throws Exception {
         boolean continueWork = true;
@@ -57,7 +65,6 @@ public abstract class MongoState {
     public void setUsageMonitoringState(EState usageMonitoringState) {
         this.usageMonitoringState = usageMonitoringState;
     }
-
 
 
 }

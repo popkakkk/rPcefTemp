@@ -21,6 +21,7 @@ public class PCEFUtils {
     public static final SimpleDateFormat startStopDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     public static final SimpleDateFormat dtLongFormatterMs = new SimpleDateFormat("yyyyMMddHHmmss SSSS", Locale.US);
     public static final SimpleDateFormat isoDateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    public static final SimpleDateFormat actualTimeDFM = new SimpleDateFormat("yyyyMMddHHmmss");
 
    /* static {
         isoDateFormatter.setTimeZone(TimeZone.getTimeZone("Asia/Bangkok"));

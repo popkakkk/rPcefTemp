@@ -4,18 +4,29 @@
                         session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615"
                         timeout="10" ret="0" diag="">
 
-            <EquinoxRawData orig="mOCHKF.ES05.DAMOCLES.0" name="HTTP" invoke="1572653657" type="request" method="POST"
-                            url="/rpcef/v1/metering-method" ctype="text/plain" val="{
-	&quot;sessionId&quot;:&quot;SessionA123456781234679ACTIVE&quot;,
-	&quot;tid&quot;:&quot;tid-00000000001&quot;,
-	&quot;rtid&quot;:&quot;r-tid-00000000004&quot;,
-	&quot;actualTime&quot;:&quot;20181105174020&quot;,
-	&quot;app&quot;:&quot;Cookie Run&quot;,
-	&quot;clientId&quot;:&quot;cGdb4azinlmwq8N5FDGXvQNwUKC352vv2de8fyCUIiI&quot;,
-	&quot;privateId&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;,
-	&quot;resourceName&quot;:&quot;Send One Time Password&quot;
-}"
-                            to="mOCHKF.ES00" ret="0"/>
+            <EquinoxRawData name="HTTP" invoke="1033578817" type="request" method="POST" url="/rpcef/v1/metering-method" ctype="text/plain" val="{
+
+        &quot;command&quot;:&quot;usageMonitoring&quot;,
+
+        &quot;sessionId&quot;:&quot;SessionA123456781234679ACTIVE&quot;,
+
+        &quot;tid&quot;:&quot;SACF-DD2345678912349999&quot;,
+
+        &quot;rtid&quot;:&quot;SPW-A12345678912346791&quot;,
+
+        &quot;actualTime&quot;:&quot;20181105174020&quot;,
+
+        &quot;app&quot;:&quot;Cookie Run&quot;,
+
+        &quot;clientId&quot;:&quot;cGdb4azinlmwq8N5FDGXvQNwUKC352vv2de8fyCUIiI&quot;,
+
+        &quot;userType&quot;:&quot;privateId&quot;,
+
+        &quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;,
+
+        &quot;resourceName&quot;:&quot;GSSO/sendOneTimePwd&quot;
+
+}" to="rPCEF_au.ES00" orig="rPCEF_au.ES05.SACF.0" ret="0" />
             <EquinoxInstance>
                 <value val=""/>
             </EquinoxInstance>

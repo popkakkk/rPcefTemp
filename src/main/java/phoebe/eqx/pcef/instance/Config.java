@@ -21,6 +21,7 @@ public class Config {
 
     public static String URL_USAGE_MONITORING;
     public static String URL_PRODUCT;
+    public static String URL_OCF_USAGE_MONITORING;
 
     public static String RESOURCE_NAME_OCF;
     public static String RESOURCE_NAME_PRODUCT;
@@ -44,10 +45,10 @@ public class Config {
         COLLECTION_QUOTA_NAME = PCEFUtils.getWarmConfig(abstractAF, EConfig.COLLECTION_QUOTA_NAME);
         COLLECTION_TRANSACTION_NAME = PCEFUtils.getWarmConfig(abstractAF, EConfig.COLLECTION_TRANSACTION_NAME);
 
-        URL_USAGE_MONITORING = PCEFUtils.getWarmConfig(abstractAF, EConfig.URL_USAGE_MONITORING);
-        URL_PRODUCT = PCEFUtils.getWarmConfig(abstractAF, EConfig.URL_PRODUCT);
 
-        RESOURCE_NAME_OCF = PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_OCF);
+        URL_PRODUCT = PCEFUtils.getWarmConfig(abstractAF, EConfig.URL_PRODUCT);
+        URL_OCF_USAGE_MONITORING = PCEFUtils.getWarmConfig(abstractAF, EConfig.URL_OCF_USAGE_MONITORING);
+
         RESOURCE_NAME_PRODUCT = PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_PRODUCT);
         RESOURCE_NAME_SACF = PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_SACF);
 

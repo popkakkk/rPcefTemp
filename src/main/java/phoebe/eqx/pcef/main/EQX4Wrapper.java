@@ -20,6 +20,8 @@ import phoebe.eqx.pcef.enums.EEvent;
 import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.states.L1.W_E11_TIMEOUT;
+import phoebe.eqx.pcef.states.L1.W_GyRAR;
+import phoebe.eqx.pcef.states.L1.W_REFUND_MANAGEMENT;
 import phoebe.eqx.pcef.states.L1.W_USAGE_MONITORING;
 import phoebe.eqx.pcef.states.abs.State;
 import phoebe.eqx.pcef.utils.*;
@@ -136,11 +138,27 @@ public class EQX4Wrapper {
                     if (name.equalsIgnoreCase("http")
                             && cType.equalsIgnoreCase("text/plain")
                             && method.equalsIgnoreCase("post")
-                            && url.equalsIgnoreCase(Config.URL_USAGE_MONITORING)) {
+                            && url.equalsIgnoreCase("/rpcef/v1/metering-method")) {
                         //String cmd = PCEFUtils.getValueFromJson("command", val);
 
                         String val = rawData.getRawDataAttribute("val");
                         appInstance.create(val, invoke, ERequestType.USAGE_MONITORING);
+                    } else if (name.equalsIgnoreCase("http")
+                            && cType.equalsIgnoreCase("text/plain")
+                            && method.equalsIgnoreCase("post")
+                            && url.equalsIgnoreCase("/rpcef/v1/gyrar")) {
+                        //String cmd = PCEFUtils.getValueFromJson("command", val);
+
+                        String val = rawData.getRawDataAttribute("val");
+                        appInstance.create(val, invoke, ERequestType.GyRAR);
+                    } else if (name.equalsIgnoreCase("http")
+                            && cType.equalsIgnoreCase("text/plain")
+                            && method.equalsIgnoreCase("post")
+                            && url.equalsIgnoreCase("/rpcef/v1/refund-management")) {
+                        //String cmd = PCEFUtils.getValueFromJson("command", val);
+
+                        String val = rawData.getRawDataAttribute("val");
+                        appInstance.create(val, invoke, ERequestType.REFUND_MANAGEMENT);
                     }
                 } else if ("response".equals(type)) {
                     InvokeManager invokeManager = appInstance.getInvokeManager();
@@ -217,11 +235,16 @@ public class EQX4Wrapper {
                 case E11_TIMEOUT:
                     state = new W_E11_TIMEOUT(appInstance);
                     break;
+                case GyRAR:
+                    state = new W_GyRAR(appInstance);
+                    break;
+                case REFUND_MANAGEMENT:
+                    state = new W_REFUND_MANAGEMENT(appInstance);
+                    break;
             }
-            if (state != null) {
-                state.dispatch();
-                appInstance.patchResponse();
-            }
+            state.dispatch();
+            appInstance.patchResponse();
+
 
         } catch (Exception e) {
             AFLog.e("Do process error", e);

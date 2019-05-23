@@ -44,7 +44,7 @@ public class MyService extends PCEFService {
         try {
             //extract
             TestResponseData testResponseData = (TestResponseData) extractResponse(Operation.TestOperation);
-            this.appInstance.getPcefInstance().setTestResponseData(testResponseData);
+//            this.appInstance.getPcefInstance().setTestResponseData(testResponseData);
 
             //validate
             ValidateMessage.validateTestData();

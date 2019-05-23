@@ -8,6 +8,8 @@ import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.enums.config.EConfig;
 import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.message.builder.req.OCFUsageMonitoringRequest;
+import phoebe.eqx.pcef.message.builder.res.GyRARResponse;
+import phoebe.eqx.pcef.message.builder.res.RefundManagementResponse;
 import phoebe.eqx.pcef.message.builder.res.UsageMonitoringResponse;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 
@@ -37,7 +39,6 @@ public class MessagePool {
         map.put("type", "request");
         map.put("ctype", "application/json");
         map.put("to", Config.RESOURCE_NAME_PRODUCT);
-        map.put("oid", "0.0.17.1218.8.7.0");
         map.put("timeout", Config.TIMEOUT_PRODUCT);
         map.put("invoke", invokeId);
 
@@ -47,16 +48,17 @@ public class MessagePool {
     }
 
 
-    public EquinoxRawData getUsageMonitoringStartRequest(OCFUsageMonitoringRequest OCFUsageMonitoringRequest, String invokeId) {
+    public EquinoxRawData getOCFUsageMonitoringRequest(OCFUsageMonitoringRequest OCFUsageMonitoringRequest, String invokeId) {
         String reqData = new Gson().toJson(OCFUsageMonitoringRequest);
         EquinoxRawData rawData = AFDataFactory.createEquinoxRawData();
         this.requestObj = reqData;
         Map<String, String> map = new HashMap<>();
+        map.put("url", Config.URL_OCF_USAGE_MONITORING);
         map.put("name", "HTTP");
+        map.put("method", "GET");
         map.put("type", "request");
         map.put("ctype", "text/plain");
         map.put("to", Config.RESOURCE_NAME_OCF);
-        map.put("oid", "0.0.17.1218.8.7.0");
         map.put("timeout", Config.TIMEOUT_OCF);
         map.put("invoke", invokeId);
 
@@ -67,22 +69,65 @@ public class MessagePool {
 
 
     public EquinoxRawData getUsageMonitoringResponse(UsageMonitoringResponse usageMonitoringResponse, String invokeId, String timeout) {
-        AFLog.d("Build OCFUsageMonitoringResponse Response ");
+
         EquinoxRawData rawData = AFDataFactory.createEquinoxRawData();
         String data = new Gson().toJson(usageMonitoringResponse);
         this.requestObj = data;
         Map<String, String> map = new HashMap<>();
         map.put("name", "HTTP");
+        map.put("method", "POST");
         map.put("type", "response");
         map.put("ctype", "text/plain");
         map.put("to", Config.RESOURCE_NAME_SACF);
-        map.put("oid", "0.0.17.1218.8.7.0");
         map.put("timeout", timeout);
-
         map.put("invoke", invokeId);
 
         rawData.setRawDataAttributes(map);
         rawData.setRawDataMessage(data);
+        return rawData;
+    }
+
+    public EquinoxRawData getGyRARResponse(GyRARResponse gyRARResponse, String invokeId) {
+        EquinoxRawData rawData = AFDataFactory.createEquinoxRawData();
+        String data = new Gson().toJson(gyRARResponse);
+        this.requestObj = data;
+        Map<String, String> map = new HashMap<>();
+        map.put("name", "HTTP");
+        map.put("method", "POST");
+        map.put("type", "response");
+        map.put("ctype", "text/plain");
+        map.put("to", Config.RESOURCE_NAME_OCF);
+//        map.put("timeout", timeout);
+        map.put("invoke", invokeId);
+        rawData.setRawDataAttributes(map);
+        rawData.setRawDataMessage(data);
+        return rawData;
+    }
+
+    public EquinoxRawData getRefundManagementReponse(RefundManagementResponse refundManagementResponse, String invokeId) {
+        EquinoxRawData rawData = AFDataFactory.createEquinoxRawData();
+        String data = new Gson().toJson(refundManagementResponse);
+        this.requestObj = data;
+        Map<String, String> map = new HashMap<>();
+        map.put("name", "HTTP");
+        map.put("method", "POST");
+        map.put("type", "response");
+        map.put("ctype", "text/plain");
+        map.put("to", Config.RESOURCE_NAME_OCF);
+//        map.put("timeout", timeout);
+        map.put("invoke", invokeId);
+        rawData.setRawDataAttributes(map);
+        rawData.setRawDataMessage(data);
+        return rawData;
+    }
+
+
+    public EquinoxRawData recurringVTTimeout(String timeout) {
+
+        EquinoxRawData rawData = AFDataFactory.createEquinoxRawData();
+        Map<String, String> map = new HashMap<>();
+        map.put("timeout", timeout);
+        rawData.setRawDataAttributes(map);
         return rawData;
     }
 

@@ -45,12 +45,12 @@ public class Profile {
         this.isProcessing = isProcessing;
     }
 
-    public int getSequenceNumber() {
-        return sequenceNumber;
+    public void increaseSequenceNumber() {
+        sequenceNumber++;
     }
 
-    public void setSequenceNumber(int sequenceNumber) {
-        this.sequenceNumber = sequenceNumber;
+    public Integer getSequenceNumber() {
+        return sequenceNumber;
     }
 
     public String getSessionId() {

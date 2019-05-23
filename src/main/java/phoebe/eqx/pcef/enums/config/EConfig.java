@@ -16,9 +16,10 @@ public enum EConfig {
     COLLECTION_QUOTA_NAME("collection-quota-name", EConfigType.MANDATORY, null),
     URL_USAGE_MONITORING("url-usage-monitoring", EConfigType.MANDATORY, null),
     URL_PRODUCT("url-product", EConfigType.MANDATORY, null),
+    URL_OCF_USAGE_MONITORING("url-ocf-usage-monitoring", EConfigType.MANDATORY, null),
 
     //resource name
-    RESOURCE_NAME_OCF("resource-name-ocf", EConfigType.MANDATORY, null),
+
     RESOURCE_NAME_PRODUCT("resource-name-product", EConfigType.MANDATORY, null),
     RESOURCE_NAME_SACF("resource-name-sacf", EConfigType.MANDATORY, null),
 

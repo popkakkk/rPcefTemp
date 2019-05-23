@@ -1,13 +1,11 @@
 package phoebe.eqx.pcef.message.builder.res;
 
-public class UsageMonitoringResponse {
+public class GyRARResponse {
+
     private String command;
     private String sessionId;
-    private String rtid;
-    private String tid;
     private String status;
     private String devMessage;
-
 
     public String getCommand() {
         return command;
@@ -23,22 +21,6 @@ public class UsageMonitoringResponse {
 
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
-    }
-
-    public String getRtid() {
-        return rtid;
-    }
-
-    public void setRtid(String rtid) {
-        this.rtid = rtid;
-    }
-
-    public String getTid() {
-        return tid;
-    }
-
-    public void setTid(String tid) {
-        this.tid = tid;
     }
 
     public String getStatus() {

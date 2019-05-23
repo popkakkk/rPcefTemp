@@ -2,7 +2,6 @@ package phoebe.eqx.pcef.states.L1;
 
 import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.model.Quota;
-import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
@@ -15,7 +14,6 @@ import phoebe.eqx.pcef.states.abs.MessageRecieved;
 import phoebe.eqx.pcef.states.mongodb.W_MONGODB_PROCESS_STATE;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class W_USAGE_MONITORING extends ComplexState {
 
@@ -43,10 +41,12 @@ public class W_USAGE_MONITORING extends ComplexState {
         EState nextState = null;
         try {
             dbConnect = new MongoDBConnect(appInstance);
+
+            //insert transaction
             dbConnect.getTransactionService().insertTransaction(resourceId);
 
             //Application Logic wait mongodb process
-            W_MONGODB_PROCESS_STATE mongodbProcessState = new W_MONGODB_PROCESS_STATE(dbConnect);
+            W_MONGODB_PROCESS_STATE mongodbProcessState = new W_MONGODB_PROCESS_STATE(appInstance, dbConnect);
             mongodbProcessState.dispatch();
 
             nextState = mongodbProcessState.getUsageMonitoringState();
@@ -61,14 +61,10 @@ public class W_USAGE_MONITORING extends ComplexState {
                 OCFUsageMonitoringService OCFUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
                 if (EState.W_USAGE_MONITORING_START.equals(nextState)) {
                     AFLog.d("State is Usage Monitoring First Usage");
-                    List<Transaction> otherTransactionStartList = dbConnect.getTransactionService().findOtherStartTransaction();
-                    appInstance.getPcefInstance().getOtherStartTransactions().addAll(otherTransactionStartList);
-                    OCFUsageMonitoringService.buildUsageMonitoringStart();
+                    OCFUsageMonitoringService.buildUsageMonitoringStart(dbConnect);
                 } else if (EState.W_USAGE_MONITORING_UPDATE.equals(nextState)) {
-                    List<Transaction> otherTransactionStartList = dbConnect.getTransactionService().findOtherStartTransaction();
-                    dbConnect.getQuotaService().filterTransactionConfirmIsNewResource(otherTransactionStartList);
-                    appInstance.getPcefInstance().getOtherStartTransactions().addAll(otherTransactionStartList);
-                    OCFUsageMonitoringService.buildUsageMonitoringUpdate();
+                    AFLog.d("State is Usage Monitoring Usage with exhaust quota");
+                    OCFUsageMonitoringService.buildUsageMonitoringUpdate(dbConnect);
                 }
             }
         } catch (Exception e) {
@@ -89,8 +85,8 @@ public class W_USAGE_MONITORING extends ComplexState {
 
     @MessageRecieved(messageType = EState.W_USAGE_MONITORING_START)
     public void wUsageMonitoringStart() throws Exception {
-        OCFUsageMonitoringService umStartService = new OCFUsageMonitoringService(appInstance);
-        OCFUsageMonitoringResponse OCFUsageMonitoringResponse = umStartService.readUsageMonitoringStart();
+        OCFUsageMonitoringService ocfUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
+        OCFUsageMonitoringResponse OCFUsageMonitoringResponse = ocfUsageMonitoringService.readUsageMonitoringStart();
 
         MongoDBConnect dbConnect = null;
         try {
@@ -98,7 +94,7 @@ public class W_USAGE_MONITORING extends ComplexState {
             UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
             ArrayList<Quota> quotaResponseList = dbConnect.getQuotaService().getQuotaFromUsageMonitoringResponse(OCFUsageMonitoringResponse);
 
-            if (umStartService.receiveQuotaAndPolicy(OCFUsageMonitoringResponse)) {
+            if (ocfUsageMonitoringService.receiveQuotaAndPolicy(OCFUsageMonitoringResponse)) {
                 dbConnect.getQuotaService().insertQuotaFirstUsage(quotaResponseList);
                 dbConnect.getTransactionService().updateTransaction(quotaResponseList);
                 dbConnect.getProfileService().updateProfileUnLockInitial(dbConnect.getQuotaService().getMinExpireDate());
@@ -123,8 +119,8 @@ public class W_USAGE_MONITORING extends ComplexState {
 
     @MessageRecieved(messageType = EState.W_USAGE_MONITORING_UPDATE)
     public void wUsageMonitoringUpdate() throws Exception {
-        OCFUsageMonitoringService umStartService = new OCFUsageMonitoringService(appInstance);
-        OCFUsageMonitoringResponse OCFUsageMonitoringResponse = umStartService.readUsageMonitoringUpdate();
+        OCFUsageMonitoringService ocfUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
+        OCFUsageMonitoringResponse OCFUsageMonitoringResponse = ocfUsageMonitoringService.readUsageMonitoringUpdate();
 
         MongoDBConnect dbConnect = null;
         try {
@@ -133,7 +129,7 @@ public class W_USAGE_MONITORING extends ComplexState {
 
             ArrayList<Quota> quotaResponseList = dbConnect.getQuotaService().getQuotaFromUsageMonitoringResponse(OCFUsageMonitoringResponse);
 
-            if (umStartService.receiveQuotaAndPolicy(OCFUsageMonitoringResponse)) {
+            if (ocfUsageMonitoringService.receiveQuotaAndPolicy(OCFUsageMonitoringResponse)) {
                 dbConnect.getQuotaService().updateQuota(quotaResponseList);
                 dbConnect.getTransactionService().updateTransaction(quotaResponseList);
                 dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
@@ -146,7 +142,7 @@ public class W_USAGE_MONITORING extends ComplexState {
             }
 
         } catch (Exception e) {
-            AFLog.d("wUsageMonitoringStart error:" + e.getStackTrace()[0]);
+            AFLog.d(" error:" + e.getStackTrace()[0]);
         } finally {
             if (dbConnect != null) {
                 dbConnect.closeConnection();
@@ -154,6 +150,7 @@ public class W_USAGE_MONITORING extends ComplexState {
 
         }
         setWorkState(EState.END);
-
     }
+
+
 }

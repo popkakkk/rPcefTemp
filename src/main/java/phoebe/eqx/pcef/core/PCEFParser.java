@@ -1,6 +1,8 @@
 package phoebe.eqx.pcef.core;
 
 import com.google.gson.Gson;
+import phoebe.eqx.pcef.message.parser.req.GyRARRequest;
+import phoebe.eqx.pcef.message.parser.req.RefundManagementRequest;
 import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
 import phoebe.eqx.pcef.instance.TestResponseData;
 import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
@@ -42,6 +44,14 @@ public class PCEFParser {
 
     public UsageMonitoringRequest translateUsageMonitoringRequest() {
         return gson.fromJson(message, UsageMonitoringRequest.class);
+    }
+
+    public GyRARRequest translateGyRARRequest() {
+        return gson.fromJson(message, GyRARRequest.class);
+    }
+
+    public RefundManagementRequest translateRefundManagementRequest() {
+        return gson.fromJson(message, RefundManagementRequest.class);
     }
 
 

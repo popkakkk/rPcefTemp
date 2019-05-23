@@ -1,10 +1,10 @@
 package phoebe.eqx.pcef.enums;
 
 public enum ERequestType {
-    IDLE,
-    TEST_CMD,
-    TEST_MY_CMD,
-    E11_TIMEOUT
-    ,
-    USAGE_MONITORING;
+    USAGE_MONITORING,
+    E11_TIMEOUT,
+    GyRAR,
+    REFUND_MANAGEMENT
+
+
 }
