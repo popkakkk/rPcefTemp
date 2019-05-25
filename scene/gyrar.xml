@@ -1,0 +1,23 @@
+<dummy-request>
+    <dummy-message id="1">
+
+        <EquinoxMessage from="rPCEF_au.E11.0" via="rPCEF_au.E11.0" session="0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" timeout="10" ret="0" diag="3:2:0">
+            <EquinoxRawData to="rPCEF_au.ES00.SERV" name="HTTP" type="request" ctype="text/plain" invoke="umStart_" ecode="200" method="POST" url="/rpcef/v1/gyrar" val="{
+	&quot;command&quot;:&quot;GyRAR&quot;,
+	&quot;sessionId&quot;:&quot; PCEF:OCF:123456789:ACTIVE&quot;,
+	&quot;actualTime&quot;:&quot;20181105174020&quot;,
+	&quot;userType&quot;:&quot;privateId&quot;,
+	&quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;
+}
+" charset="" desc="host=; port=31700; via=auto; session=766111402" orig="rPCEF_au.ES04.rOCF.0" ret="0" />
+            <EquinoxInstance>
+                <value val="" />
+            </EquinoxInstance>
+        </EquinoxMessage>
+    </dummy-message>
+
+
+
+
+
+</dummy-request>

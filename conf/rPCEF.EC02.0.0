@@ -62,9 +62,11 @@
         <timeout-ocf value = "4" />
         <timeout-product value = "4" />
 
+
         <!-- retry timeout -->
         <retry-ocf-usage-monitoring value="1"/>
         <retry-product-get-resource-id value="1"/>
+        <retry-ocf-refund-transaction value="1"/>
 
 
         <!-- http url -->

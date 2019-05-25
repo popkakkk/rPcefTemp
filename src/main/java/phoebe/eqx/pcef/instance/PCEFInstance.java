@@ -1,5 +1,6 @@
 package phoebe.eqx.pcef.instance;
 
+import com.mongodb.DBObject;
 import phoebe.eqx.pcef.core.model.Profile;
 import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.message.builder.req.OCFUsageMonitoringRequest;
@@ -31,6 +32,7 @@ public class PCEFInstance {
 
     //Commit Part
     private CommitPart commitPart;
+    List<CommitData> commitData;
 
     public boolean doCommit() {
         if (commitPart != null) {
@@ -122,5 +124,13 @@ public class PCEFInstance {
 
     public void setRefundManagementRequest(RefundManagementRequest refundManagementRequest) {
         this.refundManagementRequest = refundManagementRequest;
+    }
+
+    public List<CommitData> getCommitData() {
+        return commitData;
+    }
+
+    public void setCommitData(List<CommitData> commitData) {
+        this.commitData = commitData;
     }
 }

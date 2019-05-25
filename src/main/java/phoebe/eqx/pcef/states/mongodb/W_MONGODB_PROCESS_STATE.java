@@ -80,7 +80,7 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
 
 
     @MessageMongoRecieved(messageType = EMongoState.FIND_QUOTA_BY_NEW_RESOURCE)
-    public EMongoState findQuotatByNewResource() {
+    public EMongoState findQuotaByNewResource() {
         EMongoState nextState = null;
         waitForProcess = false;
         try {

@@ -1,6 +1,7 @@
 package phoebe.eqx.pcef.states.mongodb;
 
 
+import com.mongodb.DBObject;
 import phoebe.eqx.pcef.enums.state.EMongoState;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
@@ -28,7 +29,7 @@ public class W_MONGODB_PROCESS_GYRAR extends MongoState {
             GyRARRequest gyRARRequest = appInstance.getPcefInstance().getGyRARRequest();
             dbConnect.getQuotaService().findAllQuotaByPrivateId(gyRARRequest.getUserValue());
 
-
+            dbConnect.getQuotaService().findDataToCommit(gyRARRequest.getUserValue(), null, false);
 
         } catch (Exception e) {
 
@@ -41,27 +42,18 @@ public class W_MONGODB_PROCESS_GYRAR extends MongoState {
         EMongoState nextState = null;
         try {
 
+            DBObject dbObject = dbConnect.getProfileService().findAndModifyLockProfile(appInstance.getPcefInstance().getGyRARRequest().getUserValue());
+            if (dbObject != null) {
+                setPcefState(EState.W_USAGE_MONITORING_UPDATE);
+                nextState = EMongoState.END;
+            } else {
+                interval.waitInterval();
+                nextState = EMongoState.FIND_AND_MOD_PROFILE_FOR_WAIT_PROCESS;
+            }
+
         } catch (Exception e) {
 
         }
         return nextState;
     }
-
-
-    @MessageMongoRecieved(messageType = EMongoState.USAGE_REPORT)
-    public EMongoState usageReport() {
-        EMongoState nextState = null;
-        try {
-
-
-            setPcefState(EState.W_USAGE_MONITORING_UPDATE);
-        } catch (Exception e) {
-
-        }
-
-
-        return EMongoState.END;
-    }
-
-
 }

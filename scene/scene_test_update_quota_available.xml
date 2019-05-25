@@ -1,16 +1,17 @@
 <dummy-request>
     <dummy-message id="1">
+        <EquinoxMessage from="mOCHKF.E11.0" via="mOCHKF.E11.0"
+                        session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615"
+                        timeout="10" ret="0" diag="">
 
-
-        <EquinoxMessage from="rPCEF_au.E11.0" via="rPCEF_au.E11.0" session="0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" timeout="10" ret="0" diag="1:0:0">
-
-            <EquinoxRawData name="HTTP" invoke="1033578817" type="request" method="POST" url="/rpcef/v1/metering-method" ctype="text/plain" val="{
+            <EquinoxRawData orig="mOCHKF.ES05.DAMOCLES.0" name="HTTP" invoke="1572653657" type="request" method="POST"
+                            url="/rpcef/v1/metering-method" ctype="text/plain" val="{
 
         &quot;command&quot;:&quot;usageMonitoring&quot;,
 
         &quot;sessionId&quot;:&quot;SessionA123456781234679ACTIVE&quot;,
 
-        &quot;tid&quot;:&quot;SACF-1&quot;,
+        &quot;tid&quot;:&quot;SACF-1234&quot;,
 
         &quot;rtid&quot;:&quot;SPW-A12345678912346791&quot;,
 
@@ -26,14 +27,11 @@
 
         &quot;resourceName&quot;:&quot;GSSO/sendOneTimePwd&quot;
 
-}" to="rPCEF_au.ES00" orig="rPCEF_au.ES05.SACF.0" ret="0" />
-
+}"
+                            to="mOCHKF.ES00" ret="0"/>
             <EquinoxInstance>
-
-                <value val="" />
-
+                <value val=""/>
             </EquinoxInstance>
-
         </EquinoxMessage>
     </dummy-message>
 
@@ -49,9 +47,9 @@
 
 
 
-            <ERDHeader>
-            </ERDHeader>
-            <ERDData value="{
+                <ERDHeader>
+                </ERDHeader>
+                <ERDData value="{
 
    &quot;resultCode&quot;: &quot;20000&quot;,
 
@@ -67,7 +65,7 @@
 
          &quot;_id&quot;: &quot;5caf0d8edd70922b00cc4d4e&quot;,
 
-         &quot;productId&quot;: &quot;PD-20148&quot;,
+         &quot;productId&quot;: &quot;PD-20171&quot;,
 
          &quot;productCategory&quot;:          {
 
@@ -372,50 +370,7 @@
         </EquinoxMessage>
     </dummy-message>
 
-    <dummy-message id="3">
-        <EquinoxMessage from="mOCHKF.E11.0" via="mOCHKF.E11.0"
-                        session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615"
-                        timeout="10" ret="0" diag="">
-
-            <EquinoxRawData orig="mOCHKF.ES05.DAMOCLES.0" name="HTTP" invoke="umStart_" type="response" method="POST"
-                            url="/rpcef/api/v1/metering-method" ctype="text/plain" val="{
-    &quot;command&quot;:&quot;usageMonitoringStart&quot;,
-    &quot;sessionId&quot;:&quot;SessionA1234567891234679ACTIVE&quot;,
-    &quot;tid&quot;:&quot;TRANSACTION001&quot;,
-    &quot;requestNumber&quot;:&quot;1&quot;,
-    &quot;userType&quot;:&quot;privateId&quot;,
-    &quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;,
-    &quot;status&quot;:&quot;207&quot;,
-   &quot;devMessage&quot;:&quot;PARTIAL_SUCCESS&quot;,
-    &quot;resources&quot;:[
-        {
-            &quot;resourceId&quot;:&quot;PD-20148&quot;,
-            &quot;resourceName&quot;:&quot;API_A&quot;,
-           &quot;rtid&quot;:&quot;R-TRAN-001&quot;,
-            &quot;resultCode&quot;:&quot;20000&quot;,
-            &quot;resultDesc&quot;:&quot;SUCCESS&quot;,
-            &quot;monitoringKey&quot;:&quot;1001&quot;,
-           &quot;counterId&quot;:&quot;4001000001&quot;,
-            &quot;quotaByKey&quot;:{
-                &quot;unitType&quot;:&quot;unit&quot;,
-                &quot;unit&quot;:&quot;100&quot;,
-                &quot;validityTime&quot;:&quot;3600&quot;
-            },
-            &quot;rateLimitByKey&quot;:{
-                &quot;transactionPerTime&quot;:&quot;100|60&quot;
-            }
-        }
-    ]
-}"
-                            to="mOCHKF.ES00" ret="0"/>
-            <EquinoxInstance>
-                <value val=""/>
-            </EquinoxInstance>
-        </EquinoxMessage>
-    </dummy-message>
 
 
 
-
-
-</dummy-request>
+   </dummy-request>
