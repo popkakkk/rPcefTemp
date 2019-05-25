@@ -34,7 +34,7 @@ public class W_GyRAR extends ComplexState {
             W_MONGODB_PROCESS_GYRAR wMongodbProcessGyrar = new W_MONGODB_PROCESS_GYRAR(appInstance, dbConnect);
             wMongodbProcessGyrar.dispatch();
 
-            nextState = wMongodbProcessGyrar.getUsageMonitoringState();
+            nextState = wMongodbProcessGyrar.getPcefState();
             if (EState.END.equals(nextState)) {
                 //end
             } else {

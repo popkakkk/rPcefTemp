@@ -14,11 +14,15 @@ public class MainTest {
 //        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/scene_test_update_new_quota.xml", "", "");
 //        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/scene_test._count_quota.xml", "", "");
 //        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/scene_test.xml", "", "");
-//        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/scene_test_update_new_resource.xml", "", "");
+        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/scene_test_update_new_resource.xml", "", "");
+//        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/scene_test_update_quota_available.xml", "", "");
 //        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/scene_test_update_quota_exhaust.xml", "", "");
+//        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/scene_test_quota_exh_update_unit.xml", "", "");
+//        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/refund_complete.xml", "", "");
+//        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/refund_done.xml", "", "");
 
 //        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/E11_timeout.xml", "", "");
-        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/E11_timeout_stop.xml", "", "");
+//        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/E11_timeout_stop.xml", "", "");
 //        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/test.xml", "", "");
     }
 

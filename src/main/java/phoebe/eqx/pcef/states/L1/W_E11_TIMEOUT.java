@@ -32,7 +32,7 @@ public class W_E11_TIMEOUT extends ComplexState {
             W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE mongodbProcessState = new W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE(appInstance, dbConnect);
             mongodbProcessState.dispatch();
 
-            nextState = mongodbProcessState.getUsageMonitoringState();
+            nextState = mongodbProcessState.getPcefState();
             if (EState.END.equals(nextState)) {
                 // set Profile appointmentDate = (now - appointment)
             } else {

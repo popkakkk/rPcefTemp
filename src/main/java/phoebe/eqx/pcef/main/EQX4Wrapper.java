@@ -272,7 +272,7 @@ public class EQX4Wrapper {
             }
 
             //calculate min query timeout
-            int timeout = calculateMinQueryTimeout(appInstance.getInvokeManager().getList());
+            int timeout = calculateMinQueryTimeout(appInstance.getOutList());
             eqxPropOut.setTimeout(String.valueOf(timeout));
 
             //set Ret
@@ -302,7 +302,20 @@ public class EQX4Wrapper {
     }
 
 
-    private static int calculateMinQueryTimeout(List<InvokeObject> invokeObjects) {
+    private static int calculateMinQueryTimeout(List<EquinoxRawData> outList) {
+        Integer timeout = null;
+        for (EquinoxRawData out : outList) {
+            int timeoutRaw = Integer.parseInt(out.getRawDataAttribute("timeout"));
+            if (timeout != null) {
+                timeout = Math.min(timeout, timeoutRaw);
+            } else {
+                timeout = timeoutRaw;
+            }
+        }
+        return (timeout == null) ? 10 : timeout;
+    }
+/*
+private static int calculateMinQueryTimeoutFromInvokeObject(List<InvokeObject> invokeObjects) {
         Integer timeout = null;
         for (InvokeObject invokeObject : invokeObjects) {
             int timeoutRaw = Integer.parseInt(invokeObject.getOperationRawReq().getRawDataAttribute("timeout"));
@@ -314,6 +327,7 @@ public class EQX4Wrapper {
         }
         return (timeout == null) ? 10 : timeout;
     }
+*/
 
 
     private enum EStateApp {

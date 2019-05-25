@@ -74,6 +74,19 @@ public class TransactionService extends MongoDBService {
         return findByQuery(searchQuery).hasNext();
     }
 
+    public DBCursor findTransactionForRefund(String refId) {
+        BasicDBObject searchQuery = new BasicDBObject();
+        searchQuery.put(ETransaction.tid.name(), refId);
+
+        ArrayList<String> inStatus = new ArrayList();
+        inStatus.add(EStatusLifeCycle.Done.getName());
+        inStatus.add(EStatusLifeCycle.Completed.getName());
+
+        searchQuery.put(ETransaction.status.name(), new BasicDBObject("$in", inStatus));
+
+        return findByQuery(searchQuery);
+    }
+
 
     public List<Transaction> findOtherStartTransaction() {
         try {
@@ -175,8 +188,12 @@ public class TransactionService extends MongoDBService {
             searchQuery.put(ETransaction.status.name(), EStatusLifeCycle.Waiting.getName());
 
             BasicDBObject updateQuery = new BasicDBObject();
-            if (appInstance.getPcefInstance().doCommit() && appInstance.getPcefInstance().getTransaction().getTid().equals(transaction.getTid())) {
-                updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Completed.getName());//waiting -->Complete
+            if (appInstance.getPcefInstance().doCommit() && appInstance.getPcefInstance().getTransaction() != null) {
+                    if (appInstance.getPcefInstance().getTransaction().getTid().equals(transaction.getTid())) {
+                        updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Completed.getName());//waiting -->Complete
+
+                }
+
             } else {
                 updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Done.getName());//waiting-->Done
             }
@@ -186,6 +203,11 @@ public class TransactionService extends MongoDBService {
 
             updateSetByQuery(searchQuery, updateQuery);
         }
+    }
+
+
+    public void deleteTransactionByTid(String tid) {
+        db.getCollection(collectionName).remove(new BasicDBObject(ETransaction.tid.name(), tid));
     }
 
 

@@ -54,10 +54,9 @@ public class UsageMonitoringService extends PCEFService {
 
             //build message
             MessagePool messagePool = new MessagePool(abstractAF);
-            Date currentDate = new Date();
-            Date appointmentDate = appInstance.getPcefInstance().getProfile().getAppointmentDate();
-            String timeout = String.valueOf(appointmentDate.compareTo(currentDate));
-            EquinoxRawData equinoxRawData = messagePool.getUsageMonitoringResponse(usageMonitoringResponse, invokeId, timeout);
+
+            EquinoxRawData equinoxRawData = messagePool.getUsageMonitoringResponse(usageMonitoringResponse, invokeId, getTimeoutFromAppoinmentDate());
+
 
             appInstance.getOutList().add(equinoxRawData);
 //            appInstance.setFinish(true);

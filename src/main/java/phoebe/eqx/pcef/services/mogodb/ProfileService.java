@@ -52,29 +52,20 @@ public class ProfileService extends MongoDBService {
     }
 
 
-    public DBCursor findProfileByPrivateId() {
+    public DBCursor findProfileByPrivateId(String privateId) {
 
         try {
-            String privateId = appInstance.getPcefInstance().getUsageMonitoringRequest().getUserValue();
+
             BasicDBObject searchQuery = new BasicDBObject();
             searchQuery.put(EProfile._id.name(), privateId);
 
             DBCursor dbCursor = findByQuery(searchQuery);
-
 
             if (dbCursor.hasNext()) {
                 DBObject profileDbObject = dbCursor.iterator().next();
 
                 Profile profile = gson.fromJson(gson.toJson(profileDbObject), Profile.class);
                 appInstance.getPcefInstance().setProfile(profile);
-
-                /*Date appointmentDate = (Date) profileDbObject.get(EProfile.appointmentDate.name());
-                String sessionId = (String) profileDbObject.get(EProfile.sessionId.name());
-                Integer sequenceNumber = (Integer) profileDbObject.get(EProfile.sequenceNumber.name());
-
-                appInstance.getPcefInstance().setAppointmentDate(appointmentDate);
-                appInstance.getPcefInstance().setOcfSessionId(sessionId);
-                appInstance.getPcefInstance().setSequenceNumber(sequenceNumber);*/
 
                 PCEFUtils.writeMessageFlow("Find Profile by privateId [Found]", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
             } else {

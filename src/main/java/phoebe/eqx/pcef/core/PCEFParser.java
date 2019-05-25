@@ -1,6 +1,7 @@
 package phoebe.eqx.pcef.core;
 
 import com.google.gson.Gson;
+import phoebe.eqx.pcef.message.builder.res.RefundManagementResponse;
 import phoebe.eqx.pcef.message.parser.req.GyRARRequest;
 import phoebe.eqx.pcef.message.parser.req.RefundManagementRequest;
 import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
@@ -30,6 +31,10 @@ public class PCEFParser {
 
     public OCFUsageMonitoringResponse translateUsageMonitoringResponse() {
         return gson.fromJson(message, OCFUsageMonitoringResponse.class);
+    }
+
+    public RefundManagementResponse translateRefundTransactionResponse() {
+        return gson.fromJson(message, RefundManagementResponse.class);
     }
 
     public GetResourceIdResponse translateGetResourceId() throws JAXBException {

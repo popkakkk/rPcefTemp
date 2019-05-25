@@ -58,10 +58,10 @@ public class QuotaService extends MongoDBService {
                 quota.setUserType(OCFUsageMonitoringResponse.getUserType());
                 quota.setUserValue(OCFUsageMonitoringResponse.getUserValue());
                 quota.setProcessing(0);
-
                 quota.setMonitoringKey(resourceResponse.getMonitoringKey());
+                quota.setCounterId(resourceResponse.getCounterId());
+
                 if (resourceResponse.getQuotaByKey() != null) {
-                    quota.setCounterId(resourceResponse.getCounterId());
                     quota.setQuotaByKey(resourceResponse.getQuotaByKey());
                     quota.setRateLimitByKey(resourceResponse.getRateLimitByKey());
 
@@ -156,18 +156,6 @@ public class QuotaService extends MongoDBService {
         List<BasicDBObject> quotaBasicObjectList = getQuotaToBasicObjectList(quotaResponses);
         List<BasicDBObject> newQuotaList = new ArrayList<>();
 
-     /*
-        if (pcefInstance.doCommit()) {
-            Quota quotaExhaust = appInstance.getPcefInstance().getCommitPart().getQuotaExhaust();
-            List<Quota> quotaExpireList = appInstance.getPcefInstance().getCommitPart().getQuotaExpireList();
-
-            if (quotaExhaust != null) {
-                deleteOldQuota(quotaExhaust, quotaResponses);
-            } else if (quotaExpireList.size() > 0) {
-                quotaExpireList.forEach(quota -> deleteOldQuota(quota, quotaResponses));
-            }
-        }*/
-
 
         List<Quota> quotaCommits = new ArrayList<>();
         if (pcefInstance.doCommit()) {
@@ -220,9 +208,9 @@ public class QuotaService extends MongoDBService {
                 // exist quota --> update push
                 BasicDBObject search = new BasicDBObject();
                 search.put(EQuota._id.name(), mk);
-                db.getCollection(collectionName).update(search, new BasicDBObject("$push"
+                db.getCollection(Config.COLLECTION_QUOTA_NAME).update(search, new BasicDBObject("$push"
                         , new BasicDBObject(EQuota.resources.name()
-                        , new BasicDBObject("$each", EQuota.resources.name()))));
+                        , new BasicDBObject("$each", quotaBasicObject.get(EQuota.resources.name())))));
 
             }
         }
@@ -253,6 +241,8 @@ public class QuotaService extends MongoDBService {
         return findByQuery(searchQuery);
     }
 
+
+
     private List<Quota> getQuotaListFromDBCursor(DBCursor quotaCursor) {
         List<Quota> quotaList = new ArrayList<>();
         while (quotaCursor.hasNext()) {
@@ -265,9 +255,9 @@ public class QuotaService extends MongoDBService {
     }
 
 
-    public List<Quota> findAllQuotaByPrivateId() {
+    public List<Quota> findAllQuotaByPrivateId(String privateId) {
         BasicDBObject search = new BasicDBObject();
-        search.put(EQuota.userValue.name(), appInstance.getPcefInstance().getProfile().getUserValue());
+        search.put(EQuota.userValue.name(), privateId);
         DBCursor dbCursor = findByQuery(search);
         return getQuotaListFromDBCursor(dbCursor);
     }
@@ -345,6 +335,17 @@ public class QuotaService extends MongoDBService {
         update.put(EQuota.processing.name(), 1);//lock
 
         return findAndModify(query, update);
+    }
+
+    public void updateUnLockQuota(String monitoringKey) {
+        BasicDBObject query = new BasicDBObject();
+        query.put(EQuota._id.name(), monitoringKey);
+        query.put(EQuota.processing.name(), 1);
+
+        BasicDBObject update = new BasicDBObject();
+        update.put(EQuota.processing.name(), 0);//lock
+
+        updateSetByQuery(query, update);
     }
 
 

@@ -49,7 +49,7 @@ public class W_USAGE_MONITORING extends ComplexState {
             W_MONGODB_PROCESS_STATE mongodbProcessState = new W_MONGODB_PROCESS_STATE(appInstance, dbConnect);
             mongodbProcessState.dispatch();
 
-            nextState = mongodbProcessState.getUsageMonitoringState();
+            nextState = mongodbProcessState.getPcefState();
             if (EState.END.equals(nextState)) {
                 UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
                 if (mongodbProcessState.isResponseSuccess()) {

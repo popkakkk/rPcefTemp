@@ -41,7 +41,9 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
     public EMongoState InitialProcess() {
         EMongoState nextState = null;
         try {
-            DBCursor profileCursor = dbConnect.getProfileService().findProfileByPrivateId();
+            DBCursor profileCursor = dbConnect.getProfileService().findProfileByPrivateId(appInstance.getPcefInstance().getUsageMonitoringRequest().getUserValue());
+
+
             if (!profileCursor.hasNext()) {
                 nextState = EMongoState.INSERT_PROFILE;
             } else {
@@ -59,7 +61,7 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
         EMongoState nextState;
         try {
             dbConnect.getProfileService().insertProfile();
-            setUsageMonitoringState(EState.W_USAGE_MONITORING_START);
+            setPcefState(EState.W_USAGE_MONITORING_START);
             nextState = EMongoState.END;
         } catch (DuplicateKeyException e) {
             nextState = EMongoState.FIND_QUOTA_BY_NEW_RESOURCE;
@@ -108,6 +110,7 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
                         dbConnect.getTransactionService().updateTransaction(myQuotaToList);
 
                         setResponseSuccess();
+                        nextState = EMongoState.END;
                     } else {
                         AFLog.d("Quota Exhaust");
                         CommitPart commitPart = new CommitPart();
@@ -141,13 +144,13 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
         EMongoState nextState = null;
         try {
             if (lockByMyTransaction) {
-                setUsageMonitoringState(EState.W_USAGE_MONITORING_UPDATE);
+                setPcefState(EState.W_USAGE_MONITORING_UPDATE);
                 nextState = EMongoState.END;
             } else {
                 DBObject dbObject = dbConnect.getProfileService().findAndModifyLockProfile(appInstance.getPcefInstance().getProfile().getUserValue());
                 if (dbObject != null) {
                     if (!waitForProcess) { // not wait process --> is new resource --> sent start by resource
-                        setUsageMonitoringState(EState.W_USAGE_MONITORING_UPDATE);
+                        setPcefState(EState.W_USAGE_MONITORING_UPDATE);
                         nextState = EMongoState.END;
                     } else {
                         if (dbConnect.getTransactionService().findMyTransactionDone()) {
@@ -177,7 +180,7 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
         try {
             DBObject dbObject = dbConnect.getProfileService().findAndModifyLockProfile(appInstance.getPcefInstance().getTransaction().getUserValue());
             if (dbObject != null) {
-                setUsageMonitoringState(EState.W_USAGE_MONITORING_UPDATE);
+                setPcefState(EState.W_USAGE_MONITORING_UPDATE);
                 nextState = EMongoState.END;
             } else {
                 //interval
@@ -197,13 +200,13 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
     }
 
     public void setResponseSuccess() {
-        setUsageMonitoringState(EState.END);
+        setPcefState(EState.END);
         this.responseSuccess = true;
     }
 
 
     public void setResponseFail() {
-        setUsageMonitoringState(EState.END);
+        setPcefState(EState.END);
         this.responseSuccess = false;
     }
 

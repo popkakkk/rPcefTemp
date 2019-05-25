@@ -91,15 +91,15 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
 
             int sumTransaction = countUnitMap.values().stream().mapToInt(count -> count).sum();
             if (sumTransaction > 0) {
-                setUsageMonitoringState(EState.W_USAGE_MONITORING_UPDATE);
+                setPcefState(EState.W_USAGE_MONITORING_UPDATE);
             } else {
                 int quotaAllSize = quotaExpireList.size();
-                int quotaExpireSize = dbConnect.getQuotaService().findAllQuotaByPrivateId().size();
+                int quotaExpireSize = dbConnect.getQuotaService().findAllQuotaByPrivateId(appInstance.getPcefInstance().getProfile().getUserValue()).size();
 
                 if (quotaAllSize > quotaExpireSize) {
-                    setUsageMonitoringState(EState.W_USAGE_MONITORING_UPDATE);
+                    setPcefState(EState.W_USAGE_MONITORING_UPDATE);
                 } else if (quotaAllSize == quotaExpireSize) {
-                    setUsageMonitoringState(EState.W_USAGE_MONITORING_STOP);
+                    setPcefState(EState.W_USAGE_MONITORING_STOP);
                 }
             }
 

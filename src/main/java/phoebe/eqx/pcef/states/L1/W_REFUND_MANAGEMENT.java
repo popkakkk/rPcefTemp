@@ -1,19 +1,16 @@
 package phoebe.eqx.pcef.states.L1;
 
 import ec02.af.utils.AFLog;
-import phoebe.eqx.pcef.core.model.Quota;
+import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
-import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
-import phoebe.eqx.pcef.services.GyRARService;
-import phoebe.eqx.pcef.services.OCFUsageMonitoringService;
+import phoebe.eqx.pcef.services.RefundManagementService;
+import phoebe.eqx.pcef.services.RefundTransactionService;
+import phoebe.eqx.pcef.services.VTTimoutService;
 import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 import phoebe.eqx.pcef.states.abs.ComplexState;
 import phoebe.eqx.pcef.states.abs.MessageRecieved;
-import phoebe.eqx.pcef.states.mongodb.W_MONGODB_PROCESS_GYRAR;
 import phoebe.eqx.pcef.states.mongodb.W_MONGODB_PROCESS_REFUND_MANAGEMENT;
-
-import java.util.ArrayList;
 
 public class W_REFUND_MANAGEMENT extends ComplexState {
 
@@ -26,21 +23,36 @@ public class W_REFUND_MANAGEMENT extends ComplexState {
     public void begin() {
         EState nextState = null;
 
-        GyRARService gyRARService = new GyRARService(appInstance);
-        gyRARService.readGyRAR();
+        RefundManagementService refundManagementService = new RefundManagementService(appInstance);
+        refundManagementService.readRefundManagement();
 
         MongoDBConnect dbConnect = null;
         try {
             dbConnect = new MongoDBConnect(appInstance);
-            W_MONGODB_PROCESS_REFUND_MANAGEMENT wMongodbProcessRefundManagement = new W_MONGODB_PROCESS_REFUND_MANAGEMENT(appInstance, dbConnect);
-            wMongodbProcessRefundManagement.dispatch();
+            W_MONGODB_PROCESS_REFUND_MANAGEMENT mongodbProcessRefundManagement = new W_MONGODB_PROCESS_REFUND_MANAGEMENT(appInstance, dbConnect);
+            mongodbProcessRefundManagement.dispatch();
 
-            nextState = wMongodbProcessRefundManagement.getUsageMonitoringState();
+            nextState = mongodbProcessRefundManagement.getPcefState();
+
+
             if (EState.END.equals(nextState)) {
-                //end
+                if (mongodbProcessRefundManagement.isSuccess()) {
+                    //refund status done
+                    refundSuccess(dbConnect, refundManagementService);
+                } else {
+                    //refund error
+                    refundManagementService.buildResponseRefundManagement(false);
+
+                }
+
+
             } else {
-                OCFUsageMonitoringService OCFUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
-                OCFUsageMonitoringService.buildUsageMonitoringUpdate(dbConnect);
+                if (EState.W_REFUND_TRANSACTION.equals(nextState)) {
+                    //refund status complete
+                    RefundTransactionService refundTransactionService = new RefundTransactionService(appInstance);
+                    refundTransactionService.buildRefundTransactionRequest();
+                }
+
             }
         } catch (Exception e) {
             AFLog.d(" error:" + e.getStackTrace()[0]);
@@ -53,27 +65,20 @@ public class W_REFUND_MANAGEMENT extends ComplexState {
     }
 
 
-  /*  @MessageRecieved(messageType = EState.W_USAGE_MONITORING_UPDATE)
-    public void wUsageMonitoringUpdate() throws Exception {
-        OCFUsageMonitoringService ocfUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
-        OCFUsageMonitoringResponse OCFUsageMonitoringResponse = ocfUsageMonitoringService.readUsageMonitoringUpdate();
+    @MessageRecieved(messageType = EState.W_REFUND_TRANSACTION)
+    public void wRefundTransaction() throws Exception {
+        RefundTransactionService refundTransactionService = new RefundTransactionService(appInstance);
+        refundTransactionService.readRefundTransactionResponse();
 
         MongoDBConnect dbConnect = null;
         try {
             dbConnect = new MongoDBConnect(appInstance);
-            ArrayList<Quota> quotaResponseList = dbConnect.getQuotaService().getQuotaFromUsageMonitoringResponse(OCFUsageMonitoringResponse);
 
-            if (ocfUsageMonitoringService.receiveQuotaAndPolicy(OCFUsageMonitoringResponse)) {
-                dbConnect.getQuotaService().updateQuota(quotaResponseList);
-                dbConnect.getTransactionService().updateTransaction(quotaResponseList);
-                dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
-
-                GyRARService gyRARService = new GyRARService(appInstance);
-                gyRARService.buildResponseGyRAR();
-
+            RefundManagementService refundManagementService = new RefundManagementService(appInstance);
+            if (refundTransactionService.isRefundSuccess()) {
+                refundSuccess(dbConnect, refundManagementService);
             } else {
-
-
+                refundManagementService.buildResponseRefundManagement(false);
             }
 
         } catch (Exception e) {
@@ -85,6 +90,30 @@ public class W_REFUND_MANAGEMENT extends ComplexState {
 
         }
         setWorkState(EState.END);
-    }*/
+    }
+
+
+    private void refundSuccess(MongoDBConnect dbConnect, RefundManagementService refundManagementService) {
+
+        Transaction transactionRefund = appInstance.getPcefInstance().getTransaction();
+
+        //delete transaction
+        dbConnect.getTransactionService().deleteTransactionByTid(transactionRefund.getTid());
+
+        /**
+         ****generate cdr refund
+         */
+
+        //update quota unlock
+        dbConnect.getQuotaService().updateUnLockQuota(transactionRefund.getMonitoringKey());
+
+        //find profile set timeout
+        dbConnect.getProfileService().findProfileByPrivateId(transactionRefund.getUserValue());
+
+
+        refundManagementService.buildResponseRefundManagement(true);
+
+
+    }
 
 }

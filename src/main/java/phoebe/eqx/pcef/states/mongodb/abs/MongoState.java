@@ -1,5 +1,6 @@
 package phoebe.eqx.pcef.states.mongodb.abs;
 
+import com.google.gson.Gson;
 import phoebe.eqx.pcef.enums.state.EMongoState;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
@@ -11,9 +12,10 @@ import java.lang.reflect.Method;
 public abstract class MongoState {
 
     private EMongoState nextState = EMongoState.BEGIN;
-    private EState usageMonitoringState;
+    private EState pcefState;
     protected AppInstance appInstance;
     protected MongoDBConnect dbConnect;
+    protected Gson gson = new Gson();
 
     public MongoState(AppInstance appInstance, MongoDBConnect dbConnect) {
         this.appInstance = appInstance;
@@ -58,12 +60,12 @@ public abstract class MongoState {
     }
 
 
-    public EState getUsageMonitoringState() {
-        return usageMonitoringState;
+    public EState getPcefState() {
+        return pcefState;
     }
 
-    public void setUsageMonitoringState(EState usageMonitoringState) {
-        this.usageMonitoringState = usageMonitoringState;
+    public void setPcefState(EState pcefState) {
+        this.pcefState = pcefState;
     }
 
 

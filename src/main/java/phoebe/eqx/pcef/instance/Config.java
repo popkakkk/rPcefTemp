@@ -51,6 +51,8 @@ public class Config {
 
         RESOURCE_NAME_PRODUCT = PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_PRODUCT);
         RESOURCE_NAME_SACF = PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_SACF);
+        RESOURCE_NAME_OCF =  PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_OCF);
+
 
 
         TIMEOUT_OCF = PCEFUtils.getWarmConfig(abstractAF, EConfig.TIMEOUT_OCF);

@@ -34,7 +34,7 @@ public class PCEFInstance {
 
     public boolean doCommit() {
         if (commitPart != null) {
-            return commitPart.getQuotaExpireList().size() > 0;
+            return commitPart.getQuotaExpireList().size() > 0 || commitPart.getQuotaExhaust() != null;
         }
         return false;
     }

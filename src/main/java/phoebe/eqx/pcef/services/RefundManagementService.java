@@ -10,9 +10,9 @@ import phoebe.eqx.pcef.message.parser.req.RefundManagementRequest;
 import phoebe.eqx.pcef.utils.MessageFlow;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 
-public class RefundMangementService extends PCEFService {
+public class RefundManagementService extends PCEFService {
 
-    public RefundMangementService(AppInstance appInstance) {
+    public RefundManagementService(AppInstance appInstance) {
         super(appInstance);
     }
 
@@ -32,7 +32,7 @@ public class RefundMangementService extends PCEFService {
 
     }
 
-    public void buildRefundManagement() {
+    public void buildResponseRefundManagement(boolean success) {
 
         try {
             //create invokeId
@@ -42,23 +42,27 @@ public class RefundMangementService extends PCEFService {
             RefundManagementResponse refundManagementResponse = new RefundManagementResponse();
             refundManagementResponse.setCommand("refundManagement");
             refundManagementResponse.setSessionId(appInstance.getPcefInstance().getRefundManagementRequest().getSessionId());
-            refundManagementResponse.setStatus(EStatusResponse.SUCCESS.getCode());
-            refundManagementResponse.setDevMessage(EStatusResponse.SUCCESS.getDescription());
 
-            //build message
-            MessagePool messagePool = new MessagePool(abstractAF);
-            EquinoxRawData equinoxRawData = messagePool.getRefundManagementReponse(refundManagementResponse, invokeId);
+            if (success) {
+                refundManagementResponse.setStatus(EStatusResponse.SUCCESS.getCode());
+                refundManagementResponse.setDevMessage(EStatusResponse.SUCCESS.getDescription());
+            } else {
+                refundManagementResponse.setStatus(EStatusResponse.FAIL.getCode());
+                refundManagementResponse.setDevMessage(EStatusResponse.FAIL.getDescription());
 
-            appInstance.getOutList().add(equinoxRawData);
-//            appInstance.setFinish(true);
+            }
 
-
-            appInstance.getOutList().add(equinoxRawData);
-//            appInstance.setFinish(true);
 
             //increase stat
 //            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.PCEF_RECEIVE_TEST_DATA);
 
+
+            //build message
+            MessagePool messagePool = new MessagePool(abstractAF);
+            EquinoxRawData equinoxRawData = messagePool.getRefundManagementResponse(refundManagementResponse, invokeId, getTimeoutFromAppoinmentDate());
+
+            appInstance.getOutList().add(equinoxRawData);
+//            appInstance.setFinish(true);
 
             PCEFUtils.writeMessageFlow("Build Refund Management Response", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
         } catch (Exception e) {

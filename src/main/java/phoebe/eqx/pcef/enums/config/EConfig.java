@@ -14,7 +14,7 @@ public enum EConfig {
     COLLECTION_TRANSACTION_NAME("collection-transaction-name", EConfigType.MANDATORY, null),
     COLLECTION_PROFILE_NAME("collection-profile-name", EConfigType.MANDATORY, null),
     COLLECTION_QUOTA_NAME("collection-quota-name", EConfigType.MANDATORY, null),
-    URL_USAGE_MONITORING("url-usage-monitoring", EConfigType.MANDATORY, null),
+
     URL_PRODUCT("url-product", EConfigType.MANDATORY, null),
     URL_OCF_USAGE_MONITORING("url-ocf-usage-monitoring", EConfigType.MANDATORY, null),
 
@@ -22,6 +22,7 @@ public enum EConfig {
 
     RESOURCE_NAME_PRODUCT("resource-name-product", EConfigType.MANDATORY, null),
     RESOURCE_NAME_SACF("resource-name-sacf", EConfigType.MANDATORY, null),
+    RESOURCE_NAME_OCF("resource-name-ocf", EConfigType.MANDATORY, null),
 
 
 
@@ -34,6 +35,7 @@ public enum EConfig {
 
     //retry timeout
     RETRY_OCF_USAGE_MONITORING("retry-ocf-usage-monitoring", EConfigType.OPTIONAL, "1"),
+    RETRY_OCF_REFUND_TRANSACTION("retry-ocf-refund-transaction", EConfigType.OPTIONAL, "1"),
     RETRY_PRODUCT_GET_RESOURCE_ID("retry-product-get-resource-id", EConfigType.OPTIONAL, "1");
 
 

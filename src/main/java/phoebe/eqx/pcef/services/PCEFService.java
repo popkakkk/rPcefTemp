@@ -1,6 +1,7 @@
 package phoebe.eqx.pcef.services;
 
 import ec02.af.abstracts.AbstractAF;
+import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.core.PCEFParser;
 import phoebe.eqx.pcef.core.data.InvokeObject;
@@ -44,13 +45,13 @@ abstract public class PCEFService {
         if (Operation.TestOperation.equals(operation)) {
             // parser class
             result = parser.translateTestResponseData();
-        } else if (Operation.QueryDBPrivateID.equals(operation)) {
-            parser = new PCEFParser(equinoxRawData.getRawDataMessage());
-            result = parser.translateUsageMonitoringResponse();
+        } else if (Operation.RefundTransaction.equals(operation)) {
+            parser = new PCEFParser(equinoxRawData.getRawDataAttribute("val"));
+            result = parser.translateRefundTransactionResponse();
         } else if (Operation.UsageMonitoringStart.equals(operation) || Operation.UsageMonitoringUpdate.equals(operation)) {
             parser = new PCEFParser(equinoxRawData.getRawDataAttribute("val"));
             result = parser.translateUsageMonitoringResponse();
-        } else if (Operation.GetResourceId.equals(operation) ) {
+        } else if (Operation.GetResourceId.equals(operation)) {
             parser = new PCEFParser(equinoxRawData.getRawDataMessage());
             result = parser.translateGetResourceId();
         }
@@ -73,5 +74,16 @@ abstract public class PCEFService {
             throw e;
         }
     }
+
+
+    public String getTimeoutFromAppoinmentDate() {
+        Date currentDate = new Date();
+        Date appointmentDate = appInstance.getPcefInstance().getProfile().getAppointmentDate();
+        long timeout = Math.abs(appointmentDate.getTime() - currentDate.getTime()) / 1000;
+        AFLog.d("Get timeout ="+timeout);
+        return String.valueOf(timeout);
+
+    }
+
 
 }
