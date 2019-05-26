@@ -79,14 +79,21 @@ public class ProfileService extends MongoDBService {
     }
 
     private void updateProfileUnlock(BasicDBObject updateQuery) {
-        updateQuery.put(EProfile.isProcessing.name(), 0);//unlock
-        updateQuery.put(EProfile.sequenceNumber.name(), appInstance.getPcefInstance().getProfile().getSequenceNumber());
 
-        BasicDBObject searchQuery = new BasicDBObject();
-        searchQuery.put(EProfile.userValue.name(), appInstance.getPcefInstance().getProfile().getUserValue());
-        searchQuery.put(EProfile.isProcessing.name(), 1);
+        try {
+            updateQuery.put(EProfile.isProcessing.name(), 0);//unlock
+            updateQuery.put(EProfile.sequenceNumber.name(), appInstance.getPcefInstance().getProfile().getSequenceNumber());
 
-        updateSetByQuery(searchQuery, updateQuery);
+            BasicDBObject searchQuery = new BasicDBObject();
+            searchQuery.put(EProfile.userValue.name(), appInstance.getPcefInstance().getProfile().getUserValue());
+            searchQuery.put(EProfile.isProcessing.name(), 1);
+
+            updateSetByQuery(searchQuery, updateQuery);
+            PCEFUtils.writeMessageFlow("Update Profile Unlock", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+        } catch (Exception e) {
+            PCEFUtils.writeMessageFlow("Update Profile Unlock error-" + e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            throw e;
+        }
     }
 
 
@@ -151,6 +158,7 @@ public class ProfileService extends MongoDBService {
 
     public void removeProfile(String privateId) {
         BasicDBObject delete = new BasicDBObject(EProfile._id.name(), privateId);
-        db.getCollection(Config.COLLECTION_TRANSACTION_NAME).remove(delete);
+        writeQueryLog("remove", collectionName, delete.toString());
+        db.getCollection(collectionName).remove(delete);
     }
 }

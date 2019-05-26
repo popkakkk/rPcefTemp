@@ -36,23 +36,4 @@ public class CommitData {
 }
 
 
-class ID {
-    private String monitoringKey;
-    private String resourceId;
 
-    public String getMonitoringKey() {
-        return monitoringKey;
-    }
-
-    public void setMonitoringKey(String monitoringKey) {
-        this.monitoringKey = monitoringKey;
-    }
-
-    public String getResourceId() {
-        return resourceId;
-    }
-
-    public void setResourceId(String resourceId) {
-        this.resourceId = resourceId;
-    }
-}

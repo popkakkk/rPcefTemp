@@ -12,9 +12,12 @@ import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.model.EQuota;
 import phoebe.eqx.pcef.instance.AppInstance;
 
+import phoebe.eqx.pcef.instance.CommitData;
 import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.instance.PCEFInstance;
 import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
+import phoebe.eqx.pcef.utils.MessageFlow;
+import phoebe.eqx.pcef.utils.PCEFUtils;
 
 import java.util.*;
 
@@ -91,10 +94,19 @@ public class QuotaService extends MongoDBService {
     }
 
 
-    public void insertQuotaFirstUsage(ArrayList<Quota> quotaResponses) {
-        List<BasicDBObject> quotaBasicObjectList = getQuotaToBasicObjectList(quotaResponses);
-        insertManyByObject(quotaBasicObjectList);
-        this.minExpireDate = calMinExpireDate(quotaBasicObjectList);
+    public void insertQuotaInitial(ArrayList<Quota> quotaResponses) {
+        try {
+            List<BasicDBObject> quotaBasicObjectList = getQuotaToBasicObjectList(quotaResponses);
+            insertManyByObject(quotaBasicObjectList);
+            this.minExpireDate = calMinExpireDate(quotaBasicObjectList);
+            this.haveNewQuota = true;
+
+            PCEFUtils.writeMessageFlow("Insert Quota Initial", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+        } catch (Exception e) {
+            PCEFUtils.writeMessageFlow("Insert Quota Initial error" + e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            throw e;
+        }
+
     }
 
 
@@ -104,36 +116,10 @@ public class QuotaService extends MongoDBService {
     }
 
 
-    private void deleteOldQuota(Quota oldQuota, List<Quota> quotaResponses) {
-
-        String oldMk = oldQuota.getMonitoringKey();
-        String newMk = null;
-
-        //find new mk response by resourceId request
-        for (Quota quota : quotaResponses) {
-            if (newMk != null) {
-                break;
-            }
-            for (ResourceQuota rsQuotaResponse : quota.getResources()) {
-                if (oldQuota.getResources().get(0).getResourceId().equals(rsQuotaResponse.getResourceId())) { //[0] = check by some resource id from old quota
-                    newMk = quota.getMonitoringKey();
-                    break;
-                }
-            }
-        }
-
-
-        //old quota --> delete
-        String action = "do not delete";
-        if (!oldMk.equals(newMk)) {
-            deleteQuotaByKey(oldMk);
-            action = "delete";
-        }
-        AFLog.d("Old MK: " + oldMk + ",New MK: " + newMk + ",Action: " + action);
-    }
-
     private void deleteQuotaByKey(String key) {
-        db.getCollection(collectionName).remove(new BasicDBObject(EQuota._id.name(), key));
+        BasicDBObject delete = new BasicDBObject(EQuota._id.name(), key);
+        writeQueryLog("remove", collectionName, delete.toString());
+        db.getCollection(collectionName).remove(delete);
 
     }
 
@@ -149,7 +135,97 @@ public class QuotaService extends MongoDBService {
         return resourceIdMapMk;
     }
 
+    public List<String> getMkFromCommitData(List<CommitData> commitDataList) {
+        List<String> mkCommits = new ArrayList<>();
+        if (commitDataList.size() > 0) {
+            for (CommitData commitData : commitDataList) {
+                String mk = commitData.get_id().getMonitoringKey();
+                if (!mkCommits.contains(mk)) {
+                    mkCommits.add(mk);
+                }
+            }
+        }
+        return mkCommits;
+
+    }
+
     public void updateQuota(ArrayList<Quota> quotaResponses) {
+
+        try {
+
+
+            List<BasicDBObject> quotaBasicObjectList = getQuotaToBasicObjectList(quotaResponses);
+            List<BasicDBObject> newQuotaList = new ArrayList<>();
+
+            List<CommitData> commitDataList = appInstance.getPcefInstance().getCommitDatas();
+
+
+            //get monitoring key request
+            List<String> mkCommits = getMkFromCommitData(commitDataList);
+
+            //get monitoring key response
+            List<String> mkResponses = new ArrayList<>();
+            quotaResponses.forEach(quota -> mkResponses.add(quota.getMonitoringKey()));
+
+            //##delete old quota
+            List<String> mkUpdateCounter = new ArrayList<>();
+            for (String mkCommit : mkCommits) {
+                if (!mkResponses.contains(mkCommit)) {
+                    //delete
+                    deleteQuotaByKey(mkCommit);
+                } else {
+                    mkUpdateCounter.add(mkCommit);
+                }
+            }
+
+
+            //##insert and update quota
+            for (BasicDBObject quotaBasicObject : quotaBasicObjectList) {
+                String mk = quotaBasicObject.get(EQuota.monitoringKey.name()).toString();
+
+                if (quotaBasicObject.get(EQuota.quotaByKey.name()) != null) {  //receive new quota
+                    if (commitDataList.size() == 0) {
+                        //new quota --> insert
+                        insertByQuery(quotaBasicObject);
+                    } else {
+                        if (!mkUpdateCounter.contains(mk)) {
+                            //new quota --> insert
+                            insertByQuery(quotaBasicObject);
+                        } else {
+                            //new counter(old mk) -->update set
+                            BasicDBObject search = new BasicDBObject();
+                            search.put(EQuota._id.name(), mk);
+                            updateSetByQuery(search, quotaBasicObject);
+                        }
+                    }
+                    newQuotaList.add(quotaBasicObject);
+                } else {
+                    // exist quota --> update push
+                    BasicDBObject search = new BasicDBObject();
+                    search.put(EQuota._id.name(), mk);
+                    db.getCollection(Config.COLLECTION_QUOTA_NAME).update(search, new BasicDBObject("$push"
+                            , new BasicDBObject(EQuota.resources.name()
+                            , new BasicDBObject("$each", quotaBasicObject.get(EQuota.resources.name())))));
+
+                }
+            }
+
+            if (newQuotaList.size() > 0) {
+                this.haveNewQuota = true;
+                this.minExpireDate = findQuotaGetMinimumExpireDate();
+            }
+
+
+            PCEFUtils.writeMessageFlow("Update Quota", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+        } catch (Exception e) {
+            PCEFUtils.writeMessageFlow("Update Quota error" + e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            throw e;
+        }
+
+
+    }
+/*
+public void updateQuota(ArrayList<Quota> quotaResponses) {
 
         PCEFInstance pcefInstance = appInstance.getPcefInstance();
 
@@ -221,11 +297,12 @@ public class QuotaService extends MongoDBService {
         }
 
     }
+*/
 
 
     public void filterTransactionConfirmIsNewResource(List<Transaction> otherTransaction) {
         int index = 0;
-        for (Transaction transaction : appInstance.getPcefInstance().getOtherStartTransactions()) {
+        for (Transaction transaction : otherTransaction) {
             DBCursor quotaCursor = findQuotaByTransaction(transaction);
             if (quotaCursor.hasNext()) {
                 otherTransaction.remove(index);
@@ -240,7 +317,6 @@ public class QuotaService extends MongoDBService {
         searchQuery.put(EQuota.resources.name(), new BasicDBObject("$elemMatch", new BasicDBObject("resourceId", transaction.getResourceId())));
         return findByQuery(searchQuery);
     }
-
 
 
     private List<Quota> getQuotaListFromDBCursor(DBCursor quotaCursor) {
@@ -349,7 +425,29 @@ public class QuotaService extends MongoDBService {
     }
 
 
-    public boolean findAndModifyLockQuotaExpire() {
+    public boolean findAndModifyLockQuotaExpire(List<Quota> quotaCommits) {
+        boolean canProcess = true;
+        for (Quota quota : quotaCommits) {
+            if (quota.getProcessing() == 1) {
+                continue;
+            }
+
+            //processing 0 --> 1
+            DBObject dbObject = findAndModifyLockQuota(quota.getMonitoringKey());
+            if (dbObject != null) {
+                //success
+                quota.setProcessing(1);
+            } else {
+                //not success do waiting
+                canProcess = false;
+                break;
+            }
+        }
+        return canProcess;
+    }
+
+
+    /*  public boolean findAndModifyLockQuotaExpire() {
         boolean canProcess = true;
         for (Quota quota : quotaExpireList) {
             if (quota.getProcessing() == 1) {
@@ -367,7 +465,7 @@ public class QuotaService extends MongoDBService {
             }
         }
         return canProcess;
-    }
+    }*/
 
     public Date getMinExpireDate() {
         return minExpireDate;

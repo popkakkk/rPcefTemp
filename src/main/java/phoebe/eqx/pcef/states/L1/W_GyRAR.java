@@ -63,7 +63,7 @@ public class W_GyRAR extends ComplexState {
             ArrayList<Quota> quotaResponseList = dbConnect.getQuotaService().getQuotaFromUsageMonitoringResponse(OCFUsageMonitoringResponse);
 
             if (ocfUsageMonitoringService.receiveQuotaAndPolicy(OCFUsageMonitoringResponse)) {
-                dbConnect.getQuotaService().updateQuota(quotaResponseList);
+                dbConnect.getQuotaService().insertQuotaInitial(quotaResponseList);
                 dbConnect.getTransactionService().updateTransaction(quotaResponseList);
                 dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
 

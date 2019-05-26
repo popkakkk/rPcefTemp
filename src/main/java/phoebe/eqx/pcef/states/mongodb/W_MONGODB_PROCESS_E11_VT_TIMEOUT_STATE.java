@@ -6,13 +6,14 @@ import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.enums.state.EMongoState;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
-import phoebe.eqx.pcef.instance.CommitPart;
+import phoebe.eqx.pcef.instance.CommitData;
 import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 import phoebe.eqx.pcef.states.mongodb.abs.MessageMongoRecieved;
 import phoebe.eqx.pcef.states.mongodb.abs.MongoState;
 import phoebe.eqx.pcef.utils.Interval;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -55,11 +56,21 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
     public EMongoState findQuotaExpire() {
         EMongoState nextState = null;
         try {
-            List<Quota> quotaExpireList = dbConnect.getQuotaService().findQuotaExpire();
-            dbConnect.getQuotaService().setQuotaExpireList(quotaExpireList);
+            List<CommitData> commitDataList = dbConnect.getQuotaService().findDataToCommit(appInstance.getPcefInstance().getProfile().getUserValue(), null, true);
+            appInstance.getPcefInstance().setCommitDatas(commitDataList);
 
-            if (quotaExpireList.size() > 0) {
-                boolean modProcessing = dbConnect.getQuotaService().findAndModifyLockQuotaExpire();
+            if (commitDataList.size() > 0) {
+                List<String> mkCommits = dbConnect.getQuotaService().getMkFromCommitData(commitDataList);
+                List<Quota> quotaCommits = new ArrayList<>();
+                mkCommits.forEach(s -> {
+                    Quota quota = new Quota();
+                    quota.setMonitoringKey(s);
+                    quota.setProcessing(0);
+                    quotaCommits.add(quota);
+                });
+
+
+                boolean modProcessing = dbConnect.getQuotaService().findAndModifyLockQuotaExpire(quotaCommits);
                 if (modProcessing) {
                     nextState = EMongoState.FIND_USAGE_RESOURCE;
                 } else {
@@ -68,10 +79,8 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
                     nextState = EMongoState.FIND_QUOTA_EXPIRE;
                 }
             } else {
-                // set Profile appointmentDate = (now - appointment)
-                // no
-
-
+                //End
+                setPcefState(EState.END);
                 nextState = EMongoState.END;
             }
 
@@ -86,15 +95,14 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
     public EMongoState findUsageResource() {
         EMongoState nextState = null;
         try {
-            List<Quota> quotaExpireList = dbConnect.getQuotaService().getQuotaExpireList();
-            Map<String, Integer> countUnitMap = dbConnect.getTransactionService().findTransactionDoneGroupByResource(quotaExpireList);
+            List<CommitData> commitDataList = appInstance.getPcefInstance().getCommitDatas();
 
-            int sumTransaction = countUnitMap.values().stream().mapToInt(count -> count).sum();
+            int sumTransaction = commitDataList.stream().mapToInt(CommitData::getCount).sum();
             if (sumTransaction > 0) {
                 setPcefState(EState.W_USAGE_MONITORING_UPDATE);
             } else {
-                int quotaAllSize = quotaExpireList.size();
-                int quotaExpireSize = dbConnect.getQuotaService().findAllQuotaByPrivateId(appInstance.getPcefInstance().getProfile().getUserValue()).size();
+                int quotaExpireSize = appInstance.getPcefInstance().getQuotaCommitSize();
+                int quotaAllSize = dbConnect.getQuotaService().findAllQuotaByPrivateId(appInstance.getPcefInstance().getProfile().getUserValue()).size();
 
                 if (quotaAllSize > quotaExpireSize) {
                     setPcefState(EState.W_USAGE_MONITORING_UPDATE);
@@ -102,13 +110,6 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
                     setPcefState(EState.W_USAGE_MONITORING_STOP);
                 }
             }
-
-            CommitPart commitPart = new CommitPart();
-            commitPart.setQuotaExpireList(quotaExpireList);
-            commitPart.setCountUnitMap(countUnitMap);
-            appInstance.getPcefInstance().setCommitPart(commitPart);
-
-
             nextState = EMongoState.END;
 
         } catch (Exception e) {

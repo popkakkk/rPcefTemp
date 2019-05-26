@@ -46,7 +46,7 @@ public class GyRARService extends PCEFService {
 
             //build message
             MessagePool messagePool = new MessagePool(abstractAF);
-            EquinoxRawData equinoxRawData = messagePool.getGyRARResponse(gyRARResponse, invokeId);
+            EquinoxRawData equinoxRawData = messagePool.getGyRARResponse(gyRARResponse, invokeId, getTimeoutFromAppoinmentDate());
 
             appInstance.getOutList().add(equinoxRawData);
 //            appInstance.setFinish(true);

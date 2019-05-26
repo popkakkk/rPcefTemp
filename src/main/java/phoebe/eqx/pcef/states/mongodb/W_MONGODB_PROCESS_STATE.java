@@ -11,7 +11,7 @@ import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.enums.state.EMongoState;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
-import phoebe.eqx.pcef.instance.CommitPart;
+import phoebe.eqx.pcef.instance.CommitData;
 import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 import phoebe.eqx.pcef.states.mongodb.abs.MessageMongoRecieved;
@@ -19,7 +19,7 @@ import phoebe.eqx.pcef.states.mongodb.abs.MongoState;
 import phoebe.eqx.pcef.utils.Interval;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
 
 public class W_MONGODB_PROCESS_STATE extends MongoState {
 
@@ -91,10 +91,76 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
                 if (dbConnect.getQuotaService().checkMkCanProcess(QuotaCursor)) {
                     Quota quota = new Gson().fromJson(new Gson().toJson(QuotaCursor.iterator().next()), Quota.class);
 
+                    /* ----------------- [Check Quota Exhaust]------------------------------------*/
 
-                    /**
-                     * **Check Quota Exhaust**
-                     * **/
+                    //count transaction
+                    List<CommitData> commitDataList = dbConnect.getQuotaService().findDataToCommit(quota.getUserValue(), quota.getMonitoringKey(), false);
+
+
+                    //count resourceId this transaction + 1
+                    for (CommitData commitData : commitDataList) {
+                        if (commitData.get_id().getResourceId().equals(appInstance.getPcefInstance().getTransaction().getResourceId())) {
+                            commitData.setCount(commitData.getCount() + 1);
+                            break;
+                        }
+                    }
+
+
+                    int sumTransaction = commitDataList.stream().mapToInt(CommitData::getCount).sum();
+
+                    int quotaUnit = quota.getQuotaByKey().getUnit();
+
+                    if (quotaUnit > sumTransaction) {
+                        AFLog.d("Quota Available");
+
+                        ArrayList<Quota> myQuotaToList = new ArrayList<>();
+                        myQuotaToList.add(quota);
+
+                        //update transaction
+                        dbConnect.getTransactionService().updateTransaction(myQuotaToList);
+
+                        setResponseSuccess();
+                        nextState = EMongoState.END;
+                    } else {
+                        AFLog.d("Quota Exhaust");
+                        appInstance.getPcefInstance().setCommitDatas(commitDataList);
+                        DBObject findModQuota = dbConnect.getQuotaService().findAndModifyLockQuota(quota.getMonitoringKey());
+                        if (findModQuota != null) {
+                            nextState = EMongoState.FIND_AND_MOD_PROFILE_FOR_UPDATE_QUOTA_EXHAUST;
+                        } else {
+                            //interval
+                            nextState = EMongoState.FIND_QUOTA_BY_NEW_RESOURCE;
+                        }
+                    }
+
+
+                } else {
+                    intervalMkIsProcessing.waitInterval();
+                    nextState = EMongoState.FIND_QUOTA_BY_NEW_RESOURCE;
+                }
+            }
+        } catch (Exception e) {
+
+        }
+        return nextState;
+    }/*@MessageMongoRecieved(messageType = EMongoState.FIND_QUOTA_BY_NEW_RESOURCE)
+    public EMongoState findQuotaByNewResource() {
+        EMongoState nextState = null;
+        waitForProcess = false;
+        try {
+            DBCursor QuotaCursor = dbConnect.getQuotaService().findQuotaByTransaction(appInstance.getPcefInstance().getTransaction());
+            if (!QuotaCursor.hasNext()) {
+                nextState = EMongoState.FIND_AND_MOD_PROFILE_FOR_WAIT_PROCESS;
+            } else {
+                if (dbConnect.getQuotaService().checkMkCanProcess(QuotaCursor)) {
+                    Quota quota = new Gson().fromJson(new Gson().toJson(QuotaCursor.iterator().next()), Quota.class);
+
+
+                    */
+
+    /**
+     * **Check Quota Exhaust**
+     **//*
 
                     ArrayList<Quota> myQuotaToList = new ArrayList<>();
                     myQuotaToList.add(quota);
@@ -137,8 +203,7 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
 
         }
         return nextState;
-    }
-
+    }*/
     @MessageMongoRecieved(messageType = EMongoState.FIND_AND_MOD_PROFILE_FOR_WAIT_PROCESS)
     public EMongoState findAndModProfileForWaitProcess() {
         EMongoState nextState = null;

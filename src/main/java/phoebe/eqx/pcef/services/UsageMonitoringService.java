@@ -65,11 +65,11 @@ public class UsageMonitoringService extends PCEFService {
 //            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.PCEF_RECEIVE_TEST_DATA);
 
 
-            PCEFUtils.writeMessageFlow("Build Usage Monitoring Response Success", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Build Usage Monitoring Response", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
 
 
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Build Usage Monitoring Response Success -" + e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Build Usage Monitoring Response-" + e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
         }
 
 

@@ -1,93 +1,137 @@
-INFO|12:56:49:424|main|EC02Server|-1|EC02 :: Library Version --> 4.0.7
-DEBUG|12:56:49:427|main|ConfigLoader|-1|Initial Custom AF Log
-WARN|12:56:49:428|main|ConfigLoader|-1|testCustomLog : file name is rotated
-INFO|12:56:49:442|main|EC02Server|-1|application level ready
-ADEBUG|12:56:49:455|main|Config|89|----- Verify AF Configuration [true] -----
-DEBUG|12:56:49:503|main|EC02Handler|-1|Received data from LL Content-Length: 829
-DEBUG|12:56:49:505|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Handler|-1|
-#====> Incoming Message :        <EquinoxMessage from="rPCEF_au.E11.0" via="rPCEF_au.E11.0" session="0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" timeout="10" ret="0" diag="3:2:0">            <EquinoxRawData to="rPCEF_au.ES00.SERV" name="HTTP" type="request" ctype="text/plain" invoke="umStart_" ecode="200" method="POST" url="/rpcef/v1/gyrar" val="{	&quot;command&quot;:&quot;GyRAR&quot;,	&quot;sessionId&quot;:&quot; PCEF:OCF:123456789:ACTIVE&quot;,	&quot;actualTime&quot;:&quot;20181105174020&quot;,	&quot;userType&quot;:&quot;privateId&quot;,	&quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;}" charset="" desc="host=; port=31700; via=auto; session=766111402" orig="rPCEF_au.ES04.rOCF.0" ret="0" />            <EquinoxInstance>                <value val="" />            </EquinoxInstance>        </EquinoxMessage>    
-DEBUG|12:56:49:529|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Controller|-1|=== >> INCOMING DATA
+INFO|14:33:23:122|main|EC02Server|-1|EC02 :: Library Version --> 4.0.7
+DEBUG|14:33:23:126|main|ConfigLoader|-1|Initial Custom AF Log
+WARN|14:33:23:126|main|ConfigLoader|-1|testCustomLog : file name is rotated
+INFO|14:33:23:143|main|EC02Server|-1|application level ready
+ADEBUG|14:33:23:156|main|Config|89|----- Verify AF Configuration [true] -----
+DEBUG|14:33:23:202|main|EC02Handler|-1|Received data from LL Content-Length: 277
+DEBUG|14:33:23:204|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Handler|-1|
+#====> Incoming Message :        <EquinoxMessage from="rPCEF_au.E11.0" via="rPCEF_au.E11.0" session="0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" timeout="10" ret="4" diag="1:0:0">            <EquinoxInstance>                <value val="" />            </EquinoxInstance>        </EquinoxMessage>    
+DEBUG|14:33:23:218|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Controller|-1|=== >> INCOMING DATA
 -->applicationName  :  Sample
 -->session  : 0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384
 -->via  : rPCEF_au.E11.0
 -->from  : rPCEF_au.E11.0
--->diag  : 3:2:0
+-->diag  : 1:0:0
 -->state  : IDLE
+-->timeout  : 10
+
+-->rawdata(s)  : no raw data
+ADEBUG|14:33:23:262|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFMain|16|## actionProcess || extractInstance || Finish...
+ADEBUG|14:33:23:262|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|74|--------------------- [ Start Before Process ] ---------------------
+ADEBUG|14:33:23:264|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|196|[Request Type]: E11_TIMEOUT
+ADEBUG|14:33:23:264|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|77|--------------------- [ Stop Before Process  ] ---------------------
+ADEBUG|14:33:23:264|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|78|--------------------- [   Start Do Process   ] ---------------------
+ADEBUG|14:33:23:506|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|36|Set state to null -->  BEGIN
+ADEBUG|14:33:23:506|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|18|disPatch W_E11_TIMEOUT BEGIN
+ADEBUG|14:33:23:508|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|22|Invoke begin
+ADEBUG|14:33:34:284|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|81|[Query] find,collection name:Profile, query ={ "appointmentDate" : { "$lte" : { "$date" : 1558856003263 } } }
+ADEBUG|14:33:34:372|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ProfileService|140|userValue :0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384
+ADEBUG|14:33:34:377|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ProfileService|141|appointmentDate :Sun May 26 10:56:20 ICT 2019
+ADEBUG|14:33:34:377|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ProfileService|142|currentTime = :Sun May 26 14:33:23 ICT 2019
+ADEBUG|14:33:34:377|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|81|[Query] aggregate,collection name:Profile, query ={ "userValue" : "0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384", "isProcessing" : 0 },{ "$set" : { "isProcessing" : 1 } }
+ADEBUG|14:33:38:707|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|81|[Query] aggregate,collection name:Quota, query =[{ "$unwind" : "$resources" }, { "$lookup" : { "from" : "Transaction", "let" : { "resourceId" : "$resources.resourceId" }, "pipeline" : [{ "$match" : { "$expr" : { "$and" : [{ "$eq" : ["$resourceId", "$$resourceId"] }, { "$eq" : ["$status", "Done"] }] } } }], "as" : "transactionData" } }, { "$unwind" : { "path" : "$transactionData", "preserveNullAndEmptyArrays" : true } }, { "$match" : { "userValue" : "0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384", "expireDate" : { "$lte" : { "$date" : 1558856018706 } } } }, { "$group" : { "_id" : { "monitoringKey" : "$monitoringKey", "resourceId" : "$resources.resourceId", "resourceName" : "$resources.resourceName" }, "transactionIds" : { "$push" : "$transactionData.tid" } } }, { "$project" : { "transactionIds" : "$transactionIds", "count" : { "$cond" : { "if" : { "$isArray" : "$transactionIds" }, "then" : { "$size" : "$transactionIds" }, "else" : "" } } } }]
+ADEBUG|14:33:47:611|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|81|[Query] aggregate,collection name:Quota, query ={ "_id" : "1234", "processing" : 0 },{ "$set" : { "processing" : 1 } }
+ADEBUG|14:33:53:734|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|81|[Query] aggregate,collection name:Quota, query ={ "_id" : "1001", "processing" : 0 },{ "$set" : { "processing" : 1 } }
+ADEBUG|14:34:40:484|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|81|[Query] find,collection name:Transaction, query ={ "status" : "Waiting", "userValue" : "0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384", "monitoringKey" : "", "isActive" : 1 }
+ADEBUG|14:34:44:565|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|InvokeManager|94|Operation[UsageMonitoringUpdate] has configured retryTimeout number as 1
+ADEBUG|14:34:45:192|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Build Usage Monitoring Update Request","status":"Success"}
+ADEBUG|14:34:51:585|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|80|--------------------- [    Stop Do Process   ] ---------------------
+ADEBUG|14:34:51:585|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|81|--------------------- [ Start After Process  ] ---------------------
+ADEBUG|14:34:51:592|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|84|--------------------- [ Stop After Process   ] ---------------------
+ADEBUG|14:34:51:595|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFMain|19|## actionProcess || callActionProcess || Finish...
+ADEBUG|14:34:51:620|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFMain|22|## actionProcess || composeInstance || Finish...
+DEBUG|14:34:51:624|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|AFProxy|-1|action process completed :: 88405
+DEBUG|14:34:51:624|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Controller|-1|=== >> OUTGOING DATA
+-->applicationName  :  Sample
+-->session  : 0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384
+-->via  : rPCEF_au.E11.0
+-->from  : Sample.ES00
+-->diag  : 
+-->state  : ACTIVE
+-->timeout  : 4
+
+-->rawdata(s)  : 1
+-->raw data index : 0
+	-->message : {"command":"usageMonitoringUpdate","sessionId":"sessionIdFromPCEF","tid":"transactionId4","requestNumber":"4","actualTime":"20190526143443","userType":"privateId","userValue":"0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384","resources":[{"resourceId":"PD-2018","resourceName":"API_A","monitoringKey":"1234","unitType":"unit","usedUnit":"0","reportingReason":"1"},{"resourceId":"PD-20179","resourceName":"API_A","monitoringKey":"1001","unitType":"unit","usedUnit":"0","reportingReason":"1"},{"resourceId":"PD-20148","resourceName":"API_A","monitoringKey":"1001","unitType":"unit","usedUnit":"1","reportingReason":"0"}]}
+	-->method : POST
+	-->ctype : text/plain
+	-->name : HTTP
+	-->invoke : umUpdate_
+	-->to : rPCEF.ES04.OCF
+	-->type : request
+	-->url : /api/v1/metering-method
+	-->timeout : 4
+DEBUG|14:34:51:642|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Handler|-1|
+#====> Outgoing Message is:<?xml version="1.0" encoding="tis-620" ?><EquinoxMessage diag="" from="Sample.ES00" ret="0" session="0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" via="rPCEF_au.E11.0" timeout="4" ><EquinoxRawData method="POST" ctype="text/plain" val="{&quot;command&quot;:&quot;usageMonitoringUpdate&quot;,&quot;sessionId&quot;:&quot;sessionIdFromPCEF&quot;,&quot;tid&quot;:&quot;transactionId4&quot;,&quot;requestNumber&quot;:&quot;4&quot;,&quot;actualTime&quot;:&quot;20190526143443&quot;,&quot;userType&quot;:&quot;privateId&quot;,&quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;,&quot;resources&quot;:[{&quot;resourceId&quot;:&quot;PD-2018&quot;,&quot;resourceName&quot;:&quot;API_A&quot;,&quot;monitoringKey&quot;:&quot;1234&quot;,&quot;unitType&quot;:&quot;unit&quot;,&quot;usedUnit&quot;:&quot;0&quot;,&quot;reportingReason&quot;:&quot;1&quot;},{&quot;resourceId&quot;:&quot;PD-20179&quot;,&quot;resourceName&quot;:&quot;API_A&quot;,&quot;monitoringKey&quot;:&quot;1001&quot;,&quot;unitType&quot;:&quot;unit&quot;,&quot;usedUnit&quot;:&quot;0&quot;,&quot;reportingReason&quot;:&quot;1&quot;},{&quot;resourceId&quot;:&quot;PD-20148&quot;,&quot;resourceName&quot;:&quot;API_A&quot;,&quot;monitoringKey&quot;:&quot;1001&quot;,&quot;unitType&quot;:&quot;unit&quot;,&quot;usedUnit&quot;:&quot;1&quot;,&quot;reportingReason&quot;:&quot;0&quot;}]}" name="HTTP" invoke="umUpdate_" to="rPCEF.ES04.OCF" type="request" url="/api/v1/metering-method" timeout="4" ></EquinoxRawData><EquinoxInstance><value val="1::ACTIVE::false::ZUY2OVZkdHkyakFRL1pXT3BvOEViRERoOGtZVGszb1NMc09seVV6SU1Db29pUk5iY21TWlFCbit2VWVTZ2RDR2gzUW01UW52cnZaeVZ1ZG9UWkladXc5NHFpaWZNZEpjRS95VGFoVEcrSENyMVhxOWV1bzRsZkpwcFVBU0tlN0R5QVJOd3pscEV1ZW1jWE94V3FybGMrZlgwMk8zZnpPSWF2MUJvKzI5OU1UVGxXcTVWYTllcTlhUW8xTDNTSUZrS1pPalZZSU15QlV1cUdMQlBEZi9vRkdtN1I5TkdhWjlLV1lzVFVQK1FKcE9nYVRzSldNWXBadkZQNWtrVFUrYjRCWWN0WnI3LzIwcDR2NlozMFo5bWlRaTVDcG1YSjJqcDN4dXI5eW9PL2h0Q2tTb1J5YUhCaGRKZVVwbkN1bFMwcnk5SzVDWmlPTlFuNlBha0NPekpySGdvUklTWFYyeUZlcTY1WXBHUUxKVVpIS201MjZTL3ZsSjJYSHJiOHhkcW1FbnJYNHdiUkVVVnZ0eXdYeFhNT01LbzI0S3g0czVqdnQrc1ZyamYxYnpQalFiR2JiTzJpY0dLSU9yR2RQZDNBR0hrQy9FTSt0UVRoLzBUdGNrQ2xNNEFiZjFHRGl6ZUp6TXNiOHBSaFFKazFSdkNmWnhpbE9kM1Q1czBOdVlBWDBkc0JlZFZ0bkx5V1pPdVloVXRPaS9aQ0VYUzBUb0RiZXhlU0ZYWHcrdFFaeEVTS2ZqZFE1cFkxdEttVTVqcGg2RjJYWnZPRUxZTEsraDJGS1Zrb2lHSEVadTkvNTlOT3JqeTg3MHgwUkt3Q0QxalMzNlE4Y3I5czcwMWMyVFNYM3BnUWdvSmlQRWxXZ1NsaFp1Q2NXWnZvTW5lUmM0QUdLTEROZ1JUMTh3Tk9zdmNPOXpWbzc1TXhldnVpUDIxdHE5N1BhdXU3RG1zM1ZBS0dDS0pPdUpJUURsOHdscFRrRHdkNkNla01Ka3p6c1R0MlBrbG9VbVJvVTJ5OEd0OTR3ckg5Q1MycVN3ZGl3a281RldLMk1FblJwT3RYenFlaFhQcTVpVFc4MHgvcDNxN0Z4R2Q0enZROHFUTjJYSm5PTDhMWkRZazlza3pPbDlFS29KYnB5RzRzWjFvQlRHcHlsZ0c0U0c2TTBZYTRhUGJkdnpzZm5RWGVmcEV5RVZGajFnTkJYY1pwbGd3Y2U2cWpYK29TMm95aWUzNWRVL3R5M2J2MlIvb3dVY29UUmtBMDQ4MG5UQTBpd0NTZTVwbERLdDJrcEN4TjM4My9acHdXdURlM240Vk5ZOXZKZEdzL0lyR3hqcE1nS2xDV1NKbXRQTmQ5M3BLT2o0dmJGV2h1TVBMenlLWGJsSThjMi9DRFFScmFVTXkvVjBQR3hkK05OT3J4dU1lb09nZXpFZDk4OWJJMTlIWmFDbVhGMkpCL3MyUmVJaGYyR09hZUlST2Qwbk9tZUtocENZbzhxN1ErU1FqTjRYQjhCWUJMWlFvQ215MXBqZmJYNERsR0xFRVE9PQ==::" /></EquinoxInstance></EquinoxMessage>
+DEBUG|14:34:51:642|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Handler|-1|
+-->TIME,total Processing Time(msec) : 88438
+-->TIME,application process (msec) :88405
+-->TIME,ec02 process(msec) : 33
+DEBUG|14:34:51:644|main|EC02Handler|-1|Received data from LL Content-Length: 3354
+DEBUG|14:34:51:644|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
+#====> Incoming Message :        <EquinoxMessage from="mOCHKF.E11.0" via="mOCHKF.E11.0"                        session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615"                        timeout="10" ret="0" diag="">            <EquinoxRawData orig="mOCHKF.ES05.DAMOCLES.0" name="HTTP" invoke="umUpdate_" type="response" method="POST"                            url="/rpcef/api/v1/metering-method" ctype="text/plain" val="{    &quot;command&quot;:&quot;usageMonitoringUpdate&quot;,    &quot;sessionId&quot;:&quot;SessionA1234567891234679ACTIVE&quot;,    &quot;tid&quot;:&quot;TRANSACTION001&quot;,    &quot;requestNumber&quot;:&quot;1&quot;,    &quot;userType&quot;:&quot;privateId&quot;,    &quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;,    &quot;status&quot;:&quot;207&quot;,   &quot;devMessage&quot;:&quot;PARTIAL_SUCCESS&quot;,    &quot;resources&quot;:[        {            &quot;resourceId&quot;:&quot;PD-20148&quot;,            &quot;resourceName&quot;:&quot;API_A&quot;,           &quot;rtid&quot;:&quot;R-TRAN-001&quot;,            &quot;resultCode&quot;:&quot;20000&quot;,            &quot;resultDesc&quot;:&quot;SUCCESS&quot;,            &quot;monitoringKey&quot;:&quot;7777&quot;,           &quot;counterId&quot;:&quot;4001000001&quot;,            &quot;quotaByKey&quot;:{                &quot;unitType&quot;:&quot;unit&quot;,                &quot;unit&quot;:&quot;100&quot;,                &quot;validityTime&quot;:&quot;3600&quot;            },            &quot;rateLimitByKey&quot;:{                &quot;transactionPerTime&quot;:&quot;100|60&quot;            }        }    ]}"                            to="mOCHKF.ES00" ret="0"/>            <EquinoxInstance><value val="1::ACTIVE::false::ZUY2OVZkdHkyakFRL1pXT3BvOEViRERoOGtZVGszb1NMc09seVV6SU1Db29pUk5iY21TWlFCbit2VWVTZ2RDR2gzUW01UW52cnZaeVZ1ZG9UWkladXc5NHFpaWZNZEpjRS95VGFoVEcrSENyMVhxOWV1bzRsZkpwcFVBU0tlN0R5QVJOd3pscEV1ZW1jWE94V3FybGMrZlgwMk8zZnpPSWF2MUJvKzI5OU1UVGxXcTVWYTllcTlhUW8xTDNTSUZrS1pPalZZSU15QlV1cUdMQlBEZi9vRkdtN1I5TkdhWjlLV1lzVFVQK1FKcE9nYVRzSldNWXBadkZQNWtrVFUrYjRCWWN0WnI3LzIwcDR2NlozMFo5bWlRaTVDcG1YSjJqcDN4dXI5eW9PL2h0Q2tTb1J5YUhCaGRKZVVwbkN1bFMwcnk5SzVDWmlPTlFuNlBha0NPekpySGdvUklTWFYyeUZlcTY1WXBHUUxKVVpIS201MjZTL3ZsSjJYSHJiOHhkcW1FbnJYNHdiUkVVVnZ0eXdYeFhNT01LbzI0S3g0czVqdnQrc1ZyamYxYnpQalFiR2JiTzJpY0dLSU9yR2RQZDNBR0hrQy9FTSt0UVRoLzBUdGNrQ2xNNEFiZjFHRGl6ZUp6TXNiOHBSaFFKazFSdkNmWnhpbE9kM1Q1czBOdVlBWDBkc0JlZFZ0bkx5V1pPdVloVXRPaS9aQ0VYUzBUb0RiZXhlU0ZYWHcrdFFaeEVTS2ZqZFE1cFkxdEttVTVqcGg2RjJYWnZPRUxZTEsraDJGS1Zrb2lHSEVadTkvNTlOT3JqeTg3MHgwUkt3Q0QxalMzNlE4Y3I5czcwMWMyVFNYM3BnUWdvSmlQRWxXZ1NsaFp1Q2NXWnZvTW5lUmM0QUdLTEROZ1JUMTh3Tk9zdmNPOXpWbzc1TXhldnVpUDIxdHE5N1BhdXU3RG1zM1ZBS0dDS0pPdUpJUURsOHdscFRrRHdkNkNla01Ka3p6c1R0MlBrbG9VbVJvVTJ5OEd0OTR3ckg5Q1MycVN3ZGl3a281RldLMk1FblJwT3RYenFlaFhQcTVpVFc4MHgvcDNxN0Z4R2Q0enZROHFUTjJYSm5PTDhMWkRZazlza3pPbDlFS29KYnB5RzRzWjFvQlRHcHlsZ0c0U0c2TTBZYTRhUGJkdnpzZm5RWGVmcEV5RVZGajFnTkJYY1pwbGd3Y2U2cWpYK29TMm95aWUzNWRVL3R5M2J2MlIvb3dVY29UUmtBMDQ4MG5UQTBpd0NTZTVwbERLdDJrcEN4TjM4My9acHdXdURlM240Vk5ZOXZKZEdzL0lyR3hqcE1nS2xDV1NKbXRQTmQ5M3BLT2o0dmJGV2h1TVBMenlLWGJsSThjMi9DRFFScmFVTXkvVjBQR3hkK05OT3J4dU1lb09nZXpFZDk4OWJJMTlIWmFDbVhGMkpCL3MyUmVJaGYyR09hZUlST2Qwbk9tZUtocENZbzhxN1ErU1FqTjRYQjhCWUJMWlFvQ215MXBqZmJYNERsR0xFRVE9PQ==::" /></EquinoxInstance>        </EquinoxMessage>    
+DEBUG|14:34:51:651|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Controller|-1|=== >> INCOMING DATA
+-->applicationName  :  Sample
+-->session  : 668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615
+-->via  : mOCHKF.E11.0
+-->from  : mOCHKF.E11.0
+-->diag  : 
+-->state  : ACTIVE
 -->timeout  : 10
 
 -->rawdata(s)  : 1
 -->raw data index : 0
 	-->raw event type : Unknown
-	-->message : {	&quot;command&quot;:&quot;GyRAR&quot;,	&quot;sessionId&quot;:&quot; PCEF:OCF:123456789:ACTIVE&quot;,	&quot;actualTime&quot;:&quot;20181105174020&quot;,	&quot;userType&quot;:&quot;privateId&quot;,	&quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;}
-	-->val : { "command":"GyRAR", "sessionId":" PCEF:OCF:123456789:ACTIVE", "actualTime":"20181105174020", "userType":"privateId", "userValue":"0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384"}
+	-->message : {    &quot;command&quot;:&quot;usageMonitoringUpdate&quot;,    &quot;sessionId&quot;:&quot;SessionA1234567891234679ACTIVE&quot;,    &quot;tid&quot;:&quot;TRANSACTION001&quot;,    &quot;requestNumber&quot;:&quot;1&quot;,    &quot;userType&quot;:&quot;privateId&quot;,    &quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;,    &quot;status&quot;:&quot;207&quot;,   &quot;devMessage&quot;:&quot;PARTIAL_SUCCESS&quot;,    &quot;resources&quot;:[        {            &quot;resourceId&quot;:&quot;PD-20148&quot;,            &quot;resourceName&quot;:&quot;API_A&quot;,           &quot;rtid&quot;:&quot;R-TRAN-001&quot;,            &quot;resultCode&quot;:&quot;20000&quot;,            &quot;resultDesc&quot;:&quot;SUCCESS&quot;,            &quot;monitoringKey&quot;:&quot;7777&quot;,           &quot;counterId&quot;:&quot;4001000001&quot;,            &quot;quotaByKey&quot;:{                &quot;unitType&quot;:&quot;unit&quot;,                &quot;unit&quot;:&quot;100&quot;,                &quot;validityTime&quot;:&quot;3600&quot;            },            &quot;rateLimitByKey&quot;:{                &quot;transactionPerTime&quot;:&quot;100|60&quot;            }        }    ]}
+	-->val : {    "command":"usageMonitoringUpdate",    "sessionId":"SessionA1234567891234679ACTIVE",    "tid":"TRANSACTION001",    "requestNumber":"1",    "userType":"privateId",    "userValue":"0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384",    "status":"207",   "devMessage":"PARTIAL_SUCCESS",    "resources":[        {            "resourceId":"PD-20148",            "resourceName":"API_A",           "rtid":"R-TRAN-001",            "resultCode":"20000",            "resultDesc":"SUCCESS",            "monitoringKey":"7777",           "counterId":"4001000001",            "quotaByKey":{                "unitType":"unit",                "unit":"100",                "validityTime":"3600"            },            "rateLimitByKey":{                "transactionPerTime":"100|60"            }        }    ]}
 	-->ret : 0
-	-->charset : 
 	-->method : POST
-	-->invoke : umStart_
-	-->type : request
-	-->url : /rpcef/v1/gyrar
-	-->ecode : 200
 	-->ctype : text/plain
-	-->orig : rPCEF_au.ES04.rOCF.0
+	-->orig : mOCHKF.ES05.DAMOCLES.0
 	-->name : HTTP
-	-->to : rPCEF_au.ES00.SERV
-	-->desc : host=; port=31700; via=auto; session=766111402
-ADEBUG|12:56:49:575|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFMain|16|## actionProcess || extractInstance || Finish...
-ADEBUG|12:56:49:575|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|74|--------------------- [ Start Before Process ] ---------------------
-ADEBUG|12:56:49:577|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|196|[Request Type]: GyRAR
-ADEBUG|12:56:49:577|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|77|--------------------- [ Stop Before Process  ] ---------------------
-ADEBUG|12:56:49:577|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|78|--------------------- [   Start Do Process   ] ---------------------
-ADEBUG|12:56:49:851|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|36|Set state to null -->  BEGIN
-ADEBUG|12:56:49:851|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|18|disPatch W_GyRAR BEGIN
-ADEBUG|12:56:49:853|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|22|Invoke begin
-ADEBUG|12:56:51:597|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Read GyRAR Request","status":"Success","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:56:54:554|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|96|[Query] aggregate Quota&Transaction, condition ={"$unwind":"$resources"}{"$lookup":{"from":"Transaction","localField":"resources.resourceId","foreignField":"resourceId","as":"transactionData"}}{"$unwind":{"path":"$transactionData","preserveNullAndEmptyArrays":true}}{"$match":{}}{"$group":{"_id":{"monitoringKey":"$monitoringKey","resourceId":"$resources.resourceId"},"transactionIds":{"$push":"$transactionData.tid"}}}{"$project":{"transactionIds":"$transactionIds","count":{"$cond":{"if":{"$isArray":"$transactionIds"},"then":{"$size":"$transactionIds"},"else":""}}}}
-ADEBUG|12:57:53:216|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Find Profile by privateId","status":"Error","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:216|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Build Usage Monitoring Update Request","status":"Error","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:220|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|36|Set state to null -->  BEGIN
-ADEBUG|12:57:53:220|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|18|disPatch W_GyRAR BEGIN
-ADEBUG|12:57:53:221|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|22|Invoke begin
-ADEBUG|12:57:53:221|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Read GyRAR Request","status":"Success","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:224|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|96|[Query] aggregate Quota&Transaction, condition ={"$unwind":"$resources"}{"$lookup":{"from":"Transaction","localField":"resources.resourceId","foreignField":"resourceId","as":"transactionData"}}{"$unwind":{"path":"$transactionData","preserveNullAndEmptyArrays":true}}{"$match":{}}{"$group":{"_id":{"monitoringKey":"$monitoringKey","resourceId":"$resources.resourceId"},"transactionIds":{"$push":"$transactionData.tid"}}}{"$project":{"transactionIds":"$transactionIds","count":{"$cond":{"if":{"$isArray":"$transactionIds"},"then":{"$size":"$transactionIds"},"else":""}}}}
-ADEBUG|12:57:53:236|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Find Profile by privateId","status":"Error","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:237|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Build Usage Monitoring Update Request","status":"Error","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:238|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|36|Set state to null -->  BEGIN
-ADEBUG|12:57:53:238|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|18|disPatch W_GyRAR BEGIN
-ADEBUG|12:57:53:238|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|22|Invoke begin
-ADEBUG|12:57:53:239|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Read GyRAR Request","status":"Success","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:242|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|96|[Query] aggregate Quota&Transaction, condition ={"$unwind":"$resources"}{"$lookup":{"from":"Transaction","localField":"resources.resourceId","foreignField":"resourceId","as":"transactionData"}}{"$unwind":{"path":"$transactionData","preserveNullAndEmptyArrays":true}}{"$match":{}}{"$group":{"_id":{"monitoringKey":"$monitoringKey","resourceId":"$resources.resourceId"},"transactionIds":{"$push":"$transactionData.tid"}}}{"$project":{"transactionIds":"$transactionIds","count":{"$cond":{"if":{"$isArray":"$transactionIds"},"then":{"$size":"$transactionIds"},"else":""}}}}
-ADEBUG|12:57:53:251|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Find Profile by privateId","status":"Error","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:252|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Build Usage Monitoring Update Request","status":"Error","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:253|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|36|Set state to null -->  BEGIN
-ADEBUG|12:57:53:253|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|18|disPatch W_GyRAR BEGIN
-ADEBUG|12:57:53:253|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|22|Invoke begin
-ADEBUG|12:57:53:254|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Read GyRAR Request","status":"Success","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:255|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|96|[Query] aggregate Quota&Transaction, condition ={"$unwind":"$resources"}{"$lookup":{"from":"Transaction","localField":"resources.resourceId","foreignField":"resourceId","as":"transactionData"}}{"$unwind":{"path":"$transactionData","preserveNullAndEmptyArrays":true}}{"$match":{}}{"$group":{"_id":{"monitoringKey":"$monitoringKey","resourceId":"$resources.resourceId"},"transactionIds":{"$push":"$transactionData.tid"}}}{"$project":{"transactionIds":"$transactionIds","count":{"$cond":{"if":{"$isArray":"$transactionIds"},"then":{"$size":"$transactionIds"},"else":""}}}}
-ADEBUG|12:57:53:266|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Find Profile by privateId","status":"Error","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:267|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Build Usage Monitoring Update Request","status":"Error","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:268|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|36|Set state to null -->  BEGIN
-ADEBUG|12:57:53:268|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|18|disPatch W_GyRAR BEGIN
-ADEBUG|12:57:53:269|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|22|Invoke begin
-ADEBUG|12:57:53:270|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Read GyRAR Request","status":"Success","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:272|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|96|[Query] aggregate Quota&Transaction, condition ={"$unwind":"$resources"}{"$lookup":{"from":"Transaction","localField":"resources.resourceId","foreignField":"resourceId","as":"transactionData"}}{"$unwind":{"path":"$transactionData","preserveNullAndEmptyArrays":true}}{"$match":{}}{"$group":{"_id":{"monitoringKey":"$monitoringKey","resourceId":"$resources.resourceId"},"transactionIds":{"$push":"$transactionData.tid"}}}{"$project":{"transactionIds":"$transactionIds","count":{"$cond":{"if":{"$isArray":"$transactionIds"},"then":{"$size":"$transactionIds"},"else":""}}}}
-ADEBUG|12:57:53:282|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Find Profile by privateId","status":"Error","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:283|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Build Usage Monitoring Update Request","status":"Error","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:284|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|36|Set state to null -->  BEGIN
-ADEBUG|12:57:53:285|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|18|disPatch W_GyRAR BEGIN
-ADEBUG|12:57:53:285|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|22|Invoke begin
-ADEBUG|12:57:53:286|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Read GyRAR Request","status":"Success","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:289|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|96|[Query] aggregate Quota&Transaction, condition ={"$unwind":"$resources"}{"$lookup":{"from":"Transaction","localField":"resources.resourceId","foreignField":"resourceId","as":"transactionData"}}{"$unwind":{"path":"$transactionData","preserveNullAndEmptyArrays":true}}{"$match":{}}{"$group":{"_id":{"monitoringKey":"$monitoringKey","resourceId":"$resources.resourceId"},"transactionIds":{"$push":"$transactionData.tid"}}}{"$project":{"transactionIds":"$transactionIds","count":{"$cond":{"if":{"$isArray":"$transactionIds"},"then":{"$size":"$transactionIds"},"else":""}}}}
-ADEBUG|12:57:53:302|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Find Profile by privateId","status":"Error","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:303|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Build Usage Monitoring Update Request","status":"Error","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:304|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|36|Set state to null -->  BEGIN
-ADEBUG|12:57:53:304|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|18|disPatch W_GyRAR BEGIN
-ADEBUG|12:57:53:304|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|22|Invoke begin
-ADEBUG|12:57:53:305|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Read GyRAR Request","status":"Success","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:309|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|96|[Query] aggregate Quota&Transaction, condition ={"$unwind":"$resources"}{"$lookup":{"from":"Transaction","localField":"resources.resourceId","foreignField":"resourceId","as":"transactionData"}}{"$unwind":{"path":"$transactionData","preserveNullAndEmptyArrays":true}}{"$match":{}}{"$group":{"_id":{"monitoringKey":"$monitoringKey","resourceId":"$resources.resourceId"},"transactionIds":{"$push":"$transactionData.tid"}}}{"$project":{"transactionIds":"$transactionIds","count":{"$cond":{"if":{"$isArray":"$transactionIds"},"then":{"$size":"$transactionIds"},"else":""}}}}
-ADEBUG|12:57:53:324|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Find Profile by privateId","status":"Error","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:325|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Build Usage Monitoring Update Request","status":"Error","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:327|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|36|Set state to null -->  BEGIN
-ADEBUG|12:57:53:329|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|18|disPatch W_GyRAR BEGIN
-ADEBUG|12:57:53:329|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|22|Invoke begin
-ADEBUG|12:57:53:332|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Read GyRAR Request","status":"Success","session":" PCEF:OCF:123456789:ACTIVE"}
-ADEBUG|12:57:53:338|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|96|[Query] aggregate Quota&Transaction, condition ={"$unwind":"$resources"}{"$lookup":{"from":"Transaction","localField":"resources.resourceId","foreignField":"resourceId","as":"transactionData"}}{"$unwind":{"path":"$transactionData","preserveNullAndEmptyArrays":true}}{"$match":{}}{"$group":{"_id":{"monitoringKey":"$monitoringKey","resourceId":"$resources.resourceId"},"transactionIds":{"$push":"$transactionData.tid"}}}{"$project":{"transactionIds":"$transactionIds","count":{"$cond":{"if":{"$isArray":"$transactionIds"},"then":{"$size":"$transactionIds"},"else":""}}}}
+	-->invoke : umUpdate_
+	-->to : mOCHKF.ES00
+	-->type : response
+	-->url : /rpcef/api/v1/metering-method
+ADEBUG|14:34:51:659|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|16|## actionProcess || extractInstance || Finish...
+ADEBUG|14:34:51:659|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|74|--------------------- [ Start Before Process ] ---------------------
+ADEBUG|14:34:51:660|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|InvokeManager|23|raw data :ec02.data.EquinoxRawDataFactory$EquinoxRawDataImpl@36dce7ed
+ADEBUG|14:34:51:660|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|InvokeManager|24|set event :SUCCESS
+ADEBUG|14:34:51:660|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|InvokeManager|47|OK [0] phoebe.eqx.pcef.core.data.InvokeObject@47a64f7d
+ADEBUG|14:34:51:661|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|196|[Request Type]: E11_TIMEOUT
+ADEBUG|14:34:51:661|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|77|--------------------- [ Stop Before Process  ] ---------------------
+ADEBUG|14:34:51:661|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|78|--------------------- [   Start Do Process   ] ---------------------
+ADEBUG|14:34:51:661|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|18|disPatch W_E11_TIMEOUT W_USAGE_MONITORING_UPDATE
+ADEBUG|14:34:51:661|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|22|Invoke wUsageMonitoringUpdate
+ADEBUG|14:34:51:662|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|InvokeManager|61|InvokeExternal found UsageMonitoringUpdate phoebe.eqx.pcef.core.data.InvokeObject@47a64f7d
+ADEBUG|14:34:51:671|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Read Usage Monitoring Update Response","status":"Success"}
+ADEBUG|14:36:25:256|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|MongoDBService|81|[Query] insert,collection name:Quota, query ={ "_id" : "7777", "userType" : "privateId", "userValue" : "0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384", "processing" : 0, "expireDate" : { "$date" : 1558859759473 }, "monitoringKey" : "7777", "counterId" : "4001000001", "quotaByKey" : { "unitType" : "unit", "unit" : 100, "validityTime" : 3600 }, "rateLimitByKey" : { "transactionPerTime" : "100|60" }, "resources" : [{ "resourceId" : "PD-20148", "resourceName" : "API_A" }] }
+ADEBUG|14:36:29:922|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|MongoDBService|81|[Query] aggregate,collection name:Quota, query =[{ "$match" : { "userValue" : "0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" } }, { "$group" : { "_id" : { }, "minExpireDate" : { "$min" : "$expireDate" } } }]
+ADEBUG|14:36:42:269|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|MongoDBService|81|[Query] update,collection name:Profile, query ={ "userValue" : "0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384", "isProcessing" : 1 },{ "$set" : { "isProcessing" : 0, "sequenceNumber" : 4 } }
+ADEBUG|14:36:44:645|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|54|stop by set stateWork .. RESPONSE
+ADEBUG|14:36:44:645|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|80|--------------------- [    Stop Do Process   ] ---------------------
+ADEBUG|14:36:44:645|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|81|--------------------- [ Start After Process  ] ---------------------
+ADEBUG|14:36:44:646|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|84|--------------------- [ Stop After Process   ] ---------------------
+ADEBUG|14:36:44:646|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|19|## actionProcess || callActionProcess || Finish...
+ADEBUG|14:36:44:647|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|22|## actionProcess || composeInstance || Finish...
+DEBUG|14:36:44:647|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|AFProxy|-1|action process completed :: 112996
+DEBUG|14:36:44:647|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Controller|-1|=== >> OUTGOING DATA
+-->applicationName  :  Sample
+-->session  : 668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615
+-->via  : mOCHKF.E11.0
+-->from  : Sample.ES00
+-->diag  : 
+-->state  : ACTIVE
+-->timeout  : -1
+
+-->rawdata(s)  : 1
+-->raw data index : 0
+	-->message : 
+	-->name : HTTP
+	-->timeout : -1
+DEBUG|14:36:44:647|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
+#====> Outgoing Message is:<?xml version="1.0" encoding="tis-620" ?><EquinoxMessage diag="" from="Sample.ES00" ret="0" session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615" via="mOCHKF.E11.0" timeout="-1" ><EquinoxRawData name="HTTP" timeout="-1" invoke ="default_invoke" ></EquinoxRawData><EquinoxInstance><value val="1::ACTIVE::false::ZUY2OVUwMXYyekFNL1NzRHp5N2d6OFR4TFd1Y3dsamlHbTB5QkNpS1FIUFVWSzBsdVpKY05EUDgzMGZaYnJ0aDY2R1grU1E5MG54OGoxUUxkVW52TXFFTkVTV0ZwQVU4S2JOaEhDOWVGTVZ4TkhIZHdKOEVEdFJLM3JHcVQ5cXpBeVRnN21hN2k5T0xlWGxjLzN5NHo0dmRWVFV0cm1iTDhPbFNQcXpNM0l2Q2VCcE5zVVlRaCtCQW82bmFuR3FzZ0xYWU16RTBPNHp3ZDFJMUZ2OXNTYVlMSlV1cU5STkhTRndITkgxcUtFckpHLzZES2toQ0MyRllDdVJLM3M5TEpYbHhuaTZSbjlTMVpNSndLc3dDZXhwMWgvNHNkdkhySEpEbW5xcnIzaGRGaENhbHdYSWFrcHRiQjBySk9iUC9FUXVNenJUQXBXQkdLdXpxR3owaHIrY0gxZ0ZGdFd4VWFYVW5VQ3pPZk5lTGY0TnpZbTJIZVpIdDU0REU1cDB1Tzd3Uk5zS2cxTTc1bU14MXZYK1RUV2Yva3kzOGxEYTRucDh2ejNxamVsOTdtVjUzaXo0dzhTd2Y2Wm9JY3JRemJhRmlHb00zTnFic3dMWEorcFRlMTE1aUQ0N0xsbnJlZnBPdDA4dnRCbU1mTHpoR0RGMTVXT0pyZXBIbFF5NGlQaUpwdnJEM2huT2lUaXQ1SEtaZHllTTRzNjNHM3RadlU5L1dCN3RLcjYzM2ZUVjhRUGQvRkZwUVExaGxSUTBxLzBwRkxjTnpCTnlXbVJ2NUV5OE13akQ4NHVMVEhMUytpc2Ftb08yZ1E5TitBZk9iT3JzPQ==::" /></EquinoxInstance></EquinoxMessage>
+DEBUG|14:36:44:648|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
+-->TIME,total Processing Time(msec) : 113004
+-->TIME,application process (msec) :112996
+-->TIME,ec02 process(msec) : 8

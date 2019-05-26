@@ -88,7 +88,7 @@ public class MessagePool {
         return rawData;
     }
 
-    public EquinoxRawData getGyRARResponse(GyRARResponse gyRARResponse, String invokeId) {
+    public EquinoxRawData getGyRARResponse(GyRARResponse gyRARResponse, String invokeId, String timeout) {
         EquinoxRawData rawData = AFDataFactory.createEquinoxRawData();
         String data = new Gson().toJson(gyRARResponse);
         this.requestObj = data;
@@ -98,7 +98,7 @@ public class MessagePool {
         map.put("type", "response");
         map.put("ctype", "text/plain");
         map.put("to", Config.RESOURCE_NAME_OCF);
-//        map.put("timeout", timeout);
+        map.put("timeout", timeout);
         map.put("invoke", invokeId);
         rawData.setRawDataAttributes(map);
         rawData.setRawDataMessage(data);

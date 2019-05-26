@@ -10,6 +10,7 @@ import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.enums.EStatusLifeCycle;
 import phoebe.eqx.pcef.enums.model.ETransaction;
 import phoebe.eqx.pcef.instance.AppInstance;
+import phoebe.eqx.pcef.instance.CommitData;
 import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.instance.PCEFInstance;
 import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
@@ -88,13 +89,13 @@ public class TransactionService extends MongoDBService {
     }
 
 
-    public List<Transaction> findOtherStartTransaction() {
+    public List<Transaction> findOtherStartTransaction(String privateId) {
         try {
             PCEFInstance pcefInstance = appInstance.getPcefInstance();
 
             BasicDBObject search = new BasicDBObject();
             search.put(ETransaction.status.name(), EStatusLifeCycle.Waiting.getName());
-            search.put(ETransaction.userValue.name(), appInstance.getPcefInstance().getProfile().getUserValue());
+            search.put(ETransaction.userValue.name(), privateId);
             search.put(ETransaction.monitoringKey.name(), "");//initial
             search.put(ETransaction.isActive.name(), 1);
 
@@ -117,13 +118,13 @@ public class TransactionService extends MongoDBService {
 
             return otherStartTransactionList;
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Find Profile by privateId", MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Find Other transaction error" + e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
             throw e;
         }
 
     }
 
-    private void updateTransactionDoneToComplete(Quota quota) {
+ /*   private void updateTransactionDoneToComplete(Quota quota) {
         BasicDBObject searchQuery = new BasicDBObject();
 
         searchQuery.put(ETransaction.monitoringKey.name(), quota.getMonitoringKey());
@@ -134,6 +135,26 @@ public class TransactionService extends MongoDBService {
         updateQuery.put(ETransaction.updateDate.name(), new Date()); //updateDate
         updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Completed.getName());
         db.getCollection(collectionName).update(searchQuery, new BasicDBObject("$set", updateQuery), false, true);
+    }*/
+
+    private void updateTransactionDoneToCompleteByTid(List<CommitData> commitDataList) {
+        BasicDBObject searchQuery = new BasicDBObject();
+
+        List<String> tidList = new ArrayList<>();
+        for (CommitData commitData : commitDataList) {
+            tidList.addAll(commitData.getTransactionIds());
+        }
+
+        searchQuery.put(ETransaction.tid.name(), new BasicDBObject("$in", tidList));
+
+        BasicDBObject updateQuery = new BasicDBObject();
+        updateQuery.put(ETransaction.updateDate.name(), new Date()); //updateDate
+        updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Completed.getName());
+
+        BasicDBObject setUpdate = new BasicDBObject("$set", updateQuery);
+
+        writeQueryLog("update", collectionName, searchQuery.toString() + "," + setUpdate.toString());
+        db.getCollection(collectionName).update(searchQuery, setUpdate, false, true);
     }
 
 
@@ -150,6 +171,63 @@ public class TransactionService extends MongoDBService {
 
 
     public void updateTransaction(ArrayList<Quota> quotas) {
+
+        try {
+
+
+            List<Transaction> updateTransactionList = new ArrayList<>();
+
+            if (appInstance.getPcefInstance().getCommitDatas().size() > 0) {
+                updateTransactionDoneToCompleteByTid(appInstance.getPcefInstance().getCommitDatas());
+            }
+
+            //get monitoring key by resource
+            Map<String, Quota> resourceMap = new HashMap<>();
+            quotas.forEach(quota ->
+                    quota.getResources().forEach(resourceQuota ->
+                            resourceMap.put(resourceQuota.getResourceId(), quota)
+                    )
+            );
+
+
+            if (ERequestType.USAGE_MONITORING.equals(appInstance.getRequestType())) {
+                //add this transaction to update
+                updateTransactionList.add(appInstance.getPcefInstance().getTransaction());
+            }
+
+            updateTransactionList.addAll(appInstance.getPcefInstance().getOtherStartTransactions());
+
+            //update by transaction set mk and Counter
+            for (Transaction transaction : updateTransactionList) {
+                BasicDBObject searchQuery = new BasicDBObject();
+
+                searchQuery.put(ETransaction.tid.name(), transaction.getTid());
+                searchQuery.put(ETransaction.status.name(), EStatusLifeCycle.Waiting.getName());
+
+                BasicDBObject updateQuery = new BasicDBObject();
+                if (appInstance.getPcefInstance().getCommitDatas().size() > 0 && ERequestType.USAGE_MONITORING.equals(appInstance.getRequestType())) {
+                    if (appInstance.getPcefInstance().getTransaction().getTid().equals(transaction.getTid())) {
+                        updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Completed.getName());//waiting -->Complete
+                    } else {
+                        updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Done.getName());//waiting-->Done
+                    }
+                } else {
+                    updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Done.getName());//waiting-->Done
+                }
+                updateQuery.put(ETransaction.monitoringKey.name(), resourceMap.get(transaction.getResourceId()).getMonitoringKey());
+                updateQuery.put(ETransaction.counterId.name(), resourceMap.get(transaction.getResourceId()).getCounterId());
+                updateQuery.put(ETransaction.updateDate.name(), new Date());
+
+                updateSetByQuery(searchQuery, updateQuery);
+            }
+
+            PCEFUtils.writeMessageFlow("Update Transaction", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+        } catch (Exception e) {
+            PCEFUtils.writeMessageFlow("Update Transaction error"+e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            throw e;
+        }
+
+    }/* public void updateTransaction(ArrayList<Quota> quotas) {
 
         List<Transaction> updateTransactionList = new ArrayList<>();
 
@@ -189,8 +267,8 @@ public class TransactionService extends MongoDBService {
 
             BasicDBObject updateQuery = new BasicDBObject();
             if (appInstance.getPcefInstance().doCommit() && appInstance.getPcefInstance().getTransaction() != null) {
-                    if (appInstance.getPcefInstance().getTransaction().getTid().equals(transaction.getTid())) {
-                        updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Completed.getName());//waiting -->Complete
+                if (appInstance.getPcefInstance().getTransaction().getTid().equals(transaction.getTid())) {
+                    updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Completed.getName());//waiting -->Complete
 
                 }
 
@@ -203,45 +281,14 @@ public class TransactionService extends MongoDBService {
 
             updateSetByQuery(searchQuery, updateQuery);
         }
-    }
+    }*/
 
 
     public void deleteTransactionByTid(String tid) {
-        db.getCollection(collectionName).remove(new BasicDBObject(ETransaction.tid.name(), tid));
+        BasicDBObject delete = new BasicDBObject(ETransaction.tid.name(), tid);
+        writeQueryLog("delete", collectionName, delete.toString());
+        db.getCollection(collectionName).remove(delete);
     }
 
 
-    public Map<String, Integer> findTransactionDoneGroupByResource(List<Quota> quotaList) {
-
-        Map<String, Integer> countUnitByResourceMap = new HashMap<>();
-
-        for (Quota quota : quotaList) {
-
-            BasicDBObject match = new BasicDBObject();
-            match.put(ETransaction.monitoringKey.name(), quota.getMonitoringKey());
-            match.put(ETransaction.status.name(), EStatusLifeCycle.Done.getName());
-
-            BasicDBObject group = new BasicDBObject();
-            group.put("_id", "$" + ETransaction.resourceId.name());
-            group.put("count", new BasicDBObject("$sum", 1));
-
-            Iterator<DBObject> transactionGroupByResourceIterator = aggregateMatch(match, group).iterator();
-            while (transactionGroupByResourceIterator.hasNext()) {
-                DBObject dbObject = transactionGroupByResourceIterator.next();
-
-                int count = (int) Double.parseDouble(dbObject.get("count").toString());
-                String resourceId = dbObject.get("_id").toString();
-
-                if (ERequestType.USAGE_MONITORING.equals(appInstance.getRequestType())) {
-                    if (appInstance.getPcefInstance().getTransaction().getResourceId().equals(resourceId)) {
-                        count += 1;//resource of this transaction
-                    }
-                }
-                countUnitByResourceMap.put(resourceId, count);
-            }
-        }
-
-
-        return countUnitByResourceMap;
-    }
 }

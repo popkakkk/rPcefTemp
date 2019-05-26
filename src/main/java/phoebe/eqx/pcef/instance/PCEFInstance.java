@@ -1,6 +1,5 @@
 package phoebe.eqx.pcef.instance;
 
-import com.mongodb.DBObject;
 import phoebe.eqx.pcef.core.model.Profile;
 import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.message.builder.req.OCFUsageMonitoringRequest;
@@ -31,14 +30,19 @@ public class PCEFInstance {
 
 
     //Commit Part
-    private CommitPart commitPart;
-    List<CommitData> commitData;
 
-    public boolean doCommit() {
-        if (commitPart != null) {
-            return commitPart.getQuotaExpireList().size() > 0 || commitPart.getQuotaExhaust() != null;
+    List<CommitData> commitDatas = new ArrayList<>();
+
+
+    public int getQuotaCommitSize() {
+        List<String> mkList = new ArrayList<>();
+
+        for (CommitData commitData : commitDatas) {
+            if (!mkList.contains(commitData.get_id().getMonitoringKey())) {
+                mkList.add(commitData.get_id().getMonitoringKey());
+            }
         }
-        return false;
+        return mkList.size();
     }
 
 
@@ -98,14 +102,6 @@ public class PCEFInstance {
     }
 
 
-    public CommitPart getCommitPart() {
-        return commitPart;
-    }
-
-    public void setCommitPart(CommitPart commitPart) {
-        this.commitPart = commitPart;
-    }
-
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
@@ -126,11 +122,11 @@ public class PCEFInstance {
         this.refundManagementRequest = refundManagementRequest;
     }
 
-    public List<CommitData> getCommitData() {
-        return commitData;
+    public List<CommitData> getCommitDatas() {
+        return commitDatas;
     }
 
-    public void setCommitData(List<CommitData> commitData) {
-        this.commitData = commitData;
+    public void setCommitDatas(List<CommitData> commitDatas) {
+        this.commitDatas = commitDatas;
     }
 }

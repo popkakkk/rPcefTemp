@@ -95,7 +95,7 @@ public class W_USAGE_MONITORING extends ComplexState {
             ArrayList<Quota> quotaResponseList = dbConnect.getQuotaService().getQuotaFromUsageMonitoringResponse(OCFUsageMonitoringResponse);
 
             if (ocfUsageMonitoringService.receiveQuotaAndPolicy(OCFUsageMonitoringResponse)) {
-                dbConnect.getQuotaService().insertQuotaFirstUsage(quotaResponseList);
+                dbConnect.getQuotaService().insertQuotaInitial(quotaResponseList);
                 dbConnect.getTransactionService().updateTransaction(quotaResponseList);
                 dbConnect.getProfileService().updateProfileUnLockInitial(dbConnect.getQuotaService().getMinExpireDate());
 

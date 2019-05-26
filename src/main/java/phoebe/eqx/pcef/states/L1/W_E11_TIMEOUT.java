@@ -1,5 +1,6 @@
 package phoebe.eqx.pcef.states.L1;
 
+import com.mongodb.DBCollection;
 import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.enums.state.EState;
@@ -34,7 +35,7 @@ public class W_E11_TIMEOUT extends ComplexState {
 
             nextState = mongodbProcessState.getPcefState();
             if (EState.END.equals(nextState)) {
-                // set Profile appointmentDate = (now - appointment)
+                no(dbConnect);
             } else {
                 OCFUsageMonitoringService OCFUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
                 if (EState.W_USAGE_MONITORING_STOP.equals(nextState)) {
@@ -68,7 +69,6 @@ public class W_E11_TIMEOUT extends ComplexState {
         MongoDBConnect dbConnect = null;
         try {
             dbConnect = new MongoDBConnect(appInstance);
-
 
             ArrayList<Quota> quotaResponseList = dbConnect.getQuotaService().getQuotaFromUsageMonitoringResponse(OCFUsageMonitoringResponse);
 
@@ -126,6 +126,12 @@ public class W_E11_TIMEOUT extends ComplexState {
             }
         }
         setWorkState(EState.END);
+    }
+
+    public void no(MongoDBConnect dbConnect) {
+        dbConnect.getProfileService().updateProfileUnLock(false, null);
+        VTTimoutService vtTimoutService = new VTTimoutService(appInstance);
+        vtTimoutService.buildRecurringTimout();
     }
 
 
