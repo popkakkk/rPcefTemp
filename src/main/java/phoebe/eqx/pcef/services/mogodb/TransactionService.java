@@ -4,6 +4,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.ERequestType;
@@ -115,6 +116,7 @@ public class TransactionService extends MongoDBService {
                 otherStartTransactionList.add(transaction);
             }
 
+            AFLog.d("find other transaction start found:" + otherStartTransactionList.size());
 
             return otherStartTransactionList;
         } catch (Exception e) {
@@ -223,7 +225,7 @@ public class TransactionService extends MongoDBService {
 
             PCEFUtils.writeMessageFlow("Update Transaction", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Update Transaction error"+e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Update Transaction error" + e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
             throw e;
         }
 

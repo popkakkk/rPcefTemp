@@ -4,6 +4,7 @@ import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.exceptions.PCEFException;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
+import phoebe.eqx.pcef.services.VTTimoutService;
 
 import java.lang.reflect.Method;
 
@@ -42,7 +43,6 @@ public abstract class ComplexState extends State {
             } catch (PCEFException e) {
 
             } catch (Exception e) {
-                appInstance.setFinish(true);
                 stop = true;
             }
             EState workState = getWorkState();

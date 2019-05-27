@@ -123,14 +123,21 @@ public class ProfileService extends MongoDBService {
     }
 
     public DBObject findAndModifyLockProfile(String privateId) {
-        BasicDBObject query = new BasicDBObject();
-        query.put(EProfile.userValue.name(), privateId);
-        query.put(EProfile.isProcessing.name(), 0);
+        try {
+            BasicDBObject query = new BasicDBObject();
+            query.put(EProfile.userValue.name(), privateId);
+            query.put(EProfile.isProcessing.name(), 0);
 
-        BasicDBObject update = new BasicDBObject();
-        update.put(EProfile.isProcessing.name(), 1);//lock
+            BasicDBObject update = new BasicDBObject();
+            update.put(EProfile.isProcessing.name(), 1);//lock
 
-        return findAndModify(query, update);
+            DBObject dbObject = findAndModify(query, update);
+            PCEFUtils.writeMessageFlow("Find and Modify Profile Lock privateId:" + privateId, MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            return dbObject;
+        } catch (Exception e) {
+            PCEFUtils.writeMessageFlow("Find and Modify Profile Lock privateId:" + privateId + " error" + e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            throw e;
+        }
     }
 
     public boolean findProfileItsAppointmentTime() {

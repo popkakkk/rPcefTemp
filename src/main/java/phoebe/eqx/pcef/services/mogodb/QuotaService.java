@@ -28,9 +28,6 @@ public class QuotaService extends MongoDBService {
     private Date minExpireDate;
     private boolean haveNewQuota;
 
-    private List<Quota> quotaExpireList = new ArrayList<>();
-
-
     public QuotaService(AppInstance appInstance, MongoClient mongoClient) {
         super(appInstance, mongoClient, Config.COLLECTION_QUOTA_NAME);
     }
@@ -312,10 +309,22 @@ public void updateQuota(ArrayList<Quota> quotaResponses) {
     }
 
     public DBCursor findQuotaByTransaction(Transaction transaction) {
-        BasicDBObject searchQuery = new BasicDBObject();
-        searchQuery.put(EQuota.userValue.name(), appInstance.getPcefInstance().getProfile().getUserValue());
-        searchQuery.put(EQuota.resources.name(), new BasicDBObject("$elemMatch", new BasicDBObject("resourceId", transaction.getResourceId())));
-        return findByQuery(searchQuery);
+        try {
+            BasicDBObject searchQuery = new BasicDBObject();
+            searchQuery.put(EQuota.userValue.name(), appInstance.getPcefInstance().getProfile().getUserValue());
+            searchQuery.put(EQuota.resources.name(), new BasicDBObject("$elemMatch", new BasicDBObject("resourceId", transaction.getResourceId())));
+            DBCursor dbCursor = findByQuery(searchQuery);
+
+            if (dbCursor.hasNext()) {
+                PCEFUtils.writeMessageFlow("Find Quota resource Id:" + transaction.getResourceId() + "[Found]", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            } else {
+                PCEFUtils.writeMessageFlow("Find Quota resource Id:" + transaction.getResourceId() + "[Not Found]", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            }
+            return dbCursor;
+        } catch (Exception e) {
+            PCEFUtils.writeMessageFlow("Find Quota resource Id:" + transaction.getResourceId() + "-error" + e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            throw e;
+        }
     }
 
 
@@ -398,30 +407,50 @@ public void updateQuota(ArrayList<Quota> quotaResponses) {
         group.put("minExpireDate", new BasicDBObject("$min", "$" + EQuota.expireDate.name()));
 
         //find minimum
-        return (Date) aggregateMatch(match, group).iterator().next().get("minExpireDate");
+        Date minExpireDate = (Date) aggregateMatch(match, group).iterator().next().get("minExpireDate");
+        AFLog.d("min ExpireDate:" + minExpireDate);
+
+        return minExpireDate;
     }
 
 
     public DBObject findAndModifyLockQuota(String monitoringKey) {
-        BasicDBObject query = new BasicDBObject();
-        query.put(EQuota._id.name(), monitoringKey);
-        query.put(EQuota.processing.name(), 0);
+        try {
 
-        BasicDBObject update = new BasicDBObject();
-        update.put(EQuota.processing.name(), 1);//lock
+            BasicDBObject query = new BasicDBObject();
+            query.put(EQuota._id.name(), monitoringKey);
+            query.put(EQuota.processing.name(), 0);
 
-        return findAndModify(query, update);
+            BasicDBObject update = new BasicDBObject();
+            update.put(EQuota.processing.name(), 1);//lock
+
+            DBObject dbObject = findAndModify(query, update);
+            PCEFUtils.writeMessageFlow("Find and Modify Quota Lock Process", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+
+            return dbObject;
+        } catch (Exception e) {
+            PCEFUtils.writeMessageFlow("Find and Modify Quota Lock Process error " + e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            throw e;
+        }
     }
 
     public void updateUnLockQuota(String monitoringKey) {
-        BasicDBObject query = new BasicDBObject();
-        query.put(EQuota._id.name(), monitoringKey);
-        query.put(EQuota.processing.name(), 1);
 
-        BasicDBObject update = new BasicDBObject();
-        update.put(EQuota.processing.name(), 0);//lock
+        try {
+            BasicDBObject query = new BasicDBObject();
+            query.put(EQuota._id.name(), monitoringKey);
+            query.put(EQuota.processing.name(), 1);
 
-        updateSetByQuery(query, update);
+            BasicDBObject update = new BasicDBObject();
+            update.put(EQuota.processing.name(), 0);//lock
+
+            updateSetByQuery(query, update);
+
+            PCEFUtils.writeMessageFlow("Update Quota Unlock Process mk:" + monitoringKey, MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+        } catch (Exception e) {
+            PCEFUtils.writeMessageFlow("Update Quota Unlock Process mk:" + monitoringKey + ",error - " + e.getStackTrace()[0], MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+        }
+
     }
 
 
@@ -473,13 +502,5 @@ public void updateQuota(ArrayList<Quota> quotaResponses) {
 
     public boolean isHaveNewQuota() {
         return haveNewQuota;
-    }
-
-    public List<Quota> getQuotaExpireList() {
-        return quotaExpireList;
-    }
-
-    public void setQuotaExpireList(List<Quota> quotaExpireList) {
-        this.quotaExpireList = quotaExpireList;
     }
 }

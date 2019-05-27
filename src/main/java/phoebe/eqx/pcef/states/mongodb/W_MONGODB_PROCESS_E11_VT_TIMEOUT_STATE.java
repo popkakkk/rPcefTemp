@@ -2,6 +2,7 @@ package phoebe.eqx.pcef.states.mongodb;
 
 
 import com.mongodb.DBObject;
+import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.enums.state.EMongoState;
 import phoebe.eqx.pcef.enums.state.EState;
@@ -103,6 +104,7 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
             } else {
                 int quotaExpireSize = appInstance.getPcefInstance().getQuotaCommitSize();
                 int quotaAllSize = dbConnect.getQuotaService().findAllQuotaByPrivateId(appInstance.getPcefInstance().getProfile().getUserValue()).size();
+                AFLog.d("Quota expire size:" + quotaExpireSize + ",All Quota size:" + quotaAllSize);
 
                 if (quotaAllSize > quotaExpireSize) {
                     setPcefState(EState.W_USAGE_MONITORING_UPDATE);

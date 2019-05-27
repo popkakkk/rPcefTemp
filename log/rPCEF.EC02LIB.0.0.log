@@ -1,12 +1,12 @@
-INFO|14:33:23:122|main|EC02Server|-1|EC02 :: Library Version --> 4.0.7
-DEBUG|14:33:23:126|main|ConfigLoader|-1|Initial Custom AF Log
-WARN|14:33:23:126|main|ConfigLoader|-1|testCustomLog : file name is rotated
-INFO|14:33:23:143|main|EC02Server|-1|application level ready
-ADEBUG|14:33:23:156|main|Config|89|----- Verify AF Configuration [true] -----
-DEBUG|14:33:23:202|main|EC02Handler|-1|Received data from LL Content-Length: 277
-DEBUG|14:33:23:204|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Handler|-1|
-#====> Incoming Message :        <EquinoxMessage from="rPCEF_au.E11.0" via="rPCEF_au.E11.0" session="0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" timeout="10" ret="4" diag="1:0:0">            <EquinoxInstance>                <value val="" />            </EquinoxInstance>        </EquinoxMessage>    
-DEBUG|14:33:23:218|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Controller|-1|=== >> INCOMING DATA
+INFO|08:32:51:181|main|EC02Server|-1|EC02 :: Library Version --> 4.0.7
+DEBUG|08:32:51:186|main|ConfigLoader|-1|Initial Custom AF Log
+WARN|08:32:51:186|main|ConfigLoader|-1|testCustomLog : file name is rotated
+INFO|08:32:51:203|main|EC02Server|-1|application level ready
+ADEBUG|08:32:51:221|main|Config|89|----- Verify AF Configuration [true] -----
+DEBUG|08:32:51:268|main|EC02Handler|-1|Received data from LL Content-Length: 796
+DEBUG|08:32:51:271|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Handler|-1|
+#====> Incoming Message :        <EquinoxMessage from="rPCEF_au.E11.0" via="rPCEF_au.E11.0" session="0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" timeout="10" ret="0" diag="1:0:0">             <EquinoxRawData name="HTTP" invoke="1033578817" type="request" method="POST" url="/rpcef/v1/refund-management" ctype="text/plain" val="{	&quot;command&quot;:&quot;refundManagement&quot;,	&quot;sessionId&quot;:&quot; SessionA123456781234679ACTIVE&quot;,	&quot;actualTime&quot;:&quot;20181105174020&quot;,	&quot;tid&quot;:&quot;SACF-DD2345678912349999&quot;,	&quot;rtid&quot;:&quot;SPW-Z12345678912346999&quot;,	&quot;refId&quot;:&quot;SACF-5&quot;}" to="rPCEF_au.ES00" orig="rPCEF_au.ES05.SACF.0" ret="0" />            <EquinoxInstance>                <value val="" />            </EquinoxInstance>        </EquinoxMessage>    
+DEBUG|08:32:51:290|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Controller|-1|=== >> INCOMING DATA
 -->applicationName  :  Sample
 -->session  : 0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384
 -->via  : rPCEF_au.E11.0
@@ -15,33 +15,41 @@ DEBUG|14:33:23:218|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Controller|
 -->state  : IDLE
 -->timeout  : 10
 
--->rawdata(s)  : no raw data
-ADEBUG|14:33:23:262|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFMain|16|## actionProcess || extractInstance || Finish...
-ADEBUG|14:33:23:262|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|74|--------------------- [ Start Before Process ] ---------------------
-ADEBUG|14:33:23:264|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|196|[Request Type]: E11_TIMEOUT
-ADEBUG|14:33:23:264|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|77|--------------------- [ Stop Before Process  ] ---------------------
-ADEBUG|14:33:23:264|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|78|--------------------- [   Start Do Process   ] ---------------------
-ADEBUG|14:33:23:506|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|36|Set state to null -->  BEGIN
-ADEBUG|14:33:23:506|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|18|disPatch W_E11_TIMEOUT BEGIN
-ADEBUG|14:33:23:508|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|22|Invoke begin
-ADEBUG|14:33:34:284|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|81|[Query] find,collection name:Profile, query ={ "appointmentDate" : { "$lte" : { "$date" : 1558856003263 } } }
-ADEBUG|14:33:34:372|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ProfileService|140|userValue :0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384
-ADEBUG|14:33:34:377|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ProfileService|141|appointmentDate :Sun May 26 10:56:20 ICT 2019
-ADEBUG|14:33:34:377|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ProfileService|142|currentTime = :Sun May 26 14:33:23 ICT 2019
-ADEBUG|14:33:34:377|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|81|[Query] aggregate,collection name:Profile, query ={ "userValue" : "0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384", "isProcessing" : 0 },{ "$set" : { "isProcessing" : 1 } }
-ADEBUG|14:33:38:707|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|81|[Query] aggregate,collection name:Quota, query =[{ "$unwind" : "$resources" }, { "$lookup" : { "from" : "Transaction", "let" : { "resourceId" : "$resources.resourceId" }, "pipeline" : [{ "$match" : { "$expr" : { "$and" : [{ "$eq" : ["$resourceId", "$$resourceId"] }, { "$eq" : ["$status", "Done"] }] } } }], "as" : "transactionData" } }, { "$unwind" : { "path" : "$transactionData", "preserveNullAndEmptyArrays" : true } }, { "$match" : { "userValue" : "0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384", "expireDate" : { "$lte" : { "$date" : 1558856018706 } } } }, { "$group" : { "_id" : { "monitoringKey" : "$monitoringKey", "resourceId" : "$resources.resourceId", "resourceName" : "$resources.resourceName" }, "transactionIds" : { "$push" : "$transactionData.tid" } } }, { "$project" : { "transactionIds" : "$transactionIds", "count" : { "$cond" : { "if" : { "$isArray" : "$transactionIds" }, "then" : { "$size" : "$transactionIds" }, "else" : "" } } } }]
-ADEBUG|14:33:47:611|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|81|[Query] aggregate,collection name:Quota, query ={ "_id" : "1234", "processing" : 0 },{ "$set" : { "processing" : 1 } }
-ADEBUG|14:33:53:734|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|81|[Query] aggregate,collection name:Quota, query ={ "_id" : "1001", "processing" : 0 },{ "$set" : { "processing" : 1 } }
-ADEBUG|14:34:40:484|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|81|[Query] find,collection name:Transaction, query ={ "status" : "Waiting", "userValue" : "0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384", "monitoringKey" : "", "isActive" : 1 }
-ADEBUG|14:34:44:565|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|InvokeManager|94|Operation[UsageMonitoringUpdate] has configured retryTimeout number as 1
-ADEBUG|14:34:45:192|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Build Usage Monitoring Update Request","status":"Success"}
-ADEBUG|14:34:51:585|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|80|--------------------- [    Stop Do Process   ] ---------------------
-ADEBUG|14:34:51:585|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|81|--------------------- [ Start After Process  ] ---------------------
-ADEBUG|14:34:51:592|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|84|--------------------- [ Stop After Process   ] ---------------------
-ADEBUG|14:34:51:595|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFMain|19|## actionProcess || callActionProcess || Finish...
-ADEBUG|14:34:51:620|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFMain|22|## actionProcess || composeInstance || Finish...
-DEBUG|14:34:51:624|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|AFProxy|-1|action process completed :: 88405
-DEBUG|14:34:51:624|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Controller|-1|=== >> OUTGOING DATA
+-->rawdata(s)  : 1
+-->raw data index : 0
+	-->raw event type : Unknown
+	-->message : {	&quot;command&quot;:&quot;refundManagement&quot;,	&quot;sessionId&quot;:&quot; SessionA123456781234679ACTIVE&quot;,	&quot;actualTime&quot;:&quot;20181105174020&quot;,	&quot;tid&quot;:&quot;SACF-DD2345678912349999&quot;,	&quot;rtid&quot;:&quot;SPW-Z12345678912346999&quot;,	&quot;refId&quot;:&quot;SACF-5&quot;}
+	-->val : { "command":"refundManagement", "sessionId":" SessionA123456781234679ACTIVE", "actualTime":"20181105174020", "tid":"SACF-DD2345678912349999", "rtid":"SPW-Z12345678912346999", "refId":"SACF-5"}
+	-->ret : 0
+	-->method : POST
+	-->ctype : text/plain
+	-->orig : rPCEF_au.ES05.SACF.0
+	-->name : HTTP
+	-->invoke : 1033578817
+	-->to : rPCEF_au.ES00
+	-->type : request
+	-->url : /rpcef/v1/refund-management
+ADEBUG|08:32:51:326|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFMain|16|## actionProcess || extractInstance || Finish...
+ADEBUG|08:32:51:326|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|74|--------------------- [ Start Before Process ] ---------------------
+ADEBUG|08:32:51:328|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|196|[Request Type]: REFUND_MANAGEMENT
+ADEBUG|08:32:51:328|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|77|--------------------- [ Stop Before Process  ] ---------------------
+ADEBUG|08:32:51:328|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|78|--------------------- [   Start Do Process   ] ---------------------
+ADEBUG|08:32:51:330|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|37|Set state to null -->  BEGIN
+ADEBUG|08:32:51:330|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|19|disPatch W_REFUND_MANAGEMENT BEGIN
+ADEBUG|08:32:51:332|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|ComplexState|23|Invoke begin
+ADEBUG|08:32:51:345|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Read Refund Management Request","status":"Success","session":" SessionA123456781234679ACTIVE"}
+ADEBUG|08:32:52:297|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|81|[Query] find,collection name:Transaction, query ={ "tid" : "SACF-5", "status" : { "$in" : ["Done", "Completed"] } }
+ADEBUG|08:32:52:334|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|MongoDBService|81|[Query] aggregate,collection name:Quota, query ={ "_id" : "1002", "processing" : 0 },{ "$set" : { "processing" : 1 } }
+ADEBUG|08:32:52:342|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Find and Modify Quota Lock Process","status":"Success","session":" SessionA123456781234679ACTIVE"}
+ADEBUG|08:32:52:407|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|InvokeManager|94|Operation[RefundTransaction] has configured retryTimeout number as 0
+ADEBUG|08:32:52:408|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Build Refund Transaction Request","status":"Success","session":" SessionA123456781234679ACTIVE"}
+ADEBUG|08:32:52:411|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|80|--------------------- [    Stop Do Process   ] ---------------------
+ADEBUG|08:32:52:411|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|81|--------------------- [ Start After Process  ] ---------------------
+ADEBUG|08:32:52:413|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EQX4Wrapper|84|--------------------- [ Stop After Process   ] ---------------------
+ADEBUG|08:32:52:414|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFMain|19|## actionProcess || callActionProcess || Finish...
+ADEBUG|08:32:52:427|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|PCEFMain|22|## actionProcess || composeInstance || Finish...
+DEBUG|08:32:52:428|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|AFProxy|-1|action process completed :: 1138
+DEBUG|08:32:52:428|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Controller|-1|=== >> OUTGOING DATA
 -->applicationName  :  Sample
 -->session  : 0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384
 -->via  : rPCEF_au.E11.0
@@ -52,25 +60,24 @@ DEBUG|14:34:51:624|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Controller|
 
 -->rawdata(s)  : 1
 -->raw data index : 0
-	-->message : {"command":"usageMonitoringUpdate","sessionId":"sessionIdFromPCEF","tid":"transactionId4","requestNumber":"4","actualTime":"20190526143443","userType":"privateId","userValue":"0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384","resources":[{"resourceId":"PD-2018","resourceName":"API_A","monitoringKey":"1234","unitType":"unit","usedUnit":"0","reportingReason":"1"},{"resourceId":"PD-20179","resourceName":"API_A","monitoringKey":"1001","unitType":"unit","usedUnit":"0","reportingReason":"1"},{"resourceId":"PD-20148","resourceName":"API_A","monitoringKey":"1001","unitType":"unit","usedUnit":"1","reportingReason":"0"}]}
+	-->message : {"command":"refundTransaction","actualTime":"20190527083252","userType":"privateId","userValue":"0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384","resourceId":"PD-20148","resouceName":"GSSO/sendOneTimePwd","tid":"SACF-5","rtid":"SPW-A12345678912346791","monitoringKey":"1002","counterId":"4001000001","unitType":"unit","usedUnit":"1","reportingReason":"0"}
 	-->method : POST
 	-->ctype : text/plain
 	-->name : HTTP
-	-->invoke : umUpdate_
+	-->invoke : refundTransaction_
 	-->to : rPCEF.ES04.OCF
 	-->type : request
-	-->url : /api/v1/metering-method
 	-->timeout : 4
-DEBUG|14:34:51:642|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Handler|-1|
-#====> Outgoing Message is:<?xml version="1.0" encoding="tis-620" ?><EquinoxMessage diag="" from="Sample.ES00" ret="0" session="0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" via="rPCEF_au.E11.0" timeout="4" ><EquinoxRawData method="POST" ctype="text/plain" val="{&quot;command&quot;:&quot;usageMonitoringUpdate&quot;,&quot;sessionId&quot;:&quot;sessionIdFromPCEF&quot;,&quot;tid&quot;:&quot;transactionId4&quot;,&quot;requestNumber&quot;:&quot;4&quot;,&quot;actualTime&quot;:&quot;20190526143443&quot;,&quot;userType&quot;:&quot;privateId&quot;,&quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;,&quot;resources&quot;:[{&quot;resourceId&quot;:&quot;PD-2018&quot;,&quot;resourceName&quot;:&quot;API_A&quot;,&quot;monitoringKey&quot;:&quot;1234&quot;,&quot;unitType&quot;:&quot;unit&quot;,&quot;usedUnit&quot;:&quot;0&quot;,&quot;reportingReason&quot;:&quot;1&quot;},{&quot;resourceId&quot;:&quot;PD-20179&quot;,&quot;resourceName&quot;:&quot;API_A&quot;,&quot;monitoringKey&quot;:&quot;1001&quot;,&quot;unitType&quot;:&quot;unit&quot;,&quot;usedUnit&quot;:&quot;0&quot;,&quot;reportingReason&quot;:&quot;1&quot;},{&quot;resourceId&quot;:&quot;PD-20148&quot;,&quot;resourceName&quot;:&quot;API_A&quot;,&quot;monitoringKey&quot;:&quot;1001&quot;,&quot;unitType&quot;:&quot;unit&quot;,&quot;usedUnit&quot;:&quot;1&quot;,&quot;reportingReason&quot;:&quot;0&quot;}]}" name="HTTP" invoke="umUpdate_" to="rPCEF.ES04.OCF" type="request" url="/api/v1/metering-method" timeout="4" ></EquinoxRawData><EquinoxInstance><value val="1::ACTIVE::false::ZUY2OVZkdHkyakFRL1pXT3BvOEViRERoOGtZVGszb1NMc09seVV6SU1Db29pUk5iY21TWlFCbit2VWVTZ2RDR2gzUW01UW52cnZaeVZ1ZG9UWkladXc5NHFpaWZNZEpjRS95VGFoVEcrSENyMVhxOWV1bzRsZkpwcFVBU0tlN0R5QVJOd3pscEV1ZW1jWE94V3FybGMrZlgwMk8zZnpPSWF2MUJvKzI5OU1UVGxXcTVWYTllcTlhUW8xTDNTSUZrS1pPalZZSU15QlV1cUdMQlBEZi9vRkdtN1I5TkdhWjlLV1lzVFVQK1FKcE9nYVRzSldNWXBadkZQNWtrVFUrYjRCWWN0WnI3LzIwcDR2NlozMFo5bWlRaTVDcG1YSjJqcDN4dXI5eW9PL2h0Q2tTb1J5YUhCaGRKZVVwbkN1bFMwcnk5SzVDWmlPTlFuNlBha0NPekpySGdvUklTWFYyeUZlcTY1WXBHUUxKVVpIS201MjZTL3ZsSjJYSHJiOHhkcW1FbnJYNHdiUkVVVnZ0eXdYeFhNT01LbzI0S3g0czVqdnQrc1ZyamYxYnpQalFiR2JiTzJpY0dLSU9yR2RQZDNBR0hrQy9FTSt0UVRoLzBUdGNrQ2xNNEFiZjFHRGl6ZUp6TXNiOHBSaFFKazFSdkNmWnhpbE9kM1Q1czBOdVlBWDBkc0JlZFZ0bkx5V1pPdVloVXRPaS9aQ0VYUzBUb0RiZXhlU0ZYWHcrdFFaeEVTS2ZqZFE1cFkxdEttVTVqcGg2RjJYWnZPRUxZTEsraDJGS1Zrb2lHSEVadTkvNTlOT3JqeTg3MHgwUkt3Q0QxalMzNlE4Y3I5czcwMWMyVFNYM3BnUWdvSmlQRWxXZ1NsaFp1Q2NXWnZvTW5lUmM0QUdLTEROZ1JUMTh3Tk9zdmNPOXpWbzc1TXhldnVpUDIxdHE5N1BhdXU3RG1zM1ZBS0dDS0pPdUpJUURsOHdscFRrRHdkNkNla01Ka3p6c1R0MlBrbG9VbVJvVTJ5OEd0OTR3ckg5Q1MycVN3ZGl3a281RldLMk1FblJwT3RYenFlaFhQcTVpVFc4MHgvcDNxN0Z4R2Q0enZROHFUTjJYSm5PTDhMWkRZazlza3pPbDlFS29KYnB5RzRzWjFvQlRHcHlsZ0c0U0c2TTBZYTRhUGJkdnpzZm5RWGVmcEV5RVZGajFnTkJYY1pwbGd3Y2U2cWpYK29TMm95aWUzNWRVL3R5M2J2MlIvb3dVY29UUmtBMDQ4MG5UQTBpd0NTZTVwbERLdDJrcEN4TjM4My9acHdXdURlM240Vk5ZOXZKZEdzL0lyR3hqcE1nS2xDV1NKbXRQTmQ5M3BLT2o0dmJGV2h1TVBMenlLWGJsSThjMi9DRFFScmFVTXkvVjBQR3hkK05OT3J4dU1lb09nZXpFZDk4OWJJMTlIWmFDbVhGMkpCL3MyUmVJaGYyR09hZUlST2Qwbk9tZUtocENZbzhxN1ErU1FqTjRYQjhCWUJMWlFvQ215MXBqZmJYNERsR0xFRVE9PQ==::" /></EquinoxInstance></EquinoxMessage>
-DEBUG|14:34:51:642|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Handler|-1|
--->TIME,total Processing Time(msec) : 88438
--->TIME,application process (msec) :88405
--->TIME,ec02 process(msec) : 33
-DEBUG|14:34:51:644|main|EC02Handler|-1|Received data from LL Content-Length: 3354
-DEBUG|14:34:51:644|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
-#====> Incoming Message :        <EquinoxMessage from="mOCHKF.E11.0" via="mOCHKF.E11.0"                        session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615"                        timeout="10" ret="0" diag="">            <EquinoxRawData orig="mOCHKF.ES05.DAMOCLES.0" name="HTTP" invoke="umUpdate_" type="response" method="POST"                            url="/rpcef/api/v1/metering-method" ctype="text/plain" val="{    &quot;command&quot;:&quot;usageMonitoringUpdate&quot;,    &quot;sessionId&quot;:&quot;SessionA1234567891234679ACTIVE&quot;,    &quot;tid&quot;:&quot;TRANSACTION001&quot;,    &quot;requestNumber&quot;:&quot;1&quot;,    &quot;userType&quot;:&quot;privateId&quot;,    &quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;,    &quot;status&quot;:&quot;207&quot;,   &quot;devMessage&quot;:&quot;PARTIAL_SUCCESS&quot;,    &quot;resources&quot;:[        {            &quot;resourceId&quot;:&quot;PD-20148&quot;,            &quot;resourceName&quot;:&quot;API_A&quot;,           &quot;rtid&quot;:&quot;R-TRAN-001&quot;,            &quot;resultCode&quot;:&quot;20000&quot;,            &quot;resultDesc&quot;:&quot;SUCCESS&quot;,            &quot;monitoringKey&quot;:&quot;7777&quot;,           &quot;counterId&quot;:&quot;4001000001&quot;,            &quot;quotaByKey&quot;:{                &quot;unitType&quot;:&quot;unit&quot;,                &quot;unit&quot;:&quot;100&quot;,                &quot;validityTime&quot;:&quot;3600&quot;            },            &quot;rateLimitByKey&quot;:{                &quot;transactionPerTime&quot;:&quot;100|60&quot;            }        }    ]}"                            to="mOCHKF.ES00" ret="0"/>            <EquinoxInstance><value val="1::ACTIVE::false::ZUY2OVZkdHkyakFRL1pXT3BvOEViRERoOGtZVGszb1NMc09seVV6SU1Db29pUk5iY21TWlFCbit2VWVTZ2RDR2gzUW01UW52cnZaeVZ1ZG9UWkladXc5NHFpaWZNZEpjRS95VGFoVEcrSENyMVhxOWV1bzRsZkpwcFVBU0tlN0R5QVJOd3pscEV1ZW1jWE94V3FybGMrZlgwMk8zZnpPSWF2MUJvKzI5OU1UVGxXcTVWYTllcTlhUW8xTDNTSUZrS1pPalZZSU15QlV1cUdMQlBEZi9vRkdtN1I5TkdhWjlLV1lzVFVQK1FKcE9nYVRzSldNWXBadkZQNWtrVFUrYjRCWWN0WnI3LzIwcDR2NlozMFo5bWlRaTVDcG1YSjJqcDN4dXI5eW9PL2h0Q2tTb1J5YUhCaGRKZVVwbkN1bFMwcnk5SzVDWmlPTlFuNlBha0NPekpySGdvUklTWFYyeUZlcTY1WXBHUUxKVVpIS201MjZTL3ZsSjJYSHJiOHhkcW1FbnJYNHdiUkVVVnZ0eXdYeFhNT01LbzI0S3g0czVqdnQrc1ZyamYxYnpQalFiR2JiTzJpY0dLSU9yR2RQZDNBR0hrQy9FTSt0UVRoLzBUdGNrQ2xNNEFiZjFHRGl6ZUp6TXNiOHBSaFFKazFSdkNmWnhpbE9kM1Q1czBOdVlBWDBkc0JlZFZ0bkx5V1pPdVloVXRPaS9aQ0VYUzBUb0RiZXhlU0ZYWHcrdFFaeEVTS2ZqZFE1cFkxdEttVTVqcGg2RjJYWnZPRUxZTEsraDJGS1Zrb2lHSEVadTkvNTlOT3JqeTg3MHgwUkt3Q0QxalMzNlE4Y3I5czcwMWMyVFNYM3BnUWdvSmlQRWxXZ1NsaFp1Q2NXWnZvTW5lUmM0QUdLTEROZ1JUMTh3Tk9zdmNPOXpWbzc1TXhldnVpUDIxdHE5N1BhdXU3RG1zM1ZBS0dDS0pPdUpJUURsOHdscFRrRHdkNkNla01Ka3p6c1R0MlBrbG9VbVJvVTJ5OEd0OTR3ckg5Q1MycVN3ZGl3a281RldLMk1FblJwT3RYenFlaFhQcTVpVFc4MHgvcDNxN0Z4R2Q0enZROHFUTjJYSm5PTDhMWkRZazlza3pPbDlFS29KYnB5RzRzWjFvQlRHcHlsZ0c0U0c2TTBZYTRhUGJkdnpzZm5RWGVmcEV5RVZGajFnTkJYY1pwbGd3Y2U2cWpYK29TMm95aWUzNWRVL3R5M2J2MlIvb3dVY29UUmtBMDQ4MG5UQTBpd0NTZTVwbERLdDJrcEN4TjM4My9acHdXdURlM240Vk5ZOXZKZEdzL0lyR3hqcE1nS2xDV1NKbXRQTmQ5M3BLT2o0dmJGV2h1TVBMenlLWGJsSThjMi9DRFFScmFVTXkvVjBQR3hkK05OT3J4dU1lb09nZXpFZDk4OWJJMTlIWmFDbVhGMkpCL3MyUmVJaGYyR09hZUlST2Qwbk9tZUtocENZbzhxN1ErU1FqTjRYQjhCWUJMWlFvQ215MXBqZmJYNERsR0xFRVE9PQ==::" /></EquinoxInstance>        </EquinoxMessage>    
-DEBUG|14:34:51:651|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Controller|-1|=== >> INCOMING DATA
+DEBUG|08:32:52:438|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Handler|-1|
+#====> Outgoing Message is:<?xml version="1.0" encoding="tis-620" ?><EquinoxMessage diag="" from="Sample.ES00" ret="0" session="0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" via="rPCEF_au.E11.0" timeout="4" ><EquinoxRawData method="POST" ctype="text/plain" val="{&quot;command&quot;:&quot;refundTransaction&quot;,&quot;actualTime&quot;:&quot;20190527083252&quot;,&quot;userType&quot;:&quot;privateId&quot;,&quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;,&quot;resourceId&quot;:&quot;PD-20148&quot;,&quot;resouceName&quot;:&quot;GSSO/sendOneTimePwd&quot;,&quot;tid&quot;:&quot;SACF-5&quot;,&quot;rtid&quot;:&quot;SPW-A12345678912346791&quot;,&quot;monitoringKey&quot;:&quot;1002&quot;,&quot;counterId&quot;:&quot;4001000001&quot;,&quot;unitType&quot;:&quot;unit&quot;,&quot;usedUnit&quot;:&quot;1&quot;,&quot;reportingReason&quot;:&quot;0&quot;}" name="HTTP" invoke="refundTransaction_" to="rPCEF.ES04.OCF" type="request" timeout="4" ></EquinoxRawData><EquinoxInstance><value val="1::ACTIVE::false::ZUY2VlZXMXpta0FRL2l1Wm0zNU1Va0FJbUcvVXR6cUphRkdiek5STzVvb1hRd04zQ0lmR092NzM3aTVFVFpxMFUyY2NaWGZ2MlpkN25tWExza2pjOTJXaHVZd0V1OXl5UWhSRnJHUi96aTdaeWJoNjhFMnJZVHNYcm9lL0YyN1RiMDM2WHp2c2xNR3hYRS9pRkU2YWp1TTFMY04xellibG5ySmMzSmR5UHVDU0wwUXFwQTdGc2hTRnhneVJTbE11RWY5MUVDTCtUM29lNlpJblZYNW1HYVpubW9aanVyWmhHUUNsWTh3eDlsdmRzM2E3YnFDSkhUVGhBMzdJVGwxU2hNTjJjQ0xuc2dCUTZQLzFLUDQxaWJ6T05ybzUyMCtMa3NHNHpKZkZPUEQ0OThyTFF1U1RUUVpUWlZrZXI3Z1dVT2dwUS9OWG5wUm9OMjZidDczTmszNTZIUHo2K1JDTWJzUEVIWVhOcnIwY3FwL1gyamNkMjNNZDEvT2NobWRUczRVcTh3aUJMdG1vZlFiVHNyMGplOER4RWxsdlBCNStMSVNjRDZYQXVZN1dtRGhWTXRZcWorWGlTbXdneWpRTUM4eVJLcVVXT1VIYWhnRlcrR0N6UUF0ZEZtQnRxVFJMaEJZSUV1VUNHbW5EdHlLTGQ5RzBIVGhtUUdQWi9JVUxlR1EybXVUaVdVWTQ2akVXSjJFcEVTaUpnVkNVTmVyTmY5ajhWeXlUZEwzMEFxZmI3dDJ1dmdUcjZWV3I0VmlybFRVWDN2Mm1OZTNIZlRnWUZ6N2M3UXJ6dzJVci9TRHlNUkg0Y08xUTlMZnYyRm1heGhwcTVXU0E2Rml1MUtPbytKd2pPWklZMmZ4dFczdW9uSXJQUjNCM2tGVmxJdWNWcFZoSXFqZ0tPUGFIZkEwcVFXeGQzYjJJRE9zY0pzUFBPOHN5bHVvSklyQ21MckJINVpzUEw2MTlHRFhBWVR4aTVGV3NyeldWbXdyOW9PanVoK01KRHJIT29jV1QvcGdsUE1iSnlvb0VueWVURVk2TFduNnZMYTNRTTJwMXV1ZWRzV0dmRDF0ZE9GT2o1clhhVVlTcFVDVk1pdG1vTUtpcXM0TGJxOWs5bFk5U3JURzFPTFlHVjhId0pnQnIzY1FBbGdMc0VRRFp6cDdYeDR4ZHp2NGMrSXlkem83RVJVRkFwcWJoV0s3aE5Tekhvb2huZ1pGL0w3RzlpMFJHdnYrU0daMC9DSTBBbnFWMjhFVUN0VWJPTjlSR2NiQkx5Rjl0cHVybzN2Ym1ocUdZRnpJbEFCUXF1ZlpTSmZOQnJGWExvRzY4RVBLVjhQQThpUG1VSGhDb3JqOVRzT2prSWhTOFVMS2EwSXp0MkE2dTlvRVhvU2pLQk83Nm5pZUZ3SjJqYzFnWG9HTDZGNVRwRHdGa3BPZmxxN2VHWlJzWE94UmFUWjAra1k5VVpScU5CbTR5MDBWR1ZNeXErUk4ydXRPZ2ZUZndBNy9YR1hRQ1pQYjc3eVJjUytMYUJNaFBuVjRmK1ZWWkxMRGMzTlZZazlBUFlPNlQvcEFDU25oWDVadHJ0Y0JGQUtwWGkzcFR2aVhsU2pIdnI0SURXbHRvSGljb3pIK2QyWS9xRlk5UERKaFlOUkFvbi83Z3h0M2laWHpmL1FabmVYWnk=::" /></EquinoxInstance></EquinoxMessage>
+DEBUG|08:32:52:439|0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384|EC02Handler|-1|
+-->TIME,total Processing Time(msec) : 1167
+-->TIME,application process (msec) :1138
+-->TIME,ec02 process(msec) : 29
+DEBUG|08:32:52:441|main|EC02Handler|-1|Received data from LL Content-Length: 2650
+DEBUG|08:32:52:441|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
+#====> Incoming Message :        <EquinoxMessage from="mOCHKF.E11.0" via="mOCHKF.E11.0"                        session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615"                        timeout="10" ret="0" diag="">            <EquinoxRawData orig="mOCHKF.ES05.DAMOCLES.0" name="HTTP" invoke="refundTransaction_" type="response" method="POST"                            url="/rpcef/api/v1/metering-method" ctype="text/plain" val="{    &quot;command&quot;:&quot;refundTransaction&quot;,    &quot;userType&quot;:&quot;privateId&quot;,    &quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;,    &quot;tid&quot;:&quot;SACF-1234&quot;,    &quot;rtid&quot;:&quot;R-TRAN-001&quot;,    &quot;status&quot;:&quot;200&quot;,    &quot;devMessage&quot;:&quot;SUCCESS&quot;}"                            to="mOCHKF.ES00" ret="0"/>            <EquinoxInstance><value val="1::ACTIVE::false::ZUY2VlZXMXpta0FRL2l1Wm0zNU1Va0FJbUcvVXR6cUphRkdiek5STzVvb1hRd04zQ0lmR092NzM3aTVFVFpxMFUyY2NaWGZ2MlpkN25tWExza2pjOTJXaHVZd0V1OXl5UWhSRnJHUi96aTdaeWJoNjhFMnJZVHNYcm9lL0YyN1RiMDM2WHp2c2xNR3hYRS9pRkU2YWp1TTFMY04xellibG5ySmMzSmR5UHVDU0wwUXFwQTdGc2hTRnhneVJTbE11RWY5MUVDTCtUM29lNlpJblZYNW1HYVpubW9aanVyWmhHUUNsWTh3eDlsdmRzM2E3YnFDSkhUVGhBMzdJVGwxU2hNTjJjQ0xuc2dCUTZQLzFLUDQxaWJ6T05ybzUyMCtMa3NHNHpKZkZPUEQ0OThyTFF1U1RUUVpUWlZrZXI3Z1dVT2dwUS9OWG5wUm9OMjZidDczTmszNTZIUHo2K1JDTWJzUEVIWVhOcnIwY3FwL1gyamNkMjNNZDEvT2NobWRUczRVcTh3aUJMdG1vZlFiVHNyMGplOER4RWxsdlBCNStMSVNjRDZYQXVZN1dtRGhWTXRZcWorWGlTbXdneWpRTUM4eVJLcVVXT1VIYWhnRlcrR0N6UUF0ZEZtQnRxVFJMaEJZSUV1VUNHbW5EdHlLTGQ5RzBIVGhtUUdQWi9JVUxlR1EybXVUaVdVWTQ2akVXSjJFcEVTaUpnVkNVTmVyTmY5ajhWeXlUZEwzMEFxZmI3dDJ1dmdUcjZWV3I0VmlybFRVWDN2Mm1OZTNIZlRnWUZ6N2M3UXJ6dzJVci9TRHlNUkg0Y08xUTlMZnYyRm1heGhwcTVXU0E2Rml1MUtPbytKd2pPWklZMmZ4dFczdW9uSXJQUjNCM2tGVmxJdWNWcFZoSXFqZ0tPUGFIZkEwcVFXeGQzYjJJRE9zY0pzUFBPOHN5bHVvSklyQ21MckJINVpzUEw2MTlHRFhBWVR4aTVGV3NyeldWbXdyOW9PanVoK01KRHJIT29jV1QvcGdsUE1iSnlvb0VueWVURVk2TFduNnZMYTNRTTJwMXV1ZWRzV0dmRDF0ZE9GT2o1clhhVVlTcFVDVk1pdG1vTUtpcXM0TGJxOWs5bFk5U3JURzFPTFlHVjhId0pnQnIzY1FBbGdMc0VRRFp6cDdYeDR4ZHp2NGMrSXlkem83RVJVRkFwcWJoV0s3aE5Tekhvb2huZ1pGL0w3RzlpMFJHdnYrU0daMC9DSTBBbnFWMjhFVUN0VWJPTjlSR2NiQkx5Rjl0cHVybzN2Ym1ocUdZRnpJbEFCUXF1ZlpTSmZOQnJGWExvRzY4RVBLVjhQQThpUG1VSGhDb3JqOVRzT2prSWhTOFVMS2EwSXp0MkE2dTlvRVhvU2pLQk83Nm5pZUZ3SjJqYzFnWG9HTDZGNVRwRHdGa3BPZmxxN2VHWlJzWE94UmFUWjAra1k5VVpScU5CbTR5MDBWR1ZNeXErUk4ydXRPZ2ZUZndBNy9YR1hRQ1pQYjc3eVJjUytMYUJNaFBuVjRmK1ZWWkxMRGMzTlZZazlBUFlPNlQvcEFDU25oWDVadHJ0Y0JGQUtwWGkzcFR2aVhsU2pIdnI0SURXbHRvSGljb3pIK2QyWS9xRlk5UERKaFlOUkFvbi83Z3h0M2laWHpmL1FabmVYWnk=::" /></EquinoxInstance>        </EquinoxMessage>    
+DEBUG|08:32:52:444|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Controller|-1|=== >> INCOMING DATA
 -->applicationName  :  Sample
 -->session  : 668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615
 -->via  : mOCHKF.E11.0
@@ -82,56 +89,65 @@ DEBUG|14:34:51:651|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|2018122
 -->rawdata(s)  : 1
 -->raw data index : 0
 	-->raw event type : Unknown
-	-->message : {    &quot;command&quot;:&quot;usageMonitoringUpdate&quot;,    &quot;sessionId&quot;:&quot;SessionA1234567891234679ACTIVE&quot;,    &quot;tid&quot;:&quot;TRANSACTION001&quot;,    &quot;requestNumber&quot;:&quot;1&quot;,    &quot;userType&quot;:&quot;privateId&quot;,    &quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;,    &quot;status&quot;:&quot;207&quot;,   &quot;devMessage&quot;:&quot;PARTIAL_SUCCESS&quot;,    &quot;resources&quot;:[        {            &quot;resourceId&quot;:&quot;PD-20148&quot;,            &quot;resourceName&quot;:&quot;API_A&quot;,           &quot;rtid&quot;:&quot;R-TRAN-001&quot;,            &quot;resultCode&quot;:&quot;20000&quot;,            &quot;resultDesc&quot;:&quot;SUCCESS&quot;,            &quot;monitoringKey&quot;:&quot;7777&quot;,           &quot;counterId&quot;:&quot;4001000001&quot;,            &quot;quotaByKey&quot;:{                &quot;unitType&quot;:&quot;unit&quot;,                &quot;unit&quot;:&quot;100&quot;,                &quot;validityTime&quot;:&quot;3600&quot;            },            &quot;rateLimitByKey&quot;:{                &quot;transactionPerTime&quot;:&quot;100|60&quot;            }        }    ]}
-	-->val : {    "command":"usageMonitoringUpdate",    "sessionId":"SessionA1234567891234679ACTIVE",    "tid":"TRANSACTION001",    "requestNumber":"1",    "userType":"privateId",    "userValue":"0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384",    "status":"207",   "devMessage":"PARTIAL_SUCCESS",    "resources":[        {            "resourceId":"PD-20148",            "resourceName":"API_A",           "rtid":"R-TRAN-001",            "resultCode":"20000",            "resultDesc":"SUCCESS",            "monitoringKey":"7777",           "counterId":"4001000001",            "quotaByKey":{                "unitType":"unit",                "unit":"100",                "validityTime":"3600"            },            "rateLimitByKey":{                "transactionPerTime":"100|60"            }        }    ]}
+	-->message : {    &quot;command&quot;:&quot;refundTransaction&quot;,    &quot;userType&quot;:&quot;privateId&quot;,    &quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;,    &quot;tid&quot;:&quot;SACF-1234&quot;,    &quot;rtid&quot;:&quot;R-TRAN-001&quot;,    &quot;status&quot;:&quot;200&quot;,    &quot;devMessage&quot;:&quot;SUCCESS&quot;}
+	-->val : {    "command":"refundTransaction",    "userType":"privateId",    "userValue":"0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384",    "tid":"SACF-1234",    "rtid":"R-TRAN-001",    "status":"200",    "devMessage":"SUCCESS"}
 	-->ret : 0
 	-->method : POST
 	-->ctype : text/plain
 	-->orig : mOCHKF.ES05.DAMOCLES.0
 	-->name : HTTP
-	-->invoke : umUpdate_
+	-->invoke : refundTransaction_
 	-->to : mOCHKF.ES00
 	-->type : response
 	-->url : /rpcef/api/v1/metering-method
-ADEBUG|14:34:51:659|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|16|## actionProcess || extractInstance || Finish...
-ADEBUG|14:34:51:659|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|74|--------------------- [ Start Before Process ] ---------------------
-ADEBUG|14:34:51:660|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|InvokeManager|23|raw data :ec02.data.EquinoxRawDataFactory$EquinoxRawDataImpl@36dce7ed
-ADEBUG|14:34:51:660|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|InvokeManager|24|set event :SUCCESS
-ADEBUG|14:34:51:660|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|InvokeManager|47|OK [0] phoebe.eqx.pcef.core.data.InvokeObject@47a64f7d
-ADEBUG|14:34:51:661|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|196|[Request Type]: E11_TIMEOUT
-ADEBUG|14:34:51:661|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|77|--------------------- [ Stop Before Process  ] ---------------------
-ADEBUG|14:34:51:661|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|78|--------------------- [   Start Do Process   ] ---------------------
-ADEBUG|14:34:51:661|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|18|disPatch W_E11_TIMEOUT W_USAGE_MONITORING_UPDATE
-ADEBUG|14:34:51:661|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|22|Invoke wUsageMonitoringUpdate
-ADEBUG|14:34:51:662|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|InvokeManager|61|InvokeExternal found UsageMonitoringUpdate phoebe.eqx.pcef.core.data.InvokeObject@47a64f7d
-ADEBUG|14:34:51:671|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Read Usage Monitoring Update Response","status":"Success"}
-ADEBUG|14:36:25:256|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|MongoDBService|81|[Query] insert,collection name:Quota, query ={ "_id" : "7777", "userType" : "privateId", "userValue" : "0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384", "processing" : 0, "expireDate" : { "$date" : 1558859759473 }, "monitoringKey" : "7777", "counterId" : "4001000001", "quotaByKey" : { "unitType" : "unit", "unit" : 100, "validityTime" : 3600 }, "rateLimitByKey" : { "transactionPerTime" : "100|60" }, "resources" : [{ "resourceId" : "PD-20148", "resourceName" : "API_A" }] }
-ADEBUG|14:36:29:922|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|MongoDBService|81|[Query] aggregate,collection name:Quota, query =[{ "$match" : { "userValue" : "0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" } }, { "$group" : { "_id" : { }, "minExpireDate" : { "$min" : "$expireDate" } } }]
-ADEBUG|14:36:42:269|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|MongoDBService|81|[Query] update,collection name:Profile, query ={ "userValue" : "0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384", "isProcessing" : 1 },{ "$set" : { "isProcessing" : 0, "sequenceNumber" : 4 } }
-ADEBUG|14:36:44:645|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|54|stop by set stateWork .. RESPONSE
-ADEBUG|14:36:44:645|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|80|--------------------- [    Stop Do Process   ] ---------------------
-ADEBUG|14:36:44:645|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|81|--------------------- [ Start After Process  ] ---------------------
-ADEBUG|14:36:44:646|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|84|--------------------- [ Stop After Process   ] ---------------------
-ADEBUG|14:36:44:646|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|19|## actionProcess || callActionProcess || Finish...
-ADEBUG|14:36:44:647|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|22|## actionProcess || composeInstance || Finish...
-DEBUG|14:36:44:647|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|AFProxy|-1|action process completed :: 112996
-DEBUG|14:36:44:647|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Controller|-1|=== >> OUTGOING DATA
+ADEBUG|08:32:52:447|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|16|## actionProcess || extractInstance || Finish...
+ADEBUG|08:32:52:447|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|74|--------------------- [ Start Before Process ] ---------------------
+ADEBUG|08:32:52:447|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|InvokeManager|23|raw data :ec02.data.EquinoxRawDataFactory$EquinoxRawDataImpl@7161d8d1
+ADEBUG|08:32:52:447|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|InvokeManager|24|set event :SUCCESS
+ADEBUG|08:32:52:448|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|InvokeManager|47|OK [0] phoebe.eqx.pcef.core.data.InvokeObject@74e28667
+ADEBUG|08:32:52:448|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|196|[Request Type]: REFUND_MANAGEMENT
+ADEBUG|08:32:52:448|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|77|--------------------- [ Stop Before Process  ] ---------------------
+ADEBUG|08:32:52:448|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|78|--------------------- [   Start Do Process   ] ---------------------
+ADEBUG|08:32:52:448|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|19|disPatch W_REFUND_MANAGEMENT W_REFUND_TRANSACTION
+ADEBUG|08:32:52:448|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|23|Invoke wRefundTransaction
+ADEBUG|08:32:52:449|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|InvokeManager|61|InvokeExternal found RefundTransaction phoebe.eqx.pcef.core.data.InvokeObject@74e28667
+ADEBUG|08:32:52:469|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Read Refund Transaction Response","status":"Success","session":" SessionA123456781234679ACTIVE"}
+ADEBUG|08:32:52:471|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|MongoDBService|81|[Query] delete,collection name:Transaction, query ={ "tid" : "SACF-5" }
+ADEBUG|08:32:52:488|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|MongoDBService|81|[Query] update,collection name:Quota, query ={ "_id" : "1002", "processing" : 1 },{ "$set" : { "processing" : 0 } }
+ADEBUG|08:32:52:490|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Update Quota Unlock Process mk:1002","status":"Success","session":" SessionA123456781234679ACTIVE"}
+ADEBUG|08:32:52:491|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|MongoDBService|81|[Query] find,collection name:Profile, query ={ "_id" : "0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" }
+ADEBUG|08:32:52:494|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Find Profile by privateId [Found]","status":"Success","session":" SessionA123456781234679ACTIVE"}
+ADEBUG|08:32:52:495|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFService|83|Get timeout =46927
+ADEBUG|08:32:52:495|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFUtils|109|[MESSAGE_FLOW] : {"message":"Build Refund Management Response","status":"Success","session":" SessionA123456781234679ACTIVE"}
+ADEBUG|08:32:52:499|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|ComplexState|54|stop by set stateWork .. RESPONSE
+ADEBUG|08:32:52:499|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|80|--------------------- [    Stop Do Process   ] ---------------------
+ADEBUG|08:32:52:499|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|81|--------------------- [ Start After Process  ] ---------------------
+ADEBUG|08:32:52:500|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EQX4Wrapper|84|--------------------- [ Stop After Process   ] ---------------------
+ADEBUG|08:32:52:500|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|19|## actionProcess || callActionProcess || Finish...
+ADEBUG|08:32:52:500|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|PCEFMain|22|## actionProcess || composeInstance || Finish...
+DEBUG|08:32:52:500|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|AFProxy|-1|action process completed :: 55
+DEBUG|08:32:52:500|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Controller|-1|=== >> OUTGOING DATA
 -->applicationName  :  Sample
 -->session  : 668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615
 -->via  : mOCHKF.E11.0
 -->from  : Sample.ES00
 -->diag  : 
 -->state  : ACTIVE
--->timeout  : -1
+-->timeout  : 46927
 
 -->rawdata(s)  : 1
 -->raw data index : 0
-	-->message : 
+	-->message : {"command":"refundManagement","sessionId":" SessionA123456781234679ACTIVE","status":"200","devMessage":"Success"}
+	-->method : POST
+	-->ctype : text/plain
 	-->name : HTTP
-	-->timeout : -1
-DEBUG|14:36:44:647|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
-#====> Outgoing Message is:<?xml version="1.0" encoding="tis-620" ?><EquinoxMessage diag="" from="Sample.ES00" ret="0" session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615" via="mOCHKF.E11.0" timeout="-1" ><EquinoxRawData name="HTTP" timeout="-1" invoke ="default_invoke" ></EquinoxRawData><EquinoxInstance><value val="1::ACTIVE::false::ZUY2OVUwMXYyekFNL1NzRHp5N2d6OFR4TFd1Y3dsamlHbTB5QkNpS1FIUFVWSzBsdVpKY05EUDgzMGZaYnJ0aDY2R1grU1E5MG54OGoxUUxkVW52TXFFTkVTV0ZwQVU4S2JOaEhDOWVGTVZ4TkhIZHdKOEVEdFJLM3JHcVQ5cXpBeVRnN21hN2k5T0xlWGxjLzN5NHo0dmRWVFV0cm1iTDhPbFNQcXpNM0l2Q2VCcE5zVVlRaCtCQW82bmFuR3FzZ0xYWU16RTBPNHp3ZDFJMUZ2OXNTYVlMSlV1cU5STkhTRndITkgxcUtFckpHLzZES2toQ0MyRllDdVJLM3M5TEpYbHhuaTZSbjlTMVpNSndLc3dDZXhwMWgvNHNkdkhySEpEbW5xcnIzaGRGaENhbHdYSWFrcHRiQjBySk9iUC9FUXVNenJUQXBXQkdLdXpxR3owaHIrY0gxZ0ZGdFd4VWFYVW5VQ3pPZk5lTGY0TnpZbTJIZVpIdDU0REU1cDB1Tzd3Uk5zS2cxTTc1bU14MXZYK1RUV2Yva3kzOGxEYTRucDh2ejNxamVsOTdtVjUzaXo0dzhTd2Y2Wm9JY3JRemJhRmlHb00zTnFic3dMWEorcFRlMTE1aUQ0N0xsbnJlZnBPdDA4dnRCbU1mTHpoR0RGMTVXT0pyZXBIbFF5NGlQaUpwdnJEM2huT2lUaXQ1SEtaZHllTTRzNjNHM3RadlU5L1dCN3RLcjYzM2ZUVjhRUGQvRkZwUVExaGxSUTBxLzBwRkxjTnpCTnlXbVJ2NUV5OE13akQ4NHVMVEhMUytpc2Ftb08yZ1E5TitBZk9iT3JzPQ==::" /></EquinoxInstance></EquinoxMessage>
-DEBUG|14:36:44:648|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
--->TIME,total Processing Time(msec) : 113004
--->TIME,application process (msec) :112996
--->TIME,ec02 process(msec) : 8
+	-->invoke : 1033578817
+	-->to : rPCEF.ES04.OCF
+	-->type : response
+	-->timeout : 46927
+DEBUG|08:32:52:501|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
+#====> Outgoing Message is:<?xml version="1.0" encoding="tis-620" ?><EquinoxMessage diag="" from="Sample.ES00" ret="0" session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615" via="mOCHKF.E11.0" timeout="46927" ><EquinoxRawData method="POST" ctype="text/plain" val="{&quot;command&quot;:&quot;refundManagement&quot;,&quot;sessionId&quot;:&quot; SessionA123456781234679ACTIVE&quot;,&quot;status&quot;:&quot;200&quot;,&quot;devMessage&quot;:&quot;Success&quot;}" name="HTTP" invoke="1033578817" to="rPCEF.ES04.OCF" type="response" timeout="46927" ></EquinoxRawData><EquinoxInstance><value val="1::ACTIVE::false::ZUY2cnJnVUFBWFVBK1E9PQ==::" /></EquinoxInstance></EquinoxMessage>
+DEBUG|08:32:52:501|668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615|EC02Handler|-1|
+-->TIME,total Processing Time(msec) : 60
+-->TIME,application process (msec) :55
+-->TIME,ec02 process(msec) : 5

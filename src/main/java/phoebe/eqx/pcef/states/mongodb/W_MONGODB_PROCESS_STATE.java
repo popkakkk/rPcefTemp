@@ -219,6 +219,7 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
                         nextState = EMongoState.END;
                     } else {
                         if (dbConnect.getTransactionService().findMyTransactionDone()) {
+                            AFLog.d("My Transaction Done ,Start by other process");
                             dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
                             setResponseSuccess();
                         } else {
@@ -228,6 +229,7 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
                 } else {
                     lockByMyTransaction = true;
                     waitForProcess = true;
+                    AFLog.d("waitForProcess:" + waitForProcess);
                     interval.waitInterval();
                     nextState = EMongoState.FIND_AND_MOD_PROFILE_FOR_WAIT_PROCESS;
                 }

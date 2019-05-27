@@ -1,6 +1,8 @@
 package phoebe.eqx.pcef.services;
 
 import ec02.data.interfaces.EquinoxRawData;
+import phoebe.eqx.pcef.enums.state.EMongoState;
+import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.message.builder.MessagePool;
 
@@ -20,7 +22,6 @@ public class VTTimoutService extends PCEFService {
         String timeout = String.valueOf(appointmentDate.compareTo(currentDate));
         EquinoxRawData equinoxRawData = messagePool.recurringVTTimeout(timeout);
         appInstance.getOutList().add(equinoxRawData);
-
     }
 
 

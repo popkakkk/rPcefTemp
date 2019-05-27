@@ -68,7 +68,6 @@ public class W_USAGE_MONITORING extends ComplexState {
                 }
             }
         } catch (Exception e) {
-
             AFLog.d("Mongodb initial process error:" + e.getStackTrace()[0]);
         } finally {
             if (dbConnect != null) {
