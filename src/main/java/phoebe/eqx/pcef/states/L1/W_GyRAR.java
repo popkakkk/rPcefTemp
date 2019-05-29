@@ -2,6 +2,8 @@ package phoebe.eqx.pcef.states.L1;
 
 import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.model.Quota;
+import phoebe.eqx.pcef.core.model.Transaction;
+import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
@@ -13,6 +15,7 @@ import phoebe.eqx.pcef.states.abs.MessageRecieved;
 import phoebe.eqx.pcef.states.mongodb.W_MONGODB_PROCESS_GYRAR;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class W_GyRAR extends ComplexState {
 
@@ -55,25 +58,25 @@ public class W_GyRAR extends ComplexState {
     @MessageRecieved(messageType = EState.W_USAGE_MONITORING_UPDATE)
     public void wUsageMonitoringUpdate() throws Exception {
         OCFUsageMonitoringService ocfUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
-        OCFUsageMonitoringResponse OCFUsageMonitoringResponse = ocfUsageMonitoringService.readUsageMonitoringUpdate();
+        OCFUsageMonitoringResponse ocfUsageMonitoringResponse = ocfUsageMonitoringService.readUsageMonitoringUpdate();
 
         MongoDBConnect dbConnect = null;
         try {
             dbConnect = new MongoDBConnect(appInstance);
-            ArrayList<Quota> quotaResponseList = dbConnect.getQuotaService().getQuotaFromUsageMonitoringResponse(OCFUsageMonitoringResponse);
 
-            if (ocfUsageMonitoringService.receiveQuotaAndPolicy(OCFUsageMonitoringResponse)) {
-                dbConnect.getQuotaService().insertQuotaInitial(quotaResponseList);
-                dbConnect.getTransactionService().updateTransaction(quotaResponseList);
-                dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
+            List<Transaction> newResourceTransactions = appInstance.getMyContext().getPcefInstance().getOtherStartTransactions();
 
-                GyRARService gyRARService = new GyRARService(appInstance);
-                gyRARService.buildResponseGyRAR();
+            dbConnect.getTransactionService().filterResourceRequestErrorNewResource(ocfUsageMonitoringResponse, appInstance.getMyContext().getPcefInstance().getNewResources(), newResourceTransactions);
+            dbConnect.getTransactionService().filterResourceRequestErrorCommitResource(ocfUsageMonitoringResponse, appInstance.getMyContext().getPcefInstance().getCommitDatas());
 
-            } else {
+            ArrayList<Quota> quotaResponseList = dbConnect.getQuotaService().getQuotaFromUsageMonitoringResponse(ocfUsageMonitoringResponse);
+            dbConnect.getQuotaService().insertQuotaInitial(quotaResponseList);
+            dbConnect.getTransactionService().updateTransaction(quotaResponseList, newResourceTransactions);
+            dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
 
+            GyRARService gyRARService = new GyRARService(appInstance);
+            gyRARService.buildResponseGyRAR();
 
-            }
 
         } catch (Exception e) {
             AFLog.d(" error:" + e.getStackTrace()[0]);

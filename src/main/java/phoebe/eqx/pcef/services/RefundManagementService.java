@@ -1,5 +1,6 @@
 package phoebe.eqx.pcef.services;
 
+import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.core.PCEFParser;
 import phoebe.eqx.pcef.enums.EStatusResponse;
@@ -19,14 +20,16 @@ public class RefundManagementService extends PCEFService {
 
     public void readRefundManagement() {
         try {
-            PCEFParser pcefParser = new PCEFParser(appInstance.getReqMessage());
-            RefundManagementRequest refundManagementRequest = pcefParser.translateRefundManagementRequest();
-            appInstance.getPcefInstance().setRefundManagementRequest(refundManagementRequest);
-            appInstance.getPcefInstance().setSessionId(refundManagementRequest.getSessionId());
+            AFLog.d("Read Refund Management Request..");
 
-            PCEFUtils.writeMessageFlow("Read Refund Management Request", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            PCEFParser pcefParser = new PCEFParser(context.getReqMessage());
+            RefundManagementRequest refundManagementRequest = pcefParser.translateRefundManagementRequest();
+            context.getPcefInstance().setRefundManagementRequest(refundManagementRequest);
+            context.getPcefInstance().setSessionId(refundManagementRequest.getSessionId());
+
+            PCEFUtils.writeMessageFlow("Read Refund Management Request", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Read Refund Management Request-" + e.getStackTrace()[0], MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Read Refund Management Request-" + e.getStackTrace()[0], MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         }
 
 
@@ -35,13 +38,15 @@ public class RefundManagementService extends PCEFService {
     public void buildResponseRefundManagement(boolean success) {
 
         try {
+            AFLog.d("Build Refund Management Response..");
+
             //create invokeId
-            String invokeId = appInstance.getRequestInvokeId();
+            String invokeId = context.getRequestInvokeId();
 
             // logic build
             RefundManagementResponse refundManagementResponse = new RefundManagementResponse();
             refundManagementResponse.setCommand("refundManagement");
-            refundManagementResponse.setSessionId(appInstance.getPcefInstance().getRefundManagementRequest().getSessionId());
+            refundManagementResponse.setSessionId(context.getPcefInstance().getRefundManagementRequest().getSessionId());
 
             if (success) {
                 refundManagementResponse.setStatus(EStatusResponse.SUCCESS.getCode());
@@ -59,14 +64,14 @@ public class RefundManagementService extends PCEFService {
 
             //build message
             MessagePool messagePool = new MessagePool(abstractAF);
-            EquinoxRawData equinoxRawData = messagePool.getRefundManagementResponse(refundManagementResponse, invokeId, getTimeoutFromAppoinmentDate());
+            EquinoxRawData equinoxRawData = messagePool.getRefundManagementResponse(refundManagementResponse, invokeId, "10");
 
             appInstance.getOutList().add(equinoxRawData);
-//            appInstance.setFinish(true);
+            appInstance.setFinish(true);
 
-            PCEFUtils.writeMessageFlow("Build Refund Management Response", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Build Refund Management Response", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Build Refund Management Response -" + e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Build Refund Management Response -" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
         }
 
 

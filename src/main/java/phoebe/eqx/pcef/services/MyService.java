@@ -50,10 +50,10 @@ public class MyService extends PCEFService {
             ValidateMessage.validateTestData();
 
             //increase stat success
-            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.PCEF_RECEIVE_TEST_DATA);
+//            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.PCEF_RECEIVE_TEST_DATA);
 
             //summarylog res
-            appInstance.setSummaryLogExternalResponse(Operation.TestOperation, SummaryLog.getSummaryLogResponse(Operation.TestOperation, testResponseData));
+//            appInstance.setSummaryLogExternalResponse(Operation.TestOperation, SummaryLog.getSummaryLogResponse(Operation.TestOperation, testResponseData));
         } catch (TimeoutException e) {
             // handle time out
         } catch (ResponseErrorException e) {

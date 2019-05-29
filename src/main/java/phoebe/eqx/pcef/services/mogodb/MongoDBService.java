@@ -10,6 +10,8 @@ import phoebe.eqx.pcef.enums.model.element.EResourceQuota;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.instance.CommitData;
 import phoebe.eqx.pcef.instance.Config;
+import phoebe.eqx.pcef.instance.context.RequestContext;
+import phoebe.eqx.pcef.utils.PCEFUtils;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -19,6 +21,7 @@ public abstract class MongoDBService {
     protected AppInstance appInstance;
     protected DB db;
     protected String collectionName;
+    protected RequestContext context;
 
     public Gson gson = new Gson();
 
@@ -27,6 +30,7 @@ public abstract class MongoDBService {
         this.db = mongoClient.getDB(Config.MY_DB_NAME);
         this.appInstance = appInstance;
         this.collectionName = collectionName;
+        this.context = appInstance.getMyContext();
     }
 
 
@@ -37,7 +41,7 @@ public abstract class MongoDBService {
     }
 
     public void insertByQuery(BasicDBObject basicDBObject) {
-        writeQueryLog("insert", collectionName, basicDBObject.toString());
+        writeQueryLog("insert", collectionName, basicDBObject);
         db.getCollection(collectionName).insert(basicDBObject);
     }
 
@@ -54,7 +58,7 @@ public abstract class MongoDBService {
 
     public void updateSetByQuery(BasicDBObject searchQuery, BasicDBObject updateQuery) {
         BasicDBObject setUpdate = new BasicDBObject("$set", updateQuery);
-        writeQueryLog("update", collectionName, searchQuery.toString() + "," + setUpdate.toString());
+        writeQueryLog("update", collectionName, searchQuery + "," + setUpdate);
         db.getCollection(collectionName).update(searchQuery, setUpdate);
     }
 
@@ -81,10 +85,15 @@ public abstract class MongoDBService {
         AFLog.d("[Query] " + action + ",collection name:" + collection + ", query =" + condition);
     }
 
+    public void writeQueryLog(String action, String collection, BasicDBObject condition) {
+        AFLog.d("[Query] " + action + ",collection name:" + collection + ", query =" + condition);
+    }
+
 
     public List<CommitData> findDataToCommit(String privateId, String monitoringKey, boolean quotaExpire) {
 
         try {
+            AFLog.d("Find data to commit");
 
             String tempNameTransaction = "transactionData";
             String tempNameTids = "transactionIds";
@@ -117,7 +126,7 @@ public abstract class MongoDBService {
                 $match.put(tempNameTransaction + "." + ETransaction.monitoringKey.name(), monitoringKey);
             }
             if (quotaExpire) {
-                $match.put(EQuota.expireDate.name(), new BasicDBObject("$lte", new Date()));
+                $match.put(EQuota.expireDate.name(), new BasicDBObject("$lte", context.getPcefInstance().getStartTime()));
             }
 
 
@@ -132,6 +141,7 @@ public abstract class MongoDBService {
 
             $group.put("_id", _id);
             $group.put(tempNameTids, tid);
+            $group.put(EQuota.expireDate.name(), new BasicDBObject("$max", "$" + EQuota.expireDate.name()));
 
             BasicDBObject $project = new BasicDBObject();
 
@@ -142,6 +152,7 @@ public abstract class MongoDBService {
 
             $project.put(tempNameTids, "$" + tempNameTids);
             $project.put("count", new BasicDBObject("$cond", $cond));
+            $project.put(EQuota.expireDate.name(), 1);
 
 
             List<DBObject> pipeline = Arrays.asList(
@@ -154,20 +165,24 @@ public abstract class MongoDBService {
 
             writeQueryLog("aggregate", Config.COLLECTION_QUOTA_NAME, pipeline.toString());
 
-
+            //###aggregate
             Iterator<DBObject> dataIterator = db.getCollection(Config.COLLECTION_QUOTA_NAME).aggregate(pipeline).results().iterator();
 
 
             List<CommitData> commitDatas = new ArrayList<>();
 
-
             while (dataIterator.hasNext()) {
-                commitDatas.add(gson.fromJson(gson.toJson(dataIterator.next()), CommitData.class));
+                CommitData commitData = gson.fromJson(gson.toJson(dataIterator.next()), CommitData.class);
+                AFLog.d("mk:" + commitData.get_id().getMonitoringKey()
+                        + " ,resourceId:" + commitData.get_id().getResourceId()
+                        + " ,expireDate:" + PCEFUtils.isoDateFormatter.format(commitData.getExpireDate())
+                        + " ,count transaction:" + commitData.getCount());
+                commitDatas.add(commitData);
             }
 
             return commitDatas;
         } catch (Exception e) {
-            AFLog.d("find data to commit error" + e.getStackTrace()[0]);
+            AFLog.d("find data to commit error-" + e.getStackTrace()[0]);
             throw e;
         }
 

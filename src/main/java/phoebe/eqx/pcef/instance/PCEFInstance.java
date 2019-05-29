@@ -1,5 +1,6 @@
 package phoebe.eqx.pcef.instance;
 
+import phoebe.eqx.pcef.core.data.ResourceRequest;
 import phoebe.eqx.pcef.core.model.Profile;
 import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.message.builder.req.OCFUsageMonitoringRequest;
@@ -13,26 +14,21 @@ import java.util.List;
 
 public class PCEFInstance {
 
-    private String sessionId; // from SACF
+    private String sessionId;
     private Date startTime = new Date();
 
     private UsageMonitoringRequest usageMonitoringRequest;
     private GyRARRequest gyRARRequest;
     private RefundManagementRequest refundManagementRequest;
 
-
     private Profile profile;
     private Transaction transaction;
     private List<Transaction> otherStartTransactions = new ArrayList<>();
 
-
     private OCFUsageMonitoringRequest ocfUsageMonitoringRequest;
 
-
-    //Commit Part
-
     List<CommitData> commitDatas = new ArrayList<>();
-
+    List<ResourceRequest> newResources = new ArrayList<>();
 
     public int getQuotaCommitSize() {
         List<String> mkList = new ArrayList<>();
@@ -128,5 +124,13 @@ public class PCEFInstance {
 
     public void setCommitDatas(List<CommitData> commitDatas) {
         this.commitDatas = commitDatas;
+    }
+
+    public List<ResourceRequest> getNewResources() {
+        return newResources;
+    }
+
+    public void setNewResources(List<ResourceRequest> newResources) {
+        this.newResources = newResources;
     }
 }

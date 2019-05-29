@@ -1,5 +1,6 @@
 package phoebe.eqx.pcef.instance;
 
+import java.util.Date;
 import java.util.List;
 
 public class CommitData {
@@ -8,7 +9,15 @@ public class CommitData {
     private ID _id;
     private List<String> transactionIds;
     private int count;
+    private Date expireDate;
 
+    public Date getExpireDate() {
+        return expireDate;
+    }
+
+    public void setExpireDate(Date expireDate) {
+        this.expireDate = expireDate;
+    }
 
     public ID get_id() {
         return _id;

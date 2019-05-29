@@ -145,6 +145,7 @@ public class MessagePool {
         EquinoxRawData rawData = AFDataFactory.createEquinoxRawData();
         Map<String, String> map = new HashMap<>();
         map.put("timeout", timeout);
+        map.put("type", "response");
         rawData.setRawDataAttributes(map);
         return rawData;
     }

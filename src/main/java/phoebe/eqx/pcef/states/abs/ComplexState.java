@@ -34,7 +34,6 @@ public abstract class ComplexState extends State {
         while (continueWork) {
             EState state = getWorkState();
             if (state == null || state.equals(EState.END)) {
-                AFLog.d("Set state to " + state + " -->  BEGIN");
                 state = EState.BEGIN;
             }
 
@@ -46,14 +45,16 @@ public abstract class ComplexState extends State {
                 stop = true;
             }
             EState workState = getWorkState();
-            continueWork = !this.appInstance.isHasRequest();
+            continueWork = !this.appInstance.getMyContext().isHasRequest();
             if (EState.END.equals(workState)) {
                 if (handler != null) {
                     handler.onEnd();
                 }
-                AFLog.d("stop by set stateWork .. RESPONSE");
+                AFLog.d("stop by set END stateWork ..");
                 break;
             }
+
+
             if (stop) {
                 AFLog.d("Stop...by..flag");
                 break;

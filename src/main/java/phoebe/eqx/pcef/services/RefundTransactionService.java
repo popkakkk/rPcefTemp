@@ -1,5 +1,6 @@
 package phoebe.eqx.pcef.services;
 
+import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.core.exceptions.ResponseErrorException;
 import phoebe.eqx.pcef.core.exceptions.TimeoutException;
@@ -25,9 +26,11 @@ public class RefundTransactionService extends PCEFService {
 
     public void buildRefundTransactionRequest() {
         try {
-            Transaction transactionRefund = appInstance.getPcefInstance().getTransaction();
+            AFLog.d("Build Refund Transaction Request..");
+
+            Transaction transactionRefund = context.getPcefInstance().getTransaction();
             Operation operation = Operation.RefundTransaction;
-            String invokeId = "refundTransaction_";
+            String invokeId = generateInvokeId(operation);
 
             RefundTransactionRequest refundTransactionRequest = new RefundTransactionRequest();
 
@@ -49,16 +52,16 @@ public class RefundTransactionService extends PCEFService {
             invokeExternal(equinoxRawData, operation, messagePool.getRequestObj());
 
 
-            PCEFUtils.writeMessageFlow("Build Refund Transaction Request", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Build Refund Transaction Request", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Build Refund Transaction Stop Request", MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Build Refund Transaction Stop Request", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
         }
     }
 
 
     public void readRefundTransactionResponse() throws Exception {
-
         try {
+            AFLog.d("Read Refund Transaction Response ..");
             Operation operation = Operation.RefundTransaction;
 
             //extract
@@ -69,15 +72,13 @@ public class RefundTransactionService extends PCEFService {
             ValidateMessage.validateTestData();
 
 
-
-
             //increase stat success
 //            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.PCEF_RECEIVE_TEST_DATA);
 
             //summarylog res
-//            appInstance.setSummaryLogExternalResponse(Operation.TestOperation, SummaryLog.getSummaryLogResponse(Operation.TestOperation, testResponseData));
+//            context.setSummaryLogExternalResponse(Operation.TestOperation, SummaryLog.getSummaryLogResponse(Operation.TestOperation, testResponseData));
 
-            PCEFUtils.writeMessageFlow("Read Refund Transaction Response", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Read Refund Transaction Response", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (TimeoutException e) {
             // handle time out
             throw e;
@@ -91,7 +92,7 @@ public class RefundTransactionService extends PCEFService {
             // read fail
 
 
-            PCEFUtils.writeMessageFlow("Read Refund Transaction Response", MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Read Refund Transaction Response", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
 

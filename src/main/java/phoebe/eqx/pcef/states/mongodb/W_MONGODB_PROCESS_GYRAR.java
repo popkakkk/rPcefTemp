@@ -20,6 +20,7 @@ public class W_MONGODB_PROCESS_GYRAR extends MongoState {
 
 
     private Interval interval = new Interval(Config.RETRY_PROCESSING, Config.INTERVAL_PROCESSING);
+    private Interval intervalFindAndModProfile = new Interval(Config.RETRY_PROCESSING, Config.INTERVAL_PROCESSING);
 
 
     public W_MONGODB_PROCESS_GYRAR(AppInstance appInstance, MongoDBConnect dbConnect) {
@@ -30,11 +31,11 @@ public class W_MONGODB_PROCESS_GYRAR extends MongoState {
     public EMongoState findQuota() {
 
         try {
-            GyRARRequest gyRARRequest = appInstance.getPcefInstance().getGyRARRequest();
+            GyRARRequest gyRARRequest = context.getPcefInstance().getGyRARRequest();
             dbConnect.getQuotaService().findAllQuotaByPrivateId(gyRARRequest.getUserValue());
 
             List<CommitData> commitDataList =   dbConnect.getQuotaService().findDataToCommit(gyRARRequest.getUserValue(), null, false);
-            appInstance.getPcefInstance().setCommitDatas(commitDataList);
+            context.getPcefInstance().setCommitDatas(commitDataList);
 
         } catch (Exception e) {
 
@@ -47,18 +48,18 @@ public class W_MONGODB_PROCESS_GYRAR extends MongoState {
         EMongoState nextState = null;
         try {
 
-            DBObject dbObject = dbConnect.getProfileService().findAndModifyLockProfile(appInstance.getPcefInstance().getGyRARRequest().getUserValue());
+            DBObject dbObject = dbConnect.getProfileService().findAndModifyLockProfile(context.getPcefInstance().getGyRARRequest().getUserValue());
             if (dbObject != null) {
                 Profile profile = gson.fromJson(gson.toJson(dbObject), Profile.class);
-                appInstance.getPcefInstance().setProfile(profile);
+                context.getPcefInstance().setProfile(profile);
 
                 //remove quota
-                dbConnect.getQuotaService().removeQuota(appInstance.getPcefInstance().getGyRARRequest().getUserValue());
+                dbConnect.getQuotaService().removeQuota(context.getPcefInstance().getGyRARRequest().getUserValue());
 
                 setPcefState(EState.W_USAGE_MONITORING_UPDATE);
                 nextState = EMongoState.END;
             } else {
-                interval.waitInterval();
+                intervalFindAndModProfile.waitInterval();
                 nextState = EMongoState.REMOVE_QUOTA_GYRAR;
             }
 

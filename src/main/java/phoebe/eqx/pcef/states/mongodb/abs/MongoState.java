@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import phoebe.eqx.pcef.enums.state.EMongoState;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
+import phoebe.eqx.pcef.instance.context.RequestContext;
 import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 
 import java.lang.reflect.Method;
@@ -11,7 +12,8 @@ import java.lang.reflect.Method;
 
 public abstract class MongoState {
 
-    private EMongoState nextState = EMongoState.BEGIN;
+    protected RequestContext context;
+    protected EMongoState nextState = EMongoState.BEGIN;
     private EState pcefState;
     protected AppInstance appInstance;
     protected MongoDBConnect dbConnect;
@@ -19,6 +21,7 @@ public abstract class MongoState {
 
     public MongoState(AppInstance appInstance, MongoDBConnect dbConnect) {
         this.appInstance = appInstance;
+        this.context = appInstance.getMyContext();
         this.dbConnect = dbConnect;
     }
 
@@ -47,17 +50,6 @@ public abstract class MongoState {
         throw new Exception("Can not execute method mongo for " + state);
     }
 
-    public EMongoState getNextState() {
-        return nextState;
-    }
-
-    public void setNextState(EMongoState nextState) {
-        if (nextState == null) {
-            this.nextState = EMongoState.END;
-        } else {
-            this.nextState = nextState;
-        }
-    }
 
 
     public EState getPcefState() {

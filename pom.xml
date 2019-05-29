@@ -30,9 +30,9 @@
             <version>2.2.2</version>
         </dependency>
         <dependency>
-            <groupId>libs.mong-java</groupId>
+            <groupId>libs.mongodb-java</groupId>
             <artifactId>mongodb</artifactId>
-            <version>3.8.2</version>
+            <version>3.9.1</version>
         </dependency>
         <dependency>
             <groupId>libs.ec-dev</groupId>
@@ -40,6 +40,11 @@
             <version>1.0</version>
             <scope>provided</scope>
         </dependency>
+
+
+
+
+
         <dependency>
             <groupId>libs.ec-debug</groupId>
             <artifactId>ec-debug</artifactId>

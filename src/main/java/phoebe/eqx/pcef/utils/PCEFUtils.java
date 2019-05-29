@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import ec02.af.abstracts.AbstractAF;
 import ec02.af.utils.AFLog;
+import phoebe.eqx.pcef.enums.EEvent;
 import phoebe.eqx.pcef.enums.config.EConfig;
 import phoebe.eqx.pcef.enums.stats.EStatCmd;
 import phoebe.eqx.pcef.enums.stats.EStatMode;
@@ -19,13 +20,14 @@ import java.util.*;
 public class PCEFUtils {
 
     public static final SimpleDateFormat startStopDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+    public static final SimpleDateFormat datetimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     public static final SimpleDateFormat dtLongFormatterMs = new SimpleDateFormat("yyyyMMddHHmmss SSSS", Locale.US);
-    public static final SimpleDateFormat isoDateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    public static final SimpleDateFormat isoDateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     public static final SimpleDateFormat actualTimeDFM = new SimpleDateFormat("yyyyMMddHHmmss");
 
-   /* static {
-        isoDateFormatter.setTimeZone(TimeZone.getTimeZone("Asia/Bangkok"));
-    }*/
+    static {
+        isoDateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
 
     public static final SimpleDateFormat transactionDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 
@@ -39,15 +41,27 @@ public class PCEFUtils {
     }
 
     public static void increaseStatistic(AbstractAF abstractAF, EStatMode eMode, EStatCmd eCmd) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(eCmd.getCmd()).append(" ");
-        stringBuilder.append(eMode.getMode());
-        abstractAF.getEquinoxUtils().incrementStats(stringBuilder.toString());
+        String str = "rPCEF " + eCmd.getCmd() + " " + eMode.getMode();
+        abstractAF.getEquinoxUtils().incrementStats(str);
     }
 
     public static String gsonToJson(Object object) {
         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
         return gson.toJson(object);
+    }
+
+    public static EEvent getEventByRet(String ret) {
+        EEvent event = null;
+        if ("0".equals(ret)) {
+            event = EEvent.SUCCESS;
+        } else if ("1".equals(ret)) {
+            event = EEvent.EquinoxMessageResponseError;
+        } else if ("2".equals(ret)) {
+            event = EEvent.EquinoxMessageResponseReject;
+        } else if ("3".equals(ret)) {
+            event = EEvent.EquinoxMessageResponseAbort;
+        }
+        return event;
     }
 
     public static void writeLog(AbstractAF abstractAF, String req, String res, String summaryLog, Date startTime, String msg) {

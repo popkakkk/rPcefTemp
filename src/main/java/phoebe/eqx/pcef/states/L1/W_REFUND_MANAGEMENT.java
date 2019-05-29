@@ -42,9 +42,7 @@ public class W_REFUND_MANAGEMENT extends ComplexState {
                 } else {
                     //refund error
                     refundManagementService.buildResponseRefundManagement(false);
-
                 }
-
 
             } else {
                 if (EState.W_REFUND_TRANSACTION.equals(nextState)) {
@@ -95,7 +93,7 @@ public class W_REFUND_MANAGEMENT extends ComplexState {
 
     private void refundSuccess(MongoDBConnect dbConnect, RefundManagementService refundManagementService) {
 
-        Transaction transactionRefund = appInstance.getPcefInstance().getTransaction();
+        Transaction transactionRefund = appInstance.getMyContext().getPcefInstance().getTransaction();
 
         //delete transaction
         dbConnect.getTransactionService().deleteTransactionByTid(transactionRefund.getTid());
@@ -106,10 +104,6 @@ public class W_REFUND_MANAGEMENT extends ComplexState {
 
         //update quota unlock
         dbConnect.getQuotaService().updateUnLockQuota(transactionRefund.getMonitoringKey());
-
-        //find profile set timeout
-        dbConnect.getProfileService().findProfileByPrivateId(transactionRefund.getUserValue());
-
 
         refundManagementService.buildResponseRefundManagement(true);
 

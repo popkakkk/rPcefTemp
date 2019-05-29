@@ -1,5 +1,6 @@
 package phoebe.eqx.pcef.services;
 
+import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.enums.state.EMongoState;
 import phoebe.eqx.pcef.enums.state.EState;
@@ -15,14 +16,10 @@ public class VTTimoutService extends PCEFService {
     }
 
     public void buildRecurringTimout() {
+        AFLog.d("Build Recurring Timeout");
 
         MessagePool messagePool = new MessagePool(appInstance.getAbstractAF());
-        Date currentDate = new Date();
-        Date appointmentDate = appInstance.getPcefInstance().getProfile().getAppointmentDate();
-        String timeout = String.valueOf(appointmentDate.compareTo(currentDate));
-        EquinoxRawData equinoxRawData = messagePool.recurringVTTimeout(timeout);
+        EquinoxRawData equinoxRawData = messagePool.recurringVTTimeout(getTimeoutFromAppointmentDate());
         appInstance.getOutList().add(equinoxRawData);
     }
-
-
 }

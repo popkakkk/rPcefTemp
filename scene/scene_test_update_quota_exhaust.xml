@@ -53,12 +53,12 @@
    &quot;devMessage&quot;:&quot;PARTIAL_SUCCESS&quot;,
     &quot;resources&quot;:[
         {
-            &quot;resourceId&quot;:&quot;resourceId1234&quot;,
+            &quot;resourceId&quot;:&quot;PD-20148&quot;,
             &quot;resourceName&quot;:&quot;API_A&quot;,
            &quot;rtid&quot;:&quot;R-TRAN-001&quot;,
             &quot;resultCode&quot;:&quot;20000&quot;,
             &quot;resultDesc&quot;:&quot;SUCCESS&quot;,
-            &quot;monitoringKey&quot;:&quot;1002&quot;,
+            &quot;monitoringKey&quot;:&quot;1001&quot;,
            &quot;counterId&quot;:&quot;4001000001&quot;,
             &quot;quotaByKey&quot;:{
                 &quot;unitType&quot;:&quot;unit&quot;,
@@ -70,13 +70,30 @@
             }
         },
         {
-            &quot;resourceId&quot;:&quot;resourceId12345&quot;,
+            &quot;resourceId&quot;:&quot;PD-1111&quot;,
             &quot;resourceName&quot;:&quot;API_A&quot;,
            &quot;rtid&quot;:&quot;R-TRAN-001&quot;,
             &quot;resultCode&quot;:&quot;20000&quot;,
             &quot;resultDesc&quot;:&quot;SUCCESS&quot;,
             &quot;counterId&quot;:&quot;4001000001&quot;,
-            &quot;monitoringKey&quot;:&quot;1002&quot;,
+            &quot;monitoringKey&quot;:&quot;1001&quot;,
+            &quot;quotaByKey&quot;:{
+                &quot;unitType&quot;:&quot;unit&quot;,
+                &quot;unit&quot;:&quot;100&quot;,
+                &quot;validityTime&quot;:&quot;3600&quot;
+            },
+            &quot;rateLimitByKey&quot;:{
+                &quot;transactionPerTime&quot;:&quot;100|60&quot;
+            }
+          },
+          {
+            &quot;resourceId&quot;:&quot;PD-2018&quot;,
+            &quot;resourceName&quot;:&quot;API_A&quot;,
+           &quot;rtid&quot;:&quot;R-TRAN-001&quot;,
+            &quot;resultCode&quot;:&quot;20000&quot;,
+            &quot;resultDesc&quot;:&quot;SUCCESS&quot;,
+            &quot;counterId&quot;:&quot;4001000001&quot;,
+            &quot;monitoringKey&quot;:&quot;1001&quot;,
             &quot;quotaByKey&quot;:{
                 &quot;unitType&quot;:&quot;unit&quot;,
                 &quot;unit&quot;:&quot;100&quot;,

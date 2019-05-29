@@ -6,9 +6,11 @@ import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.core.data.InvokeObject;
 import phoebe.eqx.pcef.core.logs.summary.SummaryLog;
 import phoebe.eqx.pcef.core.logs.summary.SummaryLogDetail;
+import phoebe.eqx.pcef.enums.EEvent;
 import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.enums.Operation;
+import phoebe.eqx.pcef.instance.context.RequestContext;
 import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 
@@ -19,51 +21,39 @@ import java.util.List;
 
 public class AppInstance {
 
-    //----- instance data -------------------
-    private PCEFInstance pcefInstance;
-    private InvokeManager invokeManager;
 
-    //----- instance state------------------
-    private String requestInvokeId;
-    private ERequestType requestType;
-    private Date startTime;
-    private EState stateL1;
-    private EState stateL2;
+    List<RequestContext> requestContexts = new ArrayList<>();
 
     //------ instance logs ------------------
-    private List<SummaryLog> summaryLogs;
+    private List<SummaryLog> summaryLogs = new ArrayList<>();
     private String requestLog;
     private String responseLog;
 
 
     //------- transient ---------------------
-    private transient boolean hasRequest;
-    private transient String reqMessage;
+    private transient RequestContext myContext;
+
 
     private transient ArrayList<EquinoxRawData> outList = new ArrayList<>();
     private transient boolean finish;
     private transient AbstractAF abstractAF;
 
 
-
-
-
-
-    public synchronized void create(String reqMessage, String invoke, ERequestType requestType) {
-        this.requestInvokeId = invoke;
-        this.reqMessage = reqMessage;
-        this.requestType = requestType;
-        this.startTime = new Date();
-        this.pcefInstance = new PCEFInstance();
-        this.invokeManager = new InvokeManager();
-        this.summaryLogs = new ArrayList<>();
+    public RequestContext findCompleteContextListMatchResponse(EquinoxRawData rawData, String ret) throws Exception {
+        for (RequestContext requestContext : requestContexts) {
+            EEvent event = PCEFUtils.getEventByRet(ret);
+            if (requestContext.getInvokeManager().putRawData(rawData, event)) {
+                return requestContext;
+            }
+        }
+        throw new Exception("No invoke response match context");
     }
+
 
     public void patchResponse() {
-        invokeManager.patchResponse(outList);
+        myContext.getInvokeManager().patchResponse(outList);
     }
-
-    public void setSummaryLogExternalResponse(Operation operation, Object resp) throws Exception {
+ /*   public void setSummaryLogExternalResponse(Operation operation, Object resp) throws Exception {
 
         InvokeObject invokeObject = this.invokeManager.find(operation);
         SummaryLog summaryLog = findMatchSummaryLog(invokeObject.getInvokeId(), operation.name());
@@ -77,7 +67,7 @@ public class AppInstance {
             long usedTime = resTime.getTime() - reqTime.getTime();
             summaryLog.getSummaryLogDetail().setUsedTime(String.valueOf(usedTime));
         }
-    }
+    }*/
 
     public SummaryLog findMatchSummaryLog(String invokeId, String logName) {
         for (SummaryLog summaryLog : summaryLogs) {
@@ -101,20 +91,37 @@ public class AppInstance {
         return builder.append("}").toString();
     }
 
+
+    public RequestContext getMyContext() {
+        return myContext;
+    }
+
+    public void setMyContext(RequestContext myContext) {
+        this.myContext = myContext;
+    }
+
+    public List<RequestContext> getRequestContexts() {
+        return requestContexts;
+    }
+
+    public void setRequestContexts(List<RequestContext> requestContexts) {
+        this.requestContexts = requestContexts;
+    }
+
+    public ArrayList<EquinoxRawData> getOutList() {
+        return outList;
+    }
+
+    public void setOutList(ArrayList<EquinoxRawData> outList) {
+        this.outList = outList;
+    }
+
     public AbstractAF getAbstractAF() {
         return abstractAF;
     }
 
     public void setAbstractAF(AbstractAF abstractAF) {
         this.abstractAF = abstractAF;
-    }
-
-    public InvokeManager getInvokeManager() {
-        return invokeManager;
-    }
-
-    public void setInvokeManager(InvokeManager invokeManager) {
-        this.invokeManager = invokeManager;
     }
 
     public boolean isFinish() {
@@ -147,74 +154,6 @@ public class AppInstance {
 
     public void setResponseLog(String responseLog) {
         this.responseLog = responseLog;
-    }
-
-    public PCEFInstance getPcefInstance() {
-        return pcefInstance;
-    }
-
-    public void setPcefInstance(PCEFInstance pcefInstance) {
-        this.pcefInstance = pcefInstance;
-    }
-
-    public ArrayList<EquinoxRawData> getOutList() {
-        return outList;
-    }
-
-    public void setOutList(ArrayList<EquinoxRawData> outList) {
-        this.outList = outList;
-    }
-
-    public ERequestType getRequestType() {
-        return requestType;
-    }
-
-    public void setRequestType(ERequestType requestType) {
-        this.requestType = requestType;
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public EState getStateL1() {
-        return stateL1;
-    }
-
-    public void setStateL1(EState stateL1) {
-        this.stateL1 = stateL1;
-    }
-
-    public EState getStateL2() {
-        return stateL2;
-    }
-
-    public void setStateL2(EState stateL2) {
-        this.stateL2 = stateL2;
-    }
-
-    public String getReqMessage() {
-        return reqMessage;
-    }
-
-    public void setReqMessage(String reqMessage) {
-        this.reqMessage = reqMessage;
-    }
-
-    public boolean isHasRequest() {
-        return hasRequest;
-    }
-
-    public void setHasRequest(boolean hasRequest) {
-        this.hasRequest = hasRequest;
-    }
-
-    public String getRequestInvokeId() {
-        return requestInvokeId;
     }
 
 

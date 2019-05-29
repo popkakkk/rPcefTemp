@@ -2,9 +2,10 @@ package phoebe.eqx.pcef.services.mogodb;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import ec02.af.utils.AFLog;
+import phoebe.eqx.pcef.core.data.ResourceRequest;
+import phoebe.eqx.pcef.core.data.ResourceResponse;
 import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.ERequestType;
@@ -15,6 +16,7 @@ import phoebe.eqx.pcef.instance.CommitData;
 import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.instance.PCEFInstance;
 import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
+import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
 import phoebe.eqx.pcef.utils.MessageFlow;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 
@@ -27,7 +29,7 @@ public class TransactionService extends MongoDBService {
 
     public void insertTransaction(String resourceId) {
         try {
-            UsageMonitoringRequest usageMonitoringRequest = appInstance.getPcefInstance().getUsageMonitoringRequest();
+            UsageMonitoringRequest usageMonitoringRequest = context.getPcefInstance().getUsageMonitoringRequest();
 
             Transaction transaction = new Transaction();
             transaction.setSessionId(usageMonitoringRequest.getSessionId());
@@ -42,6 +44,11 @@ public class TransactionService extends MongoDBService {
             transaction.setApp(usageMonitoringRequest.getApp());
 
             Date now = new Date();
+//            TimeZone tz = TimeZone.getTimeZone("UTC");
+//            SimpleDateFormat isoDateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+//            isoDateFormatter.setTimeZone(tz);
+//            System.out.println("datetime zone = "+isoDateFormatter.format(now));
+
             transaction.setCreateDate(now);
             transaction.setUpdateDate(now);
             transaction.setStatus(EStatusLifeCycle.Waiting.getName());
@@ -49,24 +56,24 @@ public class TransactionService extends MongoDBService {
             transaction.setClientId(usageMonitoringRequest.getClientId());
             transaction.setIsActive(1);
 
-
             BasicDBObject transactionBasicObject = BasicDBObject.parse(gson.toJson(transaction));
             transactionBasicObject.put(ETransaction.updateDate.name(), transaction.getUpdateDate());
             transactionBasicObject.put(ETransaction.createDate.name(), transaction.getCreateDate());
 
             insertByQuery(transactionBasicObject);
 
-            appInstance.getPcefInstance().setTransaction(transaction);
-            PCEFUtils.writeMessageFlow("Insert Transaction", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+
+            context.getPcefInstance().setTransaction(transaction);
+            PCEFUtils.writeMessageFlow("Insert Transaction", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Insert Transaction", MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Insert Transaction", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
 
         }
     }
 
 
     public boolean findMyTransactionDone() {
-        Transaction transaction = appInstance.getPcefInstance().getTransaction();
+        Transaction transaction = context.getPcefInstance().getTransaction();
 
         BasicDBObject searchQuery = new BasicDBObject();
         searchQuery.put(ETransaction.userValue.name(), transaction.getUserValue());
@@ -92,7 +99,7 @@ public class TransactionService extends MongoDBService {
 
     public List<Transaction> findOtherStartTransaction(String privateId) {
         try {
-            PCEFInstance pcefInstance = appInstance.getPcefInstance();
+            PCEFInstance pcefInstance = context.getPcefInstance();
 
             BasicDBObject search = new BasicDBObject();
             search.put(ETransaction.status.name(), EStatusLifeCycle.Waiting.getName());
@@ -101,7 +108,7 @@ public class TransactionService extends MongoDBService {
             search.put(ETransaction.isActive.name(), 1);
 
             //Usage Monitoring add condition :{$nin:tid}
-            if (appInstance.getRequestType().equals(ERequestType.USAGE_MONITORING)) {
+            if (context.getRequestType().equals(ERequestType.USAGE_MONITORING)) {
                 ArrayList<String> tidArrayList = new ArrayList<>();
                 tidArrayList.add(pcefInstance.getTransaction().getTid());
                 search.put(ETransaction.tid.name(), new BasicDBObject("$nin", tidArrayList));
@@ -117,27 +124,14 @@ public class TransactionService extends MongoDBService {
             }
 
             AFLog.d("find other transaction start found:" + otherStartTransactionList.size());
-
             return otherStartTransactionList;
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Find Other transaction error" + e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Find Other transaction error" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
 
     }
 
- /*   private void updateTransactionDoneToComplete(Quota quota) {
-        BasicDBObject searchQuery = new BasicDBObject();
-
-        searchQuery.put(ETransaction.monitoringKey.name(), quota.getMonitoringKey());
-        searchQuery.put(ETransaction.userValue.name(), quota.getUserValue());
-        searchQuery.put(ETransaction.status.name(), EStatusLifeCycle.Done.getName());
-
-        BasicDBObject updateQuery = new BasicDBObject();
-        updateQuery.put(ETransaction.updateDate.name(), new Date()); //updateDate
-        updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Completed.getName());
-        db.getCollection(collectionName).update(searchQuery, new BasicDBObject("$set", updateQuery), false, true);
-    }*/
 
     private void updateTransactionDoneToCompleteByTid(List<CommitData> commitDataList) {
         BasicDBObject searchQuery = new BasicDBObject();
@@ -161,6 +155,8 @@ public class TransactionService extends MongoDBService {
 
 
     public void updateTransactionIsActive(String privateId) {
+        AFLog.d("Update Transaction isActive ..");
+
         BasicDBObject searchQuery = new BasicDBObject();
         searchQuery.put(ETransaction.userValue.name(), privateId);
         searchQuery.put(ETransaction.status.name(), EStatusLifeCycle.Completed.getName());
@@ -172,15 +168,114 @@ public class TransactionService extends MongoDBService {
     }
 
 
-    public void updateTransaction(ArrayList<Quota> quotas) {
+    public void filterResourceRequestErrorNewResource(OCFUsageMonitoringResponse ocfUsageMonitoringResponse, List<ResourceRequest> newResourceRequests, List<Transaction> newResourceTransactions) {
+
+        List<String> deleteList = new ArrayList<>();
+
+        for (ResourceRequest resourceRequest : newResourceRequests) {
+            boolean found = false;
+            boolean error = false;
+
+            String resourceId = resourceRequest.getResourceId();
+            for (ResourceResponse resourceResponse : ocfUsageMonitoringResponse.getResources()) {
+                if (resourceId.equals(resourceResponse.getResourceId())) {
+                    found = true;
+                    if (resourceResponse.getResultDesc().toLowerCase().contains("error")) {
+                        error = true;
+                        break;
+                    }
+                    break;
+                }
+            }
+
+            if (!found || error) {
+                if (!found) {
+                    AFLog.d("Resource Id:" + resourceId + "no have quota");
+                } else {
+                    AFLog.d("Resource Id:" + resourceId + "return description error");
+                }
+
+                int index = 0;
+                for (Transaction transaction : newResourceTransactions) {
+                    if (transaction.getResourceId().equals(resourceId)) {
+                        deleteList.add(transaction.getTid());
+
+                        //filter
+                        newResourceTransactions.remove(index);
+                    }
+                    index++;
+                }
+            }
+        }
+
+        //remove
+        if (deleteList.size() > 0) {
+            AFLog.d("remove transaction..");
+            removeManyTransactionByTid(deleteList);
+        }
+
+    }
+
+    public void filterResourceRequestErrorCommitResource(OCFUsageMonitoringResponse ocfUsageMonitoringResponse, List<CommitData> commitDataList) {
+
+        int index = 0;
+        for (CommitData commitData : commitDataList) {
+
+            if (commitData.getCount() == 0) { //rr1 : not check
+                continue;
+            }
+
+            boolean found = false;
+            boolean error = false;
+            String resourceId = commitData.get_id().getResourceId();
+            for (ResourceResponse resourceResponse : ocfUsageMonitoringResponse.getResources()) {
+                if (resourceId.equals(resourceResponse.getResourceId())) {
+                    found = true;
+                    if (resourceResponse.getResultDesc().toLowerCase().contains("error") && resourceResponse.getResultDesc().toLowerCase().contains("commit_error")) {
+                        error = true;
+                        break;
+                    }
+                    break;
+                }
+            }
+
+            if (!found || error) {
+                if (!found) {
+                    AFLog.d("Resource Id:" + resourceId + "no have quota");
+                } else {
+                    AFLog.d("Resource Id:" + resourceId + "return description error");
+                }
+
+
+                //remove
+                AFLog.d("remove transaction to commit by resourceId : " + resourceId);
+                removeManyTransactionByTid(commitData.getTransactionIds());
+
+                //filter
+                commitDataList.remove(index);
+            }
+            index++;
+        }
+
+    }
+
+
+    public void removeManyTransactionByTid(List<String> tidList) {
+        BasicDBObject removeQuery = new BasicDBObject();
+        removeQuery.put(ETransaction.tid.name(), new BasicDBObject("$in", tidList));
+
+        writeQueryLog("remove", collectionName, removeQuery.toString());
+        db.getCollection(collectionName).remove(removeQuery);
+
+    }
+
+
+    public void updateTransaction(ArrayList<Quota> quotas, List<Transaction> newResourceTransactions) {
 
         try {
 
-
-            List<Transaction> updateTransactionList = new ArrayList<>();
-
-            if (appInstance.getPcefInstance().getCommitDatas().size() > 0) {
-                updateTransactionDoneToCompleteByTid(appInstance.getPcefInstance().getCommitDatas());
+            if (context.getPcefInstance().getCommitDatas().size() > 0) {
+                updateTransactionDoneToCompleteByTid(context.getPcefInstance().getCommitDatas());
             }
 
             //get monitoring key by resource
@@ -191,24 +286,18 @@ public class TransactionService extends MongoDBService {
                     )
             );
 
-
-            if (ERequestType.USAGE_MONITORING.equals(appInstance.getRequestType())) {
-                //add this transaction to update
-                updateTransactionList.add(appInstance.getPcefInstance().getTransaction());
-            }
-
-            updateTransactionList.addAll(appInstance.getPcefInstance().getOtherStartTransactions());
-
             //update by transaction set mk and Counter
-            for (Transaction transaction : updateTransactionList) {
+            for (Transaction transaction : newResourceTransactions) {
                 BasicDBObject searchQuery = new BasicDBObject();
 
                 searchQuery.put(ETransaction.tid.name(), transaction.getTid());
                 searchQuery.put(ETransaction.status.name(), EStatusLifeCycle.Waiting.getName());
 
                 BasicDBObject updateQuery = new BasicDBObject();
-                if (appInstance.getPcefInstance().getCommitDatas().size() > 0 && ERequestType.USAGE_MONITORING.equals(appInstance.getRequestType())) {
-                    if (appInstance.getPcefInstance().getTransaction().getTid().equals(transaction.getTid())) {
+                if (context.getPcefInstance().getCommitDatas().size() > 0 && ERequestType.USAGE_MONITORING.equals(context.getRequestType())) {
+                    if (context.getPcefInstance().getTransaction().getTid().equals(transaction.getTid())) {
+
+                        //check this transaction to commit
                         updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Completed.getName());//waiting -->Complete
                     } else {
                         updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Done.getName());//waiting-->Done
@@ -223,67 +312,13 @@ public class TransactionService extends MongoDBService {
                 updateSetByQuery(searchQuery, updateQuery);
             }
 
-            PCEFUtils.writeMessageFlow("Update Transaction", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Update Transaction", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Update Transaction error" + e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Update Transaction error" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
 
-    }/* public void updateTransaction(ArrayList<Quota> quotas) {
-
-        List<Transaction> updateTransactionList = new ArrayList<>();
-
-        //commit -->Update Status Done to Complete
-        if (appInstance.getPcefInstance().doCommit()) {
-            Quota quotaExhaust = appInstance.getPcefInstance().getCommitPart().getQuotaExhaust();
-            List<Quota> quotaExpireList = appInstance.getPcefInstance().getCommitPart().getQuotaExpireList();
-            if (quotaExhaust != null) {
-                updateTransactionDoneToComplete(quotaExhaust);
-            } else if (quotaExpireList.size() > 0) {
-                for (Quota quota : quotaExpireList) {
-                    updateTransactionDoneToComplete(quota);
-                }
-            }
-        }
-
-        //get monitoring key by resource
-        Map<String, Quota> resourceMap = new HashMap<>();
-        quotas.forEach(quota ->
-                quota.getResources().forEach(resourceQuota ->
-                        resourceMap.put(resourceQuota.getResourceId(), quota)
-                )
-        );
-
-        if (ERequestType.USAGE_MONITORING.equals(appInstance.getRequestType())) {
-            updateTransactionList.add(appInstance.getPcefInstance().getTransaction());
-        }
-
-        updateTransactionList.addAll(appInstance.getPcefInstance().getOtherStartTransactions());
-
-        //update by transaction set mk and Counter
-        for (Transaction transaction : updateTransactionList) {
-            BasicDBObject searchQuery = new BasicDBObject();
-
-            searchQuery.put(ETransaction.tid.name(), transaction.getTid());
-            searchQuery.put(ETransaction.status.name(), EStatusLifeCycle.Waiting.getName());
-
-            BasicDBObject updateQuery = new BasicDBObject();
-            if (appInstance.getPcefInstance().doCommit() && appInstance.getPcefInstance().getTransaction() != null) {
-                if (appInstance.getPcefInstance().getTransaction().getTid().equals(transaction.getTid())) {
-                    updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Completed.getName());//waiting -->Complete
-
-                }
-
-            } else {
-                updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Done.getName());//waiting-->Done
-            }
-            updateQuery.put(ETransaction.monitoringKey.name(), resourceMap.get(transaction.getResourceId()).getMonitoringKey());
-            updateQuery.put(ETransaction.counterId.name(), resourceMap.get(transaction.getResourceId()).getCounterId());
-            updateQuery.put(ETransaction.updateDate.name(), new Date());
-
-            updateSetByQuery(searchQuery, updateQuery);
-        }
-    }*/
+    }
 
 
     public void deleteTransactionByTid(String tid) {

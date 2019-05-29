@@ -5,8 +5,6 @@ import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.core.data.InvokeObject;
 import phoebe.eqx.pcef.enums.EEvent;
 import phoebe.eqx.pcef.enums.Operation;
-import phoebe.eqx.pcef.instance.AppInstance;
-import phoebe.eqx.pcef.instance.Config;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,7 +14,7 @@ public class InvokeManager {
     private List<InvokeObject> list;
     private transient List<InvokeObject> newList = new ArrayList<>();
 
-    public void putRawData(EquinoxRawData rawData, EEvent event) {
+    public boolean putRawData(EquinoxRawData rawData, EEvent event) {
         String invoke = rawData.getInvoke();
         for (InvokeObject invokeObject : list) {
             if (invoke.equals(invokeObject.getInvokeId())) {
@@ -25,8 +23,10 @@ public class InvokeManager {
 
                 invokeObject.setEvent(event);
                 invokeObject.setOperationRaw(rawData);
+                return true;
             }
         }
+        return false;
     }
 
 

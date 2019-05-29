@@ -7,6 +7,7 @@ import phoebe.eqx.pcef.instance.AppInstance;
 public abstract class State {
     protected AppInstance appInstance;
 
+
     private Level level;
 
     public State(AppInstance appInstance, Level level) {
@@ -21,7 +22,7 @@ public abstract class State {
         EState result = null;
         switch (level) {
             case L1:
-                result = appInstance.getStateL2();
+                result = appInstance.getMyContext().getStateL2();
                 break;
 
         }
@@ -40,10 +41,10 @@ public abstract class State {
         EState result = null;
         switch (level) {
             case L1:
-                result = appInstance.getStateL1();
+                result = appInstance.getMyContext().getStateL1();
                 break;
             case L2:
-                result = appInstance.getStateL2();
+                result = appInstance.getMyContext().getStateL2();
                 break;
 
         }
@@ -63,11 +64,11 @@ public abstract class State {
     }
 
     private void setStateL1(EState state) {
-        appInstance.setStateL1(state);
+        appInstance.getMyContext().setStateL1(state);
     }
 
     private void setStateL2(EState state) {
-        appInstance.setStateL2(state);
+        appInstance.getMyContext().setStateL2(state);
     }
 
     public AppInstance getAppInstance() {

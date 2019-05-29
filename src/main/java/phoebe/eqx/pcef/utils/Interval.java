@@ -19,6 +19,7 @@ public class Interval {
     public void waitInterval() throws TimeoutIntervalException {
         retry++;
         if (retry > retryConfig) {
+            AFLog.d("Interval Timeout!!!");
             throw new TimeoutIntervalException();
         }
         try {

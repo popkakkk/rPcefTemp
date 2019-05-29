@@ -1,76 +1,69 @@
 <dummy-request>
     <dummy-message id="1">
-
-        <EquinoxMessage from="rPCEF_au.E11.0" via="rPCEF_au.E11.0" session="0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" timeout="10" ret="0" diag="3:2:0">
-            <EquinoxRawData to="rPCEF_au.ES00.SERV" name="HTTP" type="response" ctype="text/plain" invoke="umStart_" ecode="200" method="POST" url="/" val="{
-
+        <EquinoxMessage from="rPCEF.E11.0" via="rPCEF.E11.0" session="0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" timeout="10" ret="0" diag="3:2:0">
+            <EquinoxRawData to="rPCEF.ES00.SERV" name="HTTP" type="response" ctype="text/plain" invoke="umStart_" ecode="200" method="POST" url="/api/v1/metering-method" val="{
 &quot;command&quot;:&quot;usageMonitoringStart&quot;,
-
 &quot;devMessage&quot;:&quot;SUCCESS&quot;,
-
 &quot;requestNumber&quot;:&quot;1&quot;,
-
 &quot;resources&quot;:[
-
    {
-
       &quot;counterId&quot;:&quot;4001000001&quot;,
-
-      &quot;monitoringKey&quot;:&quot;1005176999_4001000001_20251117:174659&quot;,
-
-      &quot;quotaByKey&quot;:[
-
+      &quot;monitoringKey&quot;:&quot;1005176999&quot;,
+      &quot;quotaByKey&quot;:
          {
-
             &quot;unit&quot;:&quot;5&quot;,
-
             &quot;unitType&quot;:&quot;unit&quot;,
-
-            &quot;validityTime&quot;:&quot;360&quot;
-
+            &quot;validityTime&quot;:&quot;30&quot;
          }
-
-      ],
-
-      &quot;rateLimitByKey&quot;:[
-
+      ,
+      &quot;rateLimitByKey&quot;:
          {
-
             &quot;transactionPerTime&quot;:&quot;100|60&quot;
-
          }
-
-      ]
-
-,
-
-      &quot;resourceId&quot;:&quot;PD-20148&quot;,
-
+      ,
+      &quot;resourceId&quot;:&quot;000000100000010000001&quot;,
       &quot;resourceName&quot;:&quot;GSSO/sendOneTimePwd&quot;,
-
       &quot;resultCode&quot;:&quot;20000&quot;,
-
       &quot;resultDesc&quot;:&quot;SUCCESS&quot;,
-
-      &quot;rtid&quot;:&quot;R-TRAN-004&quot;
-
+      &quot;rtid&quot;:&quot;R-TRAN-0001&quot;
+   },
+   {
+      &quot;resourceName&quot;:&quot;GSSO/sendOneTimePwd&quot;,
+      &quot;resultCode&quot;:&quot;20000&quot;,
+      &quot;resultDesc&quot;:&quot;SUCCESS&quot;,
+      &quot;rtid&quot;:&quot;R-TRAN-0001&quot;
+   },
+   {
+      &quot;counterId&quot;:&quot;4001000001&quot;,
+      &quot;monitoringKey&quot;:&quot;1005177000&quot;,
+      &quot;quotaByKey&quot;:
+         {
+            &quot;unit&quot;:&quot;5&quot;,
+            &quot;unitType&quot;:&quot;unit&quot;,
+            &quot;validityTime&quot;:&quot;30&quot;
+         }
+      ,
+      &quot;rateLimitByKey&quot;:
+         {
+            &quot;transactionPerTime&quot;:&quot;100|60&quot;
+         }
+      ,
+      &quot;resourceId&quot;:&quot;000000100000020000002&quot;,
+      &quot;resourceName&quot;:&quot;SMS&quot;,
+      &quot;resultCode&quot;:&quot;20000&quot;,
+      &quot;resultDesc&quot;:&quot;SUCCESS&quot;,
+      &quot;rtid&quot;:&quot;R-TRAN-0002&quot;
    }
-
-],
-
+]
+,
 &quot;sessionId&quot;:&quot;sessionIdFromPCEF&quot;,
-
 &quot;status&quot;:&quot;200&quot;,
-
 &quot;tid&quot;:&quot;transactionId1&quot;,
-
 &quot;userType&quot;:&quot;privateId&quot;,
-
 &quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;
-
-}" charset="" desc="host=; port=31700; via=auto; session=766111402" orig="rPCEF_au.ES04.rOCF.0" ret="0" />
+}" charset="" desc="host=; port=41500; via=auto; session=21" orig="rPCEF.ES04.rOCF.0" ret="0" />
             <EquinoxInstance>
-                <value val="1::ACTIVE::false::ZUY2MVZsdHY0a29NL2l2VjZEelNiQklTU1ByRzRYYWlsc0J5MlZaYUtqUWJCcHB0eU5ESmhNdWkvdmRqVHhKdVcxcjFIQzBTSXRpTzdiSDlmWjRkV1FaczVzV0pwSEhBeU0yT0pDeEpRaDU3VTNKREJ0bHp6VERMbGwycE92aGJxYnExK3RENzFpUWxBbThKT1F3WDhLSmgyNDV0Vk1zVnArcVlKU0lGalJNYVNQRDBXYWRDaGlwMjcvNTZIOWpOSXhzUU5GZlg2cTNyUmlOUFRPbGQrSUFlb3FZMHlySWlwbTQ0aHFGRFpwWnU2cUJORXlhRzJ5VmtUSllpWEZISjRLU1orQnVOVXBUckQrNURlN3VSbStmT3I1OVBmdStoSDFWN2ZiZGx2WFQ1enp0Wk0yekxxZHBWeDdITGpnWHZDcGJ3VkFUbzZJYjBHdGNRMDNLTzVEN0ZBcEgyWU5EOWtyQjQybzBaWnRkYlkrQUZqMFBKUlJqUGI5a1dyTEtxeWpTQjUzc2FTbENBS0JBTU1tM0E5NmpTYmtWM0lQUGw5SklxaUVJV1M1VlcwSjcrc09pdk1JNFc2eGZIdDF1TjlzUHFxNzhlM2RiTHRybGFtVlBtekxiMWtSZDZFRzRXaXFUb2E0bUVTUTBhdWNMUXJ5WEM1Uk1UQTlYNFE0OGgyKytQV0VVNlo1MzlpZnJzSldXSnhBRUkrR0pCWTh6a3pBYlArNG1KKzZqNUh3M1ArOE5CbDB2SXNNNzVjOGl1K21tTWxmK3ZOZnlEZy9iT1FHR0RndG5vODMxUUhUMXJ4cjR4TGNFWHZYcXpCZnFzQVVmdzlxWUlTcEcxMms4WFA1aUFHcUxzL1ZyL3dmcmdOTzcrSHl6Zm42UFhSNmh6Z2tjRzBpek9iS2pTNTVTcFFQZFcvVjVTTG1sejgwUlRCTWFNUmdrRFgyRzg0cytzUTJQQUQ1UnZSNklRMVhDS1RLUGNwUXZWcEFtVWxpK1pvQm01a3JObUY0M2NtL1RwR29DSVRtWEdleXpRVFExSWcyck5selNNK1FZc2dGcG9DeHJHeGZhdlU2bTNXRVlRRWUzUmg4aHNhMUtxUElQY3AyUWIrV1VaMFJBeEUyZUU5ODl3MklOLzJRbE84NWNjL2dzY3FRbE50ZVpBdHpUUnJlTjhjVVgrdXFaclJsVXpUTVBSSEsycUlYUG5rZkpKUXdHUUtFK2hUTVFpVUVQSXJMa0N2c3ZaZlJRL3gzeU42YkJqcVgvcmQrOTlrT1lINlFENVFOSEJ5VzVjc05TWTNJelBlVXFWZFV4SzQwTlhsZGx2UFZZMmdCS2xQY1dKVXAwZ1JSa1pTbjVBaXhLZUxpNWxVU0JHNmZmTGE2OVM2MHZwUHJYQThxU3lGWmJBKzkraEVJZVZwaHdXUyszRUZsbElhZDlZYkpsaFVZVzNWL21ZQUl6SUszVHVpU1o5bHFSUkFRaWtFeWxnR3dLazFGTUJNVjBSemRtRnczWExaUVhJdkxLZXdwSkNEQ3grUzRkN2dXTmp3ek9LS3NaalVHczNKNTJ1N3cyN2ZjOXZnOEhsMnd4b0pMc3p3T1BmemJhSDA1TkpUSkRjVDBabnJpYURZYTAvUktNVWxwN1kzdkY1eGtnUm54ZlV6U1NjdUxnMUZCaFJPYytQVllqMWc1Y0drelNNRUhaSHJQQ2IvYjVDT0VPdWJwdW1VVEZkMDduU25TcmVqMEFQWWRRRFhqSjJxZ2ZBT1B2a0xoREsyMHowUVhaSG5IVWhML2RLaHdaZXlPdng5VjkzelY0NQ==::" />
+                <value val="1::ACTIVE::false::ZUY2MVZtdHY0am9RL1NzcjYzNmtKUWtFUXIreHZHN1U4cmdFdHBXV0NubURTNzFOYk9vNFVCYjF2OSt4SFY0dDBHVzFyVlFCOW5nOG5uUG16S3lRSU04cFNXU05NMGxlWklLdXZxL1FMQ1FQUGtza1ppRkJWeXVVa0NTaG5Qa1RkSVVDODcxcU80V2lXeXA3NnJOVXJsUnJBLzliQStVUW5CSnlRR000YUx0dXhTcVV2S0pqdVlVY1NoTThKVzNPcU9TQ3NtbmZYS3o4aHp5T01WUGUzOWdvZjJmY0xhbU9zRnByWHRUcldYd1ZGYUFGZitCTFpBYTkyNHROL0x2N09KUXBqa3p3eUxIc2l1VTZubDBzRkp3aW5NYXpHWGl2Y2Y1RXlaZCt5bUFwakNoaFV1Y2xiRTErRlBFdnlxSjQ4ZXgxM0dhOWRUZi9yN01ZWHRjS3JqT2ZPeFBpUFN4clE1LzZjREJOaUJnc1o1QWtOQk4wamlVQkoyYjVHNDVTdFc3ZFZlNWF5eGY1OHRUKzlmT3gwN3ZyUitWZXY5SXNQbmY1enh0WnRkMmlWM2JMbnVjV1BCV2VJQWxQUlVnNldPVWV0WUtnbTA4SW0zUVpVUy9xTFNib05RZTM4UWNhYVZUSE9sdm5Ydk1Ka2RPa0ozaW9jR1pUWUkzQ0hEZ0ozT3VrOFE4aXNxVXRCVGVVYUFvZTkycU5wbnFZRkpnbEFDRHc5RnpLZmtTTGoyaDFtamFma0xBMTFKcDRpdHVXWmU5Ly9CNGZjaWplbE9NMVdZSXpWWEFTeXhSMEFOMWlLaFVpUUhOQmdLRjErTjh0YXJ0U0JNYk9Kc2UyL21hOTBLUUswTTdWL1lBMWw0OUVCRnBvdHFnYjZmcFFManhySTFXbmNMZmgyYWR3Vi92SGNYYy90OFRmNCs0WStKMzN1QWZ0QUJiL0VHZkg4eXdYWEIvQWVidjFXVGpmQS9HZ01WQUp4TU1LWFZoZ1pOSFBkTTdnL2ZkSzRSUWJMRkNZMVVaaHowLy9LZDgyZXIwSFRsTTI1MCtralJrMFNaQzhGWXBvSW5VM05qdjYwalRXckI4RG9ueEdCRFpxaDRiN25WWGI3SnIwTVdUdFdUbVZwdWVRMEhJdW9YRHhaZU01cFl5L2dJWEtjaE1vemNYeW4vMVZQNTVGNEU3Wkt4L0MyRmFsMUhIR1JENXlGVnl2R3d6QUxNenVVT05FZmhaaHFob2xNMDNwMzhHZ0I3L01pL2JmSXpuOEZrck5MeHVCVmJ3VTNWb1RURE5uMlpRQ0M2bUl3RENQWnpRL3QvTndPVkhEeEVVV2hTcmFtUEFVTW9kc2hacUt0akdISnAxMTJ5RjdZbnloUWlLN3E1M3JUdmUyQTZ2WjQ5clFqUUFJOExJYXJjZVRFYm9hdlIxUWRLcEhLRGZhemluYTdGMkwwallnS0hwM3AxZjVFMXR2WlE4MEhVOGJtZld0eHVqRi9hRkVuMXozRjcyL0dTWTJXM3FjMEh0bmRmb3NLRE5TSkhEK095UmlXMnpHNGFIT3MzZFF6U0xhOU1BMFlnelhLUWtPem1RalZYZW43MTByMytGN1FmMSs0eDVJTmRRZ2VnVzZQT0lFQkNhTmdFQVBPRXFJbXF1a2dOWUlZNG4rdHA1SlFCTUJzN2VEYnNIeWREVm5jUHE2cUhYcDJyWlg4Q3FsVXFtc1dHWm0zelVuZzJxck1XNTNPLzZnMi9jN0xUQTRQa1dyOWt4dWJQRDR0ZEh5RldYTmlnTXJ0K1BoRzFmallGRHREK0IxWUpiQ2tDMldOM3hxbERQaTAvV29TT1JhVlBVVXVpTTQwOTB0SlR0YkwzVWlNWVZhM0JPb2QvYWJIRzJwV3lxV0hlZUxaYm1leVFRRXJyK29tV09sVVFEeDJ3UjNSTnNPaStJSDBlM0k1L0c0QU1JamNkMi8vZzhSbEJFQg==::" />
             </EquinoxInstance>
         </EquinoxMessage>
     </dummy-message>

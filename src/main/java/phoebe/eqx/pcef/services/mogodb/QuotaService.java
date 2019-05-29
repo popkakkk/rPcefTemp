@@ -43,6 +43,11 @@ public class QuotaService extends MongoDBService {
     public ArrayList<Quota> getQuotaFromUsageMonitoringResponse(OCFUsageMonitoringResponse OCFUsageMonitoringResponse) {
         Map<String, Quota> quotaMap = new HashMap<>();
         for (ResourceResponse resourceResponse : OCFUsageMonitoringResponse.getResources()) {
+
+            if (resourceResponse.getResultDesc().toLowerCase().contains("error") && !resourceResponse.getResultDesc().toLowerCase().contains("commit_error")) {
+                continue;
+            }
+
             String monitoringKey = resourceResponse.getMonitoringKey();
             String resourceName = resourceResponse.getResourceName();
             String resourceId = resourceResponse.getResourceId();
@@ -98,9 +103,9 @@ public class QuotaService extends MongoDBService {
             this.minExpireDate = calMinExpireDate(quotaBasicObjectList);
             this.haveNewQuota = true;
 
-            PCEFUtils.writeMessageFlow("Insert Quota Initial", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Insert Quota Initial", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Insert Quota Initial error" + e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Insert Quota Initial error" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
 
@@ -108,7 +113,10 @@ public class QuotaService extends MongoDBService {
 
 
     public void removeQuota(String privateId) {
+        AFLog.d("Delete Quota with privateId:" + privateId+" ..");
+
         BasicDBObject delete = new BasicDBObject(EQuota.userValue.name(), privateId);
+        writeQueryLog("remove", collectionName, delete);
         db.getCollection(collectionName).remove(delete);
     }
 
@@ -132,6 +140,7 @@ public class QuotaService extends MongoDBService {
         return resourceIdMapMk;
     }
 
+
     public List<String> getMkFromCommitData(List<CommitData> commitDataList) {
         List<String> mkCommits = new ArrayList<>();
         if (commitDataList.size() > 0) {
@@ -149,13 +158,10 @@ public class QuotaService extends MongoDBService {
     public void updateQuota(ArrayList<Quota> quotaResponses) {
 
         try {
-
-
             List<BasicDBObject> quotaBasicObjectList = getQuotaToBasicObjectList(quotaResponses);
             List<BasicDBObject> newQuotaList = new ArrayList<>();
 
-            List<CommitData> commitDataList = appInstance.getPcefInstance().getCommitDatas();
-
+            List<CommitData> commitDataList = context.getPcefInstance().getCommitDatas();
 
             //get monitoring key request
             List<String> mkCommits = getMkFromCommitData(commitDataList);
@@ -213,88 +219,14 @@ public class QuotaService extends MongoDBService {
             }
 
 
-            PCEFUtils.writeMessageFlow("Update Quota", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Update Quota", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Update Quota error" + e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Update Quota error" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
 
 
     }
-/*
-public void updateQuota(ArrayList<Quota> quotaResponses) {
-
-        PCEFInstance pcefInstance = appInstance.getPcefInstance();
-
-        List<BasicDBObject> quotaBasicObjectList = getQuotaToBasicObjectList(quotaResponses);
-        List<BasicDBObject> newQuotaList = new ArrayList<>();
-
-
-        List<Quota> quotaCommits = new ArrayList<>();
-        if (pcefInstance.doCommit()) {
-            Quota quotaExhaust = appInstance.getPcefInstance().getCommitPart().getQuotaExhaust();
-            List<Quota> quotaExpireList = appInstance.getPcefInstance().getCommitPart().getQuotaExpireList();
-
-            if (quotaExhaust != null) {
-                quotaCommits.add(quotaExhaust);
-            } else if (quotaExpireList.size() > 0) {
-                quotaCommits.addAll(quotaExpireList);
-            }
-        }
-
-        List<String> mkResponses = new ArrayList<>();
-        quotaResponses.forEach(quota -> mkResponses.add(quota.getMonitoringKey()));
-
-        //##delete old quota
-        List<String> mkUpdateCounter = new ArrayList<>();
-        for (Quota quota : quotaCommits) {
-            String mk = quota.getMonitoringKey();
-            if (!mkResponses.contains(mk)) {
-                deleteQuotaByKey(mk);
-            } else {
-                mkUpdateCounter.add(mk);
-            }
-        }
-
-
-        //##insert and update quota
-        for (BasicDBObject quotaBasicObject : quotaBasicObjectList) {
-            String mk = quotaBasicObject.get(EQuota.monitoringKey.name()).toString();
-
-            if (quotaBasicObject.get(EQuota.quotaByKey.name()) != null) {  //receive new quota
-                if (!pcefInstance.doCommit()) {
-                    //new quota --> insert
-                    insertByQuery(quotaBasicObject);
-                } else {
-                    if (!mkUpdateCounter.contains(mk)) {
-                        //new quota --> insert
-                        insertByQuery(quotaBasicObject);
-                    } else {
-                        //new counter -->update set
-                        BasicDBObject search = new BasicDBObject();
-                        search.put(EQuota._id.name(), mk);
-                        updateSetByQuery(search, quotaBasicObject);
-                    }
-                }
-                newQuotaList.add(quotaBasicObject);
-            } else {
-                // exist quota --> update push
-                BasicDBObject search = new BasicDBObject();
-                search.put(EQuota._id.name(), mk);
-                db.getCollection(Config.COLLECTION_QUOTA_NAME).update(search, new BasicDBObject("$push"
-                        , new BasicDBObject(EQuota.resources.name()
-                        , new BasicDBObject("$each", quotaBasicObject.get(EQuota.resources.name())))));
-
-            }
-        }
-
-        if (newQuotaList.size() > 0) {
-            this.haveNewQuota = true;
-            this.minExpireDate = findQuotaGetMinimumExpireDate();
-        }
-
-    }
-*/
 
 
     public void filterTransactionConfirmIsNewResource(List<Transaction> otherTransaction) {
@@ -311,18 +243,18 @@ public void updateQuota(ArrayList<Quota> quotaResponses) {
     public DBCursor findQuotaByTransaction(Transaction transaction) {
         try {
             BasicDBObject searchQuery = new BasicDBObject();
-            searchQuery.put(EQuota.userValue.name(), appInstance.getPcefInstance().getProfile().getUserValue());
+            searchQuery.put(EQuota.userValue.name(), context.getPcefInstance().getProfile().getUserValue());
             searchQuery.put(EQuota.resources.name(), new BasicDBObject("$elemMatch", new BasicDBObject("resourceId", transaction.getResourceId())));
             DBCursor dbCursor = findByQuery(searchQuery);
 
             if (dbCursor.hasNext()) {
-                PCEFUtils.writeMessageFlow("Find Quota resource Id:" + transaction.getResourceId() + "[Found]", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+                PCEFUtils.writeMessageFlow("Find Quota resource Id:" + transaction.getResourceId() + "[Found]", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
             } else {
-                PCEFUtils.writeMessageFlow("Find Quota resource Id:" + transaction.getResourceId() + "[Not Found]", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+                PCEFUtils.writeMessageFlow("Find Quota resource Id:" + transaction.getResourceId() + "[Not Found]", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
             }
             return dbCursor;
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Find Quota resource Id:" + transaction.getResourceId() + "-error" + e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Find Quota resource Id:" + transaction.getResourceId() + "-error" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
     }
@@ -348,10 +280,10 @@ public void updateQuota(ArrayList<Quota> quotaResponses) {
     }
 
     public List<Quota> findQuotaExpire() {
-        Date currentTime = appInstance.getPcefInstance().getStartTime();
+        Date currentTime = context.getPcefInstance().getStartTime();
 
         BasicDBObject search = new BasicDBObject();
-        search.put(EQuota.userValue.name(), appInstance.getPcefInstance().getProfile().getUserValue());
+        search.put(EQuota.userValue.name(), context.getPcefInstance().getProfile().getUserValue());
         search.put(EQuota.expireDate.name(), new BasicDBObject("$lte", currentTime));
 
         DBCursor dbCursor = findByQuery(search);
@@ -390,14 +322,14 @@ public void updateQuota(ArrayList<Quota> quotaResponses) {
             AFLog.d("Quota Exhaust");
 
             commitPart.setQuotaExhaust(quota);
-            appInstance.getPcefInstance().setCommitPart(commitPart);
+            context.getPcefInstance().setCommitPart(commitPart);
             return false;
         }
     }*/
 
 
     public Date findQuotaGetMinimumExpireDate() {
-        String privateId = appInstance.getPcefInstance().getProfile().getUserValue();
+        String privateId = context.getPcefInstance().getProfile().getUserValue();
 
         BasicDBObject match = new BasicDBObject();
         match.put(EQuota.userValue.name(), privateId);
@@ -408,7 +340,7 @@ public void updateQuota(ArrayList<Quota> quotaResponses) {
 
         //find minimum
         Date minExpireDate = (Date) aggregateMatch(match, group).iterator().next().get("minExpireDate");
-        AFLog.d("min ExpireDate:" + minExpireDate);
+        AFLog.d("min ExpireDate:" + PCEFUtils.isoDateFormatter.format(minExpireDate));
 
         return minExpireDate;
     }
@@ -425,11 +357,11 @@ public void updateQuota(ArrayList<Quota> quotaResponses) {
             update.put(EQuota.processing.name(), 1);//lock
 
             DBObject dbObject = findAndModify(query, update);
-            PCEFUtils.writeMessageFlow("Find and Modify Quota Lock Process", MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Find and Modify Quota Lock Process", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
 
             return dbObject;
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Find and Modify Quota Lock Process error " + e.getStackTrace()[0], MessageFlow.Status.Error, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Find and Modify Quota Lock Process error " + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
     }
@@ -446,9 +378,9 @@ public void updateQuota(ArrayList<Quota> quotaResponses) {
 
             updateSetByQuery(query, update);
 
-            PCEFUtils.writeMessageFlow("Update Quota Unlock Process mk:" + monitoringKey, MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Update Quota Unlock Process mk:" + monitoringKey, MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Update Quota Unlock Process mk:" + monitoringKey + ",error - " + e.getStackTrace()[0], MessageFlow.Status.Success, appInstance.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Update Quota Unlock Process mk:" + monitoringKey + ",error - " + e.getStackTrace()[0], MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         }
 
     }

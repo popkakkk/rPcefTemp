@@ -1,8 +1,8 @@
 package phoebe.eqx.pcef.states.L1;
 
-import com.mongodb.DBCollection;
 import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.model.Quota;
+import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
@@ -14,6 +14,7 @@ import phoebe.eqx.pcef.states.abs.MessageRecieved;
 import phoebe.eqx.pcef.states.mongodb.W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class W_E11_TIMEOUT extends ComplexState {
 
@@ -35,7 +36,8 @@ public class W_E11_TIMEOUT extends ComplexState {
 
             nextState = mongodbProcessState.getPcefState();
             if (EState.END.equals(nextState)) {
-                no(dbConnect);
+                AFLog.d("Not Do Thing! -->set finish");
+                appInstance.setFinish(true);
             } else {
                 OCFUsageMonitoringService OCFUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
                 if (EState.W_USAGE_MONITORING_STOP.equals(nextState)) {
@@ -64,26 +66,26 @@ public class W_E11_TIMEOUT extends ComplexState {
     @MessageRecieved(messageType = EState.W_USAGE_MONITORING_UPDATE)
     public void wUsageMonitoringUpdate() throws Exception {
         OCFUsageMonitoringService ocfUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
-        OCFUsageMonitoringResponse OCFUsageMonitoringResponse = ocfUsageMonitoringService.readUsageMonitoringUpdate();
+        OCFUsageMonitoringResponse ocfUsageMonitoringResponse = ocfUsageMonitoringService.readUsageMonitoringUpdate();
 
         MongoDBConnect dbConnect = null;
         try {
             dbConnect = new MongoDBConnect(appInstance);
 
-            ArrayList<Quota> quotaResponseList = dbConnect.getQuotaService().getQuotaFromUsageMonitoringResponse(OCFUsageMonitoringResponse);
+            List<Transaction> newResourceTransactions = appInstance.getMyContext().getPcefInstance().getOtherStartTransactions();
 
-            if (ocfUsageMonitoringService.receiveQuotaAndPolicy(OCFUsageMonitoringResponse)) {
-                dbConnect.getQuotaService().updateQuota(quotaResponseList);
-                dbConnect.getTransactionService().updateTransaction(quotaResponseList);
-                dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
+            dbConnect.getTransactionService().filterResourceRequestErrorNewResource(ocfUsageMonitoringResponse, appInstance.getMyContext().getPcefInstance().getNewResources(), newResourceTransactions);
+            dbConnect.getTransactionService().filterResourceRequestErrorCommitResource(ocfUsageMonitoringResponse, appInstance.getMyContext().getPcefInstance().getCommitDatas());
 
-                VTTimoutService vtTimoutService = new VTTimoutService(appInstance);
-                vtTimoutService.buildRecurringTimout();
+            ArrayList<Quota> quotaResponseList = dbConnect.getQuotaService().getQuotaFromUsageMonitoringResponse(ocfUsageMonitoringResponse);
 
-            } else {
+            dbConnect.getQuotaService().updateQuota(quotaResponseList);
+            dbConnect.getTransactionService().updateTransaction(quotaResponseList, newResourceTransactions);
+            dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
 
+            VTTimoutService vtTimoutService = new VTTimoutService(appInstance);
+            vtTimoutService.buildRecurringTimout();
 
-            }
 
         } catch (Exception e) {
             AFLog.d(" error:" + e.getStackTrace()[0]);
@@ -106,7 +108,7 @@ public class W_E11_TIMEOUT extends ComplexState {
         try {
             dbConnect = new MongoDBConnect(appInstance);
 
-            String privateId = appInstance.getPcefInstance().getProfile().getUserValue();
+            String privateId = appInstance.getMyContext().getPcefInstance().getProfile().getUserValue();
 
             //stop by privateId
             dbConnect.getTransactionService().updateTransactionIsActive(privateId);
@@ -115,7 +117,7 @@ public class W_E11_TIMEOUT extends ComplexState {
 
             //end
             //finish ret 10
-
+            appInstance.setFinish(true);
 
         } catch (Exception e) {
 

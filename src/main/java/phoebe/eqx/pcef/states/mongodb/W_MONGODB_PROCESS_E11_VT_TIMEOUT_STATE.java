@@ -3,6 +3,7 @@ package phoebe.eqx.pcef.states.mongodb;
 
 import com.mongodb.DBObject;
 import ec02.af.utils.AFLog;
+import phoebe.eqx.pcef.core.exceptions.TimeoutIntervalException;
 import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.enums.state.EMongoState;
 import phoebe.eqx.pcef.enums.state.EState;
@@ -13,17 +14,15 @@ import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 import phoebe.eqx.pcef.states.mongodb.abs.MessageMongoRecieved;
 import phoebe.eqx.pcef.states.mongodb.abs.MongoState;
 import phoebe.eqx.pcef.utils.Interval;
+import phoebe.eqx.pcef.utils.PCEFUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
 
-
-    private Interval interval = new Interval(Config.RETRY_PROCESSING, Config.INTERVAL_PROCESSING);
-    private Interval intervalInsertProfile = new Interval(Config.RETRY_PROCESSING, Config.INTERVAL_PROCESSING);
-    private Interval intervalMkIsProcessing = new Interval(Config.RETRY_PROCESSING, Config.INTERVAL_PROCESSING);
+    private Interval intervalFindAndModProfile = new Interval(Config.RETRY_PROCESSING, Config.INTERVAL_PROCESSING);
+    private Interval intervalFindAndModQuota = new Interval(Config.RETRY_PROCESSING, Config.INTERVAL_PROCESSING);
 
     public W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE(AppInstance appInstance, MongoDBConnect dbConnect) {
         super(appInstance, dbConnect);
@@ -33,19 +32,25 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
     public EMongoState checkProfileAppointmentDate() {
         EMongoState nextState = null;
         try {
+            AFLog.d("Find Appointment Date");
+            AFLog.d("Current Date:" + PCEFUtils.isoDateFormatter.format(context.getPcefInstance().getStartTime()));
+
             if (dbConnect.getProfileService().findProfileItsAppointmentTime()) {
-                DBObject dbObject = dbConnect.getProfileService().findAndModifyLockProfile(appInstance.getPcefInstance().getProfile().getUserValue());
+                DBObject dbObject = dbConnect.getProfileService().findAndModifyLockProfile(context.getPcefInstance().getProfile().getUserValue());
                 if (dbObject != null) {
                     nextState = EMongoState.FIND_QUOTA_EXPIRE;
                 } else {
                     //interval
-                    interval.waitInterval();
+                    intervalFindAndModProfile.waitInterval();
                     nextState = EMongoState.BEGIN;
                 }
             } else {
-                // no
+                setPcefState(EState.END);
                 nextState = EMongoState.END;
             }
+        } catch (TimeoutIntervalException e) {
+            setPcefState(EState.END);
+            nextState = EMongoState.END;
         } catch (Exception e) {
 
         }
@@ -57,10 +62,14 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
     public EMongoState findQuotaExpire() {
         EMongoState nextState = null;
         try {
-            List<CommitData> commitDataList = dbConnect.getQuotaService().findDataToCommit(appInstance.getPcefInstance().getProfile().getUserValue(), null, true);
-            appInstance.getPcefInstance().setCommitDatas(commitDataList);
+            AFLog.d("Find Quota Expire");
+            AFLog.d("Current Date:" + PCEFUtils.isoDateFormatter.format(context.getPcefInstance().getStartTime()));
+
+            List<CommitData> commitDataList = dbConnect.getQuotaService().findDataToCommit(context.getPcefInstance().getProfile().getUserValue(), null, true);
+            context.getPcefInstance().setCommitDatas(commitDataList);
 
             if (commitDataList.size() > 0) {
+
                 List<String> mkCommits = dbConnect.getQuotaService().getMkFromCommitData(commitDataList);
                 List<Quota> quotaCommits = new ArrayList<>();
                 mkCommits.forEach(s -> {
@@ -76,15 +85,17 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
                     nextState = EMongoState.FIND_USAGE_RESOURCE;
                 } else {
                     //interval
-                    interval.waitInterval();
+                    intervalFindAndModQuota.waitInterval();
                     nextState = EMongoState.FIND_QUOTA_EXPIRE;
                 }
             } else {
-                //End
                 setPcefState(EState.END);
                 nextState = EMongoState.END;
             }
 
+        } catch (TimeoutIntervalException e) {
+            setPcefState(EState.END);
+            nextState = EMongoState.END;
         } catch (Exception e) {
 
         }
@@ -96,14 +107,14 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
     public EMongoState findUsageResource() {
         EMongoState nextState = null;
         try {
-            List<CommitData> commitDataList = appInstance.getPcefInstance().getCommitDatas();
+            List<CommitData> commitDataList = context.getPcefInstance().getCommitDatas();
 
             int sumTransaction = commitDataList.stream().mapToInt(CommitData::getCount).sum();
             if (sumTransaction > 0) {
                 setPcefState(EState.W_USAGE_MONITORING_UPDATE);
             } else {
-                int quotaExpireSize = appInstance.getPcefInstance().getQuotaCommitSize();
-                int quotaAllSize = dbConnect.getQuotaService().findAllQuotaByPrivateId(appInstance.getPcefInstance().getProfile().getUserValue()).size();
+                int quotaExpireSize = context.getPcefInstance().getQuotaCommitSize();
+                int quotaAllSize = dbConnect.getQuotaService().findAllQuotaByPrivateId(context.getPcefInstance().getProfile().getUserValue()).size();
                 AFLog.d("Quota expire size:" + quotaExpireSize + ",All Quota size:" + quotaAllSize);
 
                 if (quotaAllSize > quotaExpireSize) {

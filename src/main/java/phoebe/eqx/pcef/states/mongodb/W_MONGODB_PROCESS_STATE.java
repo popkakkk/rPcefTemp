@@ -8,6 +8,7 @@ import com.mongodb.DuplicateKeyException;
 import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.exceptions.TimeoutIntervalException;
 import phoebe.eqx.pcef.core.model.Quota;
+import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.state.EMongoState;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
@@ -26,12 +27,16 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
 
     private boolean responseSuccess;
 
+
+    //flag
     private boolean waitForProcess;
     private boolean lockByMyTransaction;
 
-    private Interval interval = new Interval(Config.RETRY_PROCESSING, Config.INTERVAL_PROCESSING);
+
     private Interval intervalInsertProfile = new Interval(Config.RETRY_PROCESSING, Config.INTERVAL_PROCESSING);
     private Interval intervalMkIsProcessing = new Interval(Config.RETRY_PROCESSING, Config.INTERVAL_PROCESSING);
+    private Interval intervalFindAndModQuota = new Interval(Config.RETRY_PROCESSING, Config.INTERVAL_PROCESSING);
+    private Interval intervalFindAndModProfile = new Interval(Config.RETRY_PROCESSING, Config.INTERVAL_PROCESSING);
 
     public W_MONGODB_PROCESS_STATE(AppInstance appInstance, MongoDBConnect dbConnect) {
         super(appInstance, dbConnect);
@@ -41,13 +46,12 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
     public EMongoState InitialProcess() {
         EMongoState nextState = null;
         try {
-            DBCursor profileCursor = dbConnect.getProfileService().findProfileByPrivateId(appInstance.getPcefInstance().getUsageMonitoringRequest().getUserValue());
-
+            DBCursor profileCursor = dbConnect.getProfileService().findProfileByPrivateId(context.getPcefInstance().getUsageMonitoringRequest().getUserValue());
 
             if (!profileCursor.hasNext()) {
                 nextState = EMongoState.INSERT_PROFILE;
             } else {
-                nextState = EMongoState.FIND_QUOTA_BY_NEW_RESOURCE;
+                nextState = EMongoState.CHECK_QUOTA_AVAILIABLE;
             }
         } catch (Exception e) {
 
@@ -64,7 +68,7 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
             setPcefState(EState.W_USAGE_MONITORING_START);
             nextState = EMongoState.END;
         } catch (DuplicateKeyException e) {
-            nextState = EMongoState.FIND_QUOTA_BY_NEW_RESOURCE;
+            nextState = EMongoState.CHECK_QUOTA_AVAILIABLE;
         } catch (Exception e) {
             try {
                 intervalInsertProfile.waitInterval();
@@ -79,36 +83,42 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
     }
 
 
-    @MessageMongoRecieved(messageType = EMongoState.FIND_QUOTA_BY_NEW_RESOURCE)
-    public EMongoState findQuotaByNewResource() {
+    @MessageMongoRecieved(messageType = EMongoState.CHECK_QUOTA_AVAILIABLE)
+    public EMongoState checkQuotaAvailable() {
         EMongoState nextState = null;
         waitForProcess = false;
         try {
-            DBCursor QuotaCursor = dbConnect.getQuotaService().findQuotaByTransaction(appInstance.getPcefInstance().getTransaction());
+            DBCursor QuotaCursor = dbConnect.getQuotaService().findQuotaByTransaction(context.getPcefInstance().getTransaction());
             if (!QuotaCursor.hasNext()) {
-                nextState = EMongoState.FIND_AND_MOD_PROFILE_FOR_WAIT_PROCESS;
+
+                if (lockByMyTransaction) {
+                    setPcefState(EState.W_USAGE_MONITORING_UPDATE);
+                    nextState = EMongoState.END;
+                } else {
+                    nextState = EMongoState.FIND_AND_MOD_PROFILE_FOR_WAIT_PROCESS;
+                }
+
             } else {
                 if (dbConnect.getQuotaService().checkMkCanProcess(QuotaCursor)) {
                     Quota quota = new Gson().fromJson(new Gson().toJson(QuotaCursor.iterator().next()), Quota.class);
 
                     /* ----------------- [Check Quota Exhaust]------------------------------------*/
-
                     //count transaction
                     List<CommitData> commitDataList = dbConnect.getQuotaService().findDataToCommit(quota.getUserValue(), quota.getMonitoringKey(), false);
 
-
                     //count resourceId this transaction + 1
                     for (CommitData commitData : commitDataList) {
-                        if (commitData.get_id().getResourceId().equals(appInstance.getPcefInstance().getTransaction().getResourceId())) {
+                        if (commitData.get_id().getResourceId().equals(context.getPcefInstance().getTransaction().getResourceId())) {
                             commitData.setCount(commitData.getCount() + 1);
                             break;
                         }
                     }
 
-
                     int sumTransaction = commitDataList.stream().mapToInt(CommitData::getCount).sum();
-
                     int quotaUnit = quota.getQuotaByKey().getUnit();
+
+                    AFLog.d("sum transaction unit:" + sumTransaction);
+                    AFLog.d("quota unit:" + quotaUnit);
 
                     if (quotaUnit > sumTransaction) {
                         AFLog.d("Quota Available");
@@ -116,124 +126,66 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
                         ArrayList<Quota> myQuotaToList = new ArrayList<>();
                         myQuotaToList.add(quota);
 
+                        List<Transaction> transactionList = new ArrayList<>();
+                        transactionList.add(context.getPcefInstance().getTransaction());
+
                         //update transaction
-                        dbConnect.getTransactionService().updateTransaction(myQuotaToList);
+                        dbConnect.getTransactionService().updateTransaction(myQuotaToList, transactionList);
 
+                        AFLog.d("State is Usage Monitoring Usage with available quota");
                         setResponseSuccess();
                         nextState = EMongoState.END;
                     } else {
                         AFLog.d("Quota Exhaust");
-                        appInstance.getPcefInstance().setCommitDatas(commitDataList);
+                        context.getPcefInstance().setCommitDatas(commitDataList);
                         DBObject findModQuota = dbConnect.getQuotaService().findAndModifyLockQuota(quota.getMonitoringKey());
                         if (findModQuota != null) {
                             nextState = EMongoState.FIND_AND_MOD_PROFILE_FOR_UPDATE_QUOTA_EXHAUST;
                         } else {
-                            //interval
-                            nextState = EMongoState.FIND_QUOTA_BY_NEW_RESOURCE;
+                            intervalFindAndModQuota.waitInterval();
+                            nextState = EMongoState.CHECK_QUOTA_AVAILIABLE;
                         }
                     }
-
-
                 } else {
                     intervalMkIsProcessing.waitInterval();
-                    nextState = EMongoState.FIND_QUOTA_BY_NEW_RESOURCE;
+                    nextState = EMongoState.CHECK_QUOTA_AVAILIABLE;
                 }
             }
         } catch (Exception e) {
 
         }
         return nextState;
-    }/*@MessageMongoRecieved(messageType = EMongoState.FIND_QUOTA_BY_NEW_RESOURCE)
-    public EMongoState findQuotaByNewResource() {
-        EMongoState nextState = null;
-        waitForProcess = false;
-        try {
-            DBCursor QuotaCursor = dbConnect.getQuotaService().findQuotaByTransaction(appInstance.getPcefInstance().getTransaction());
-            if (!QuotaCursor.hasNext()) {
-                nextState = EMongoState.FIND_AND_MOD_PROFILE_FOR_WAIT_PROCESS;
-            } else {
-                if (dbConnect.getQuotaService().checkMkCanProcess(QuotaCursor)) {
-                    Quota quota = new Gson().fromJson(new Gson().toJson(QuotaCursor.iterator().next()), Quota.class);
+    }
 
-
-                    */
-
-    /**
-     * **Check Quota Exhaust**
-     **//*
-
-                    ArrayList<Quota> myQuotaToList = new ArrayList<>();
-                    myQuotaToList.add(quota);
-
-
-                    Map<String, Integer> countUnitByResourceMap = dbConnect.getTransactionService().findTransactionDoneGroupByResource(myQuotaToList);
-
-                    int sumTransaction = countUnitByResourceMap.values().stream().mapToInt(count -> count).sum();
-                    int quotaUnit = quota.getQuotaByKey().getUnit();
-
-                    if (quotaUnit > sumTransaction) {
-                        AFLog.d("Quota Available");
-                        dbConnect.getTransactionService().updateTransaction(myQuotaToList);
-
-                        setResponseSuccess();
-                        nextState = EMongoState.END;
-                    } else {
-                        AFLog.d("Quota Exhaust");
-                        CommitPart commitPart = new CommitPart();
-                        commitPart.setCountUnitMap(countUnitByResourceMap);
-                        commitPart.setQuotaExhaust(quota);
-                        appInstance.getPcefInstance().setCommitPart(commitPart);
-
-                        DBObject findModQuota = dbConnect.getQuotaService().findAndModifyLockQuota(quota.getMonitoringKey());
-                        if (findModQuota != null) {
-                            nextState = EMongoState.FIND_AND_MOD_PROFILE_FOR_UPDATE_QUOTA_EXHAUST;
-                        } else {
-                            //interval
-                            nextState = EMongoState.FIND_QUOTA_BY_NEW_RESOURCE;
-                        }
-                    }
-
-
-                } else {
-                    intervalMkIsProcessing.waitInterval();
-                    nextState = EMongoState.FIND_QUOTA_BY_NEW_RESOURCE;
-                }
-            }
-        } catch (Exception e) {
-
-        }
-        return nextState;
-    }*/
     @MessageMongoRecieved(messageType = EMongoState.FIND_AND_MOD_PROFILE_FOR_WAIT_PROCESS)
     public EMongoState findAndModProfileForWaitProcess() {
         EMongoState nextState = null;
         try {
-            if (lockByMyTransaction) {
-                setPcefState(EState.W_USAGE_MONITORING_UPDATE);
-                nextState = EMongoState.END;
-            } else {
-                DBObject dbObject = dbConnect.getProfileService().findAndModifyLockProfile(appInstance.getPcefInstance().getProfile().getUserValue());
-                if (dbObject != null) {
-                    if (!waitForProcess) { // not wait process --> is new resource --> sent start by resource
-                        setPcefState(EState.W_USAGE_MONITORING_UPDATE);
-                        nextState = EMongoState.END;
-                    } else {
-                        if (dbConnect.getTransactionService().findMyTransactionDone()) {
-                            AFLog.d("My Transaction Done ,Start by other process");
-                            dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
-                            setResponseSuccess();
-                        } else {
-                            nextState = EMongoState.FIND_QUOTA_BY_NEW_RESOURCE;
-                        }
-                    }
+
+            DBObject dbObject = dbConnect.getProfileService().findAndModifyLockProfile(context.getPcefInstance().getProfile().getUserValue());
+            if (dbObject != null) {
+                if (!waitForProcess) { // not wait process --> is new resource --> sent start by resource
+                    AFLog.d("State is Usage Monitoring First usage by resource");
+                    setPcefState(EState.W_USAGE_MONITORING_UPDATE);
+                    nextState = EMongoState.END;
                 } else {
-                    lockByMyTransaction = true;
-                    waitForProcess = true;
-                    AFLog.d("waitForProcess:" + waitForProcess);
-                    interval.waitInterval();
-                    nextState = EMongoState.FIND_AND_MOD_PROFILE_FOR_WAIT_PROCESS;
+                    if (dbConnect.getTransactionService().findMyTransactionDone()) {
+                        AFLog.d("My Transaction Done ,Start by other process");
+                        dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
+                        setResponseSuccess();
+                    } else {
+                        nextState = EMongoState.CHECK_QUOTA_AVAILIABLE;
+                    }
                 }
+            } else {
+                lockByMyTransaction = true;
+                waitForProcess = true;
+                AFLog.d("waitForProcess:" + waitForProcess);
+                AFLog.d("lockByMyTransaction:" + lockByMyTransaction);
+                intervalFindAndModProfile.waitInterval();
+                nextState = EMongoState.FIND_AND_MOD_PROFILE_FOR_WAIT_PROCESS;
             }
+
 
         } catch (Exception e) {
 
@@ -245,14 +197,15 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
     public EMongoState findProfileForUpdateQuotaExhaust() {
         EMongoState nextState = null;
         try {
-            DBObject dbObject = dbConnect.getProfileService().findAndModifyLockProfile(appInstance.getPcefInstance().getTransaction().getUserValue());
+            DBObject dbObject = dbConnect.getProfileService().findAndModifyLockProfile(context.getPcefInstance().getTransaction().getUserValue());
             if (dbObject != null) {
                 setPcefState(EState.W_USAGE_MONITORING_UPDATE);
                 nextState = EMongoState.END;
+                AFLog.d("State is Usage Monitoring Usage with exhaust quota");
             } else {
                 //interval
                 waitForProcess = true;
-                interval.waitInterval();
+                intervalFindAndModProfile.waitInterval();
                 nextState = EMongoState.FIND_AND_MOD_PROFILE_FOR_UPDATE_QUOTA_EXHAUST;
             }
 
