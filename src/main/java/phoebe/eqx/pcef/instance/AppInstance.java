@@ -4,6 +4,7 @@ import ec02.af.abstracts.AbstractAF;
 import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.core.data.InvokeObject;
+import phoebe.eqx.pcef.core.exceptions.PCEFException;
 import phoebe.eqx.pcef.core.logs.summary.SummaryLog;
 import phoebe.eqx.pcef.core.logs.summary.SummaryLogDetail;
 import phoebe.eqx.pcef.enums.EEvent;
@@ -34,8 +35,9 @@ public class AppInstance {
     private transient RequestContext myContext;
 
 
+
     private transient ArrayList<EquinoxRawData> outList = new ArrayList<>();
-    private transient boolean finish;
+    private transient boolean finish; //summary and ret 10
     private transient AbstractAF abstractAF;
 
 
@@ -47,6 +49,11 @@ public class AppInstance {
             }
         }
         throw new Exception("No invoke response match context");
+    }
+
+    public void removeRequestContext() {
+        AFLog.d("remove context");
+        requestContexts.remove(myContext);
     }
 
 

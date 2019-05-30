@@ -25,6 +25,8 @@ public class PCEFInstance {
     private Transaction transaction;
     private List<Transaction> otherStartTransactions = new ArrayList<>();
 
+    private boolean error;
+
     private OCFUsageMonitoringRequest ocfUsageMonitoringRequest;
 
     List<CommitData> commitDatas = new ArrayList<>();
@@ -132,5 +134,13 @@ public class PCEFInstance {
 
     public void setNewResources(List<ResourceRequest> newResources) {
         this.newResources = newResources;
+    }
+
+    public boolean isError() {
+        return error;
+    }
+
+    public void setError(boolean error) {
+        this.error = error;
     }
 }

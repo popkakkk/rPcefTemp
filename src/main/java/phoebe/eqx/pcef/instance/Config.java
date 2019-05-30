@@ -26,6 +26,7 @@ public class Config {
     public static String RESOURCE_NAME_OCF;
     public static String RESOURCE_NAME_PRODUCT;
     public static String RESOURCE_NAME_SACF;
+    public static String RESOURCE_NAME_REFUND;
 
 
     public static String TIMEOUT_OCF;
@@ -34,6 +35,13 @@ public class Config {
     public static int RETRY_OCF_USAGE_MONITORING;
     public static int RETRY_PRODUCT_GET_RESOURCE_ID;
 
+    public static String LOG_SUMMARY_NAME;
+    public static String LOG_ERROR_NAME;
+
+    public static String CDR_CHARGING_NAME;
+    public static String CDR_REFUND_NAME;
+
+    public static int DELAY_TIMEOUT;
 
     public static void loadConfiguration(AbstractAF abstractAF) {
 
@@ -51,9 +59,8 @@ public class Config {
 
         RESOURCE_NAME_PRODUCT = PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_PRODUCT);
         RESOURCE_NAME_SACF = PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_SACF);
-        RESOURCE_NAME_OCF =  PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_OCF);
-
-
+        RESOURCE_NAME_OCF = PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_OCF);
+        RESOURCE_NAME_REFUND = PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_REFUND);
 
         TIMEOUT_OCF = PCEFUtils.getWarmConfig(abstractAF, EConfig.TIMEOUT_OCF);
         TIMEOUT_PRODUCT = PCEFUtils.getWarmConfig(abstractAF, EConfig.TIMEOUT_PRODUCT);
@@ -61,7 +68,13 @@ public class Config {
         RETRY_OCF_USAGE_MONITORING = Integer.parseInt(PCEFUtils.getWarmConfig(abstractAF, EConfig.RETRY_OCF_USAGE_MONITORING));
         RETRY_PRODUCT_GET_RESOURCE_ID = Integer.parseInt(PCEFUtils.getWarmConfig(abstractAF, EConfig.RETRY_PRODUCT_GET_RESOURCE_ID));
 
+        LOG_SUMMARY_NAME = PCEFUtils.getWarmConfig(abstractAF, EConfig.RETRY_PRODUCT_GET_RESOURCE_ID);
+        LOG_ERROR_NAME = PCEFUtils.getWarmConfig(abstractAF, EConfig.LOG_ERROR_NAME);
 
+        CDR_CHARGING_NAME = PCEFUtils.getWarmConfig(abstractAF, EConfig.CDR_CHARGING_NAME);
+        CDR_REFUND_NAME = PCEFUtils.getWarmConfig(abstractAF, EConfig.CDR_REFUND_NAME);
+
+        DELAY_TIMEOUT = Integer.parseInt(PCEFUtils.getWarmConfig(abstractAF, EConfig.DELAY_TIMEOUT));
     }
 
     public static boolean verify(AbstractAF abstractAF) {

@@ -25,7 +25,7 @@ public class W_GyRAR extends ComplexState {
     }
 
     @MessageRecieved(messageType = EState.BEGIN)
-    public void begin() {
+    public void begin() throws Exception {
         EState nextState = null;
 
         GyRARService gyRARService = new GyRARService(appInstance);
@@ -39,13 +39,14 @@ public class W_GyRAR extends ComplexState {
 
             nextState = wMongodbProcessGyrar.getPcefState();
             if (EState.END.equals(nextState)) {
-                //end
+                gyRARService.buildResponseGyRAR(false);
             } else {
                 OCFUsageMonitoringService OCFUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
                 OCFUsageMonitoringService.buildUsageMonitoringUpdate(dbConnect);
             }
         } catch (Exception e) {
             AFLog.d(" error:" + e.getStackTrace()[0]);
+            throw e;
         } finally {
             if (dbConnect != null) {
                 dbConnect.closeConnection();
@@ -75,11 +76,12 @@ public class W_GyRAR extends ComplexState {
             dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
 
             GyRARService gyRARService = new GyRARService(appInstance);
-            gyRARService.buildResponseGyRAR();
+            gyRARService.buildResponseGyRAR(true);
 
 
         } catch (Exception e) {
             AFLog.d(" error:" + e.getStackTrace()[0]);
+            throw e;
         } finally {
             if (dbConnect != null) {
                 dbConnect.closeConnection();
@@ -88,5 +90,6 @@ public class W_GyRAR extends ComplexState {
         }
         setWorkState(EState.END);
     }
+
 
 }

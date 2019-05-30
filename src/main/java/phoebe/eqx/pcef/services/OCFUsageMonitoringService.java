@@ -2,9 +2,14 @@ package phoebe.eqx.pcef.services;
 
 import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
+import org.apache.commons.lang3.StringUtils;
 import phoebe.eqx.pcef.core.data.ResourceQuota;
 import phoebe.eqx.pcef.core.data.ResourceResponse;
+import phoebe.eqx.pcef.core.exceptions.PCEFException;
+import phoebe.eqx.pcef.enums.EError;
 import phoebe.eqx.pcef.enums.ERequestType;
+import phoebe.eqx.pcef.enums.stats.EStatCmd;
+import phoebe.eqx.pcef.enums.stats.EStatMode;
 import phoebe.eqx.pcef.instance.CommitData;
 import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
 import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
@@ -22,6 +27,7 @@ import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 import phoebe.eqx.pcef.utils.MessageFlow;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 import phoebe.eqx.pcef.utils.ValidateMessage;
+import phoebe.eqx.pcef.utils.WriteLog;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,7 +40,7 @@ public class OCFUsageMonitoringService extends PCEFService {
     }
 
 
-    public boolean receiveQuotaAndPolicy(OCFUsageMonitoringResponse ocfUsageMonitoringResponse) {
+    /*public boolean receiveQuotaAndPolicy(OCFUsageMonitoringResponse ocfUsageMonitoringResponse) {
         boolean checkReceiveQuotaAndPolicy = true;
 
         List<String> resourceIdResponseList = new ArrayList<>();
@@ -65,15 +71,16 @@ public class OCFUsageMonitoringService extends PCEFService {
         }
 
         return checkReceiveQuotaAndPolicy;
-    }
+    }*/
 
 
     private String generateSessionId() {
-        return "sessionIdFromPCEF";
+        return "PCEF:ACTIVE:" + PCEFUtils.regularDateFormat.format(appInstance.getMyContext().getStartTime());
     }
 
     private String generateTransactionId() {
-        return "transactionId" + context.getPcefInstance().getProfile().getSequenceNumber();
+        String sequenceNumber = String.valueOf(context.getPcefInstance().getProfile().getSequenceNumber());
+        return "PCEF" + StringUtils.leftPad(sequenceNumber, 10, "0");
     }
 
 
@@ -101,8 +108,10 @@ public class OCFUsageMonitoringService extends PCEFService {
 
             buildUsageMonitoring(umStartRequest, operation, invokeId, transactionList);
 
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.sent_Usage_Monitoring_Start_request);
             PCEFUtils.writeMessageFlow("Build Usage Monitoring Start Request", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.sent_Usage_Monitoring_Start_request);
             PCEFUtils.writeMessageFlow("Build Usage Monitoring Start Request" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
         }
     }
@@ -167,15 +176,16 @@ public class OCFUsageMonitoringService extends PCEFService {
                 resourceRequest.setRtid(context.getPcefInstance().getTransaction().getRtid());
                 resourceRequest.setReportingReason("0");
             } else if (ERequestType.E11_TIMEOUT.equals(requestType)) {
-//                resourceRequest.setRtid(context.getPcefInstance().getTransaction().getRtid()); // last of tid
+//                resourceRequest.setRtid(context.getPcefInstance().getTransaction().getRtid()); // last tid of profile
 
                 if (unit == 0) {
-                    resourceRequest.setReportingReason("1");
+                    resourceRequest.setReportingReason("1");//sent terminate by resource
                 } else {
                     resourceRequest.setReportingReason("0");
                 }
 
             } else if (ERequestType.GyRAR.equals(requestType)) {
+//                resourceRequest.setRtid(context.getPcefInstance().getGyRARRequest().ge);
                 resourceRequest.setReportingReason("0");
             }
             resourceRequestList.add(resourceRequest);
@@ -221,6 +231,7 @@ public class OCFUsageMonitoringService extends PCEFService {
 
             List<Transaction> transactionStartList = new ArrayList<>();
             if (pcefInstance.getCommitDatas().size() > 0) {
+                /**Update Commit Resource**/
                 setActualTimeByRequestType(ocfUsageMonitoringRequest, context.getRequestType());
                 ocfUsageMonitoringRequest.setResources(getResourceCommit(pcefInstance.getCommitDatas(), context.getRequestType())); //set unit to Resource
             } else {
@@ -230,8 +241,11 @@ public class OCFUsageMonitoringService extends PCEFService {
             }
 
             buildUsageMonitoring(ocfUsageMonitoringRequest, operation, invokeId, transactionStartList);
+
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.sent_Usage_Monitoring_Update_request);
             PCEFUtils.writeMessageFlow("Build Usage Monitoring Update Request", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.sent_Usage_Monitoring_Update_request);
             PCEFUtils.writeMessageFlow("Build Usage Monitoring Update Request", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
         }
     }
@@ -247,40 +261,33 @@ public class OCFUsageMonitoringService extends PCEFService {
     }
 
     public OCFUsageMonitoringResponse readUsageMonitoringStart() throws Exception {
-
         try {
-            AFLog.d("Read Usage Monitoring Start Response ..");
+            try {
+                AFLog.d("Read Usage Monitoring Start Response ..");
 
-            Operation operation = Operation.UsageMonitoringStart;
+                Operation operation = Operation.UsageMonitoringStart;
+                OCFUsageMonitoringResponse OCFUsageMonitoringResponse;
 
-            //extract
-            OCFUsageMonitoringResponse OCFUsageMonitoringResponse = (OCFUsageMonitoringResponse) extractResponse(operation);
-//            this.context.getPcefInstance().setUsageMonitoring(OCFUsageMonitoringResponse);
+                OCFUsageMonitoringResponse = (OCFUsageMonitoringResponse) extractResponse(operation);
 
-            //validate
-            ValidateMessage.validateTestData();
+                ValidateMessage.validateUsageMonitoringStart(OCFUsageMonitoringResponse);
 
-            //increase stat success
-//            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.PCEF_RECEIVE_TEST_DATA);
+                PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.receive_Usage_Monitoring_Start_response);
 
-            //summarylog res
+                //summarylog res
 //            context.setSummaryLogExternalResponse(Operation.TestOperation, SummaryLog.getSummaryLogResponse(Operation.TestOperation, testResponseData));
 
-            PCEFUtils.writeMessageFlow("Read Usage Monitoring Start Response", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
-            return OCFUsageMonitoringResponse;
-        } catch (TimeoutException e) {
-            // handle time out
-            throw e;
-        } catch (ResponseErrorException e) {
-
-            // handle ret error
-            throw e;
-        } catch (Exception e) {
-            //increase stat fail
-            //summarylog fail
-            // read fail
-
-
+                PCEFUtils.writeMessageFlow("Read Usage Monitoring Start Response", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
+                return OCFUsageMonitoringResponse;
+            } catch (TimeoutException e) {
+                PCEFUtils.increaseStatistic(abstractAF, EStatMode.TIMEOUT, EStatCmd.receive_Usage_Monitoring_Start_response);
+                throw new TimeoutException("timeout", EError.USAGE_MONITORING_START_RESPONSE_TIMEOUT);
+            } catch (ResponseErrorException e) {
+                PCEFUtils.increaseStatistic(abstractAF, EStatMode.EQUINOX_ERROR, EStatCmd.receive_Usage_Monitoring_Start_response);
+                throw new ResponseErrorException("return error", EError.USAGE_MONITORING_START_RESPONSE_EQUINOX_ERROR);
+            }
+        } catch (PCEFException e) {
+            WriteLog.writeErrorLogUsageMonitoring(abstractAF, e, context.getPcefInstance().getUsageMonitoringRequest(), context.getPcefInstance().getTransaction().getResourceId());
             PCEFUtils.writeMessageFlow("Read Usage Monitoring Start Response", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
@@ -348,7 +355,9 @@ public class OCFUsageMonitoringService extends PCEFService {
 
             buildUsageMonitoring(ocfUsageMonitoringRequest, operation, invokeId, transactionStartList);
             PCEFUtils.writeMessageFlow("Build Usage Monitoring Stop Request", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.sent_Usage_Monitoring_Stop_request);
         } catch (Exception e) {
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.sent_Usage_Monitoring_Stop_request);
             PCEFUtils.writeMessageFlow("Build Usage Monitoring Stop Request", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
         }
     }

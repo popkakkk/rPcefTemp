@@ -17,7 +17,6 @@ public class VTTimoutService extends PCEFService {
 
     public void buildRecurringTimout() {
         AFLog.d("Build Recurring Timeout");
-
         MessagePool messagePool = new MessagePool(appInstance.getAbstractAF());
         EquinoxRawData equinoxRawData = messagePool.recurringVTTimeout(getTimeoutFromAppointmentDate());
         appInstance.getOutList().add(equinoxRawData);

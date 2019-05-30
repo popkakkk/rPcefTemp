@@ -2,10 +2,17 @@ package phoebe.eqx.pcef.states.abs;
 
 import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.exceptions.PCEFException;
+import phoebe.eqx.pcef.core.model.Profile;
+import phoebe.eqx.pcef.core.model.Transaction;
+import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
+import phoebe.eqx.pcef.main.EQX4Wrapper;
+import phoebe.eqx.pcef.services.PCEFService;
 import phoebe.eqx.pcef.services.VTTimoutService;
+import phoebe.eqx.pcef.utils.WriteLog;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public abstract class ComplexState extends State {
@@ -15,7 +22,7 @@ public abstract class ComplexState extends State {
         super(appInstance, level);
     }
 
-    private Object dispatchToWorkingState(EState subState) throws Exception {
+    private Object dispatchToWorkingState(EState subState) throws PCEFException, InvocationTargetException, IllegalAccessException {
         AFLog.d("disPatch " + this.getClass().getSimpleName() + " " + subState);
         Object invoke = null;
         Class clazz = getClass();
@@ -39,9 +46,9 @@ public abstract class ComplexState extends State {
 
             try {
                 dispatchToWorkingState(state); //execute state
-            } catch (PCEFException e) {
-
             } catch (Exception e) {
+                PCEFService.buildErrorResponse(appInstance);
+//                AFLog.e("working state error-" + e.getStackTrace()[0]);
                 stop = true;
             }
             EState workState = getWorkState();
@@ -63,7 +70,7 @@ public abstract class ComplexState extends State {
 
     }
 
-    public static Method findMethod(Class clazz, EState state) throws Exception {
+    public static Method findMethod(Class clazz, EState state) {
         for (Method method : clazz.getMethods()) {
             if (method.isAnnotationPresent(MessageRecieved.class)) {
                 MessageRecieved messageRecieved = method.getAnnotation(MessageRecieved.class);
@@ -72,7 +79,7 @@ public abstract class ComplexState extends State {
                 }
             }
         }
-        throw new Exception("Can not execute method for " + state);
+        return null;
     }
 
     public boolean isStop() {

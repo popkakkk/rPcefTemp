@@ -27,6 +27,11 @@ public class W_MONGODB_PROCESS_GYRAR extends MongoState {
         super(appInstance, dbConnect);
     }
 
+    public void setResponseError() {
+        nextState = EMongoState.END;
+        setPcefState(EState.END);
+    }
+
     @MessageMongoRecieved(messageType = EMongoState.BEGIN)
     public EMongoState findQuota() {
 
@@ -34,11 +39,11 @@ public class W_MONGODB_PROCESS_GYRAR extends MongoState {
             GyRARRequest gyRARRequest = context.getPcefInstance().getGyRARRequest();
             dbConnect.getQuotaService().findAllQuotaByPrivateId(gyRARRequest.getUserValue());
 
-            List<CommitData> commitDataList =   dbConnect.getQuotaService().findDataToCommit(gyRARRequest.getUserValue(), null, false);
+            List<CommitData> commitDataList = dbConnect.getQuotaService().findDataToCommit(gyRARRequest.getUserValue(), null, false);
             context.getPcefInstance().setCommitDatas(commitDataList);
 
         } catch (Exception e) {
-
+            setResponseError();
         }
         return EMongoState.REMOVE_QUOTA_GYRAR;
     }
@@ -64,7 +69,7 @@ public class W_MONGODB_PROCESS_GYRAR extends MongoState {
             }
 
         } catch (Exception e) {
-
+            setResponseError();
         }
         return nextState;
     }

@@ -1,6 +1,7 @@
 package phoebe.eqx.pcef.instance.context;
 
 import ec02.af.utils.AFLog;
+import phoebe.eqx.pcef.core.exceptions.PCEFException;
 import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.InvokeManager;
@@ -17,7 +18,10 @@ public class RequestContext {
 
     //----- instance state------------------
     private String requestInvokeId;
+    private String eqxPropSession;
     private ERequestType requestType;
+
+
     private Date startTime;
     private EState stateL1;
     private EState stateL2;
@@ -25,18 +29,19 @@ public class RequestContext {
     private transient boolean hasRequest;
     private transient String reqMessage;
 
+    private PCEFException pcefException;
 
-    public RequestContext(String reqMessage, String invoke, ERequestType requestType) {
+
+    public RequestContext(String reqMessage, String invoke, String eqxPropSession,ERequestType requestType) {
         this.requestInvokeId = invoke;
         this.reqMessage = reqMessage;
         this.requestType = requestType;
         this.startTime = new Date();
         this.pcefInstance = new PCEFInstance();
         this.invokeManager = new InvokeManager();
+        this.eqxPropSession = eqxPropSession;
 
     }
-
-
 
 
     public PCEFInstance getPcefInstance() {
@@ -109,5 +114,21 @@ public class RequestContext {
 
     public void setReqMessage(String reqMessage) {
         this.reqMessage = reqMessage;
+    }
+
+    public PCEFException getPcefException() {
+        return pcefException;
+    }
+
+    public void setPcefException(PCEFException pcefException) {
+        this.pcefException = pcefException;
+    }
+
+    public String getEqxPropSession() {
+        return eqxPropSession;
+    }
+
+    public void setEqxPropSession(String eqxPropSession) {
+        this.eqxPropSession = eqxPropSession;
     }
 }

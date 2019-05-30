@@ -34,7 +34,7 @@ public class GyRARService extends PCEFService {
 
     }
 
-    public void buildResponseGyRAR() {
+    public void buildResponseGyRAR(boolean success) {
 
         try {
             AFLog.d("Build GyRAR Response..");
@@ -46,8 +46,16 @@ public class GyRARService extends PCEFService {
             GyRARResponse gyRARResponse = new GyRARResponse();
             gyRARResponse.setCommand("GyRAR");
             gyRARResponse.setSessionId(context.getPcefInstance().getGyRARRequest().getSessionId());
-            gyRARResponse.setStatus(EStatusResponse.SUCCESS.getCode());
-            gyRARResponse.setDevMessage(EStatusResponse.SUCCESS.getDescription());
+
+            if (success) {
+                gyRARResponse.setStatus(EStatusResponse.SUCCESS.getCode());
+                gyRARResponse.setDevMessage(EStatusResponse.SUCCESS.getDescription());
+            } else {
+                gyRARResponse.setStatus(EStatusResponse.FAIL.getCode());
+                gyRARResponse.setDevMessage(EStatusResponse.FAIL.getDescription());
+
+            }
+
 
             //build message
             MessagePool messagePool = new MessagePool(abstractAF);

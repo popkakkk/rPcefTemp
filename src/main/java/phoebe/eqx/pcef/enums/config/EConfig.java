@@ -15,14 +15,25 @@ public enum EConfig {
     COLLECTION_PROFILE_NAME("collection-profile-name", EConfigType.MANDATORY, null),
     COLLECTION_QUOTA_NAME("collection-quota-name", EConfigType.MANDATORY, null),
 
+    //url
     URL_PRODUCT("url-product", EConfigType.MANDATORY, null),
     URL_OCF_USAGE_MONITORING("url-ocf-usage-monitoring", EConfigType.MANDATORY, null),
 
     //resource name
-
     RESOURCE_NAME_PRODUCT("resource-name-product", EConfigType.MANDATORY, null),
     RESOURCE_NAME_SACF("resource-name-sacf", EConfigType.MANDATORY, null),
     RESOURCE_NAME_OCF("resource-name-ocf", EConfigType.MANDATORY, null),
+    RESOURCE_NAME_REFUND("resource-name-refund", EConfigType.MANDATORY, null),
+
+    //Log name
+    LOG_SUMMARY_NAME("log-summary-name", EConfigType.MANDATORY, null),
+    LOG_ERROR_NAME("log-error-name", EConfigType.MANDATORY, null),
+
+    //cdr name
+    CDR_CHARGING_NAME("cdr-charging-name", EConfigType.MANDATORY, null),
+    CDR_REFUND_NAME("cdr-refund-name", EConfigType.MANDATORY, null),
+
+    DELAY_TIMEOUT("delay-timeout", EConfigType.MANDATORY, null),
 
 
 

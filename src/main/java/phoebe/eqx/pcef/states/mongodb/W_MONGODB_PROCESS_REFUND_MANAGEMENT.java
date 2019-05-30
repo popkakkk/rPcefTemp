@@ -51,7 +51,7 @@ public class W_MONGODB_PROCESS_REFUND_MANAGEMENT extends MongoState {
 
 
         } catch (Exception e) {
-
+            setStateResponseError();
         }
         return nextState;
     }
@@ -76,7 +76,7 @@ public class W_MONGODB_PROCESS_REFUND_MANAGEMENT extends MongoState {
         } catch (TimeoutIntervalException e) {
             setStateResponseError();
         } catch (Exception e) {
-
+            setStateResponseError();
         }
 
 
@@ -101,7 +101,7 @@ public class W_MONGODB_PROCESS_REFUND_MANAGEMENT extends MongoState {
         } catch (TimeoutIntervalException e) {
             setStateResponseError();
         } catch (Exception e) {
-
+            setStateResponseError();
         }
 
 

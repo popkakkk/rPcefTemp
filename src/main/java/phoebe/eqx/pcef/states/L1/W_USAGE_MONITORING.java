@@ -56,9 +56,9 @@ public class W_USAGE_MONITORING extends ComplexState {
             if (EState.END.equals(nextState)) {
                 UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
                 if (mongodbProcessState.isResponseSuccess()) {
-                    usageMonitoringService.buildResponseUsageMonitoringSuccess();
+                    usageMonitoringService.buildResponseUsageMonitoring(true);
                 } else {
-                    usageMonitoringService.buildResponseUsageMonitoringFail();
+                    throw new Exception("sent error usage monitoring response");
                 }
             } else {
                 OCFUsageMonitoringService OCFUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
@@ -71,6 +71,7 @@ public class W_USAGE_MONITORING extends ComplexState {
             }
         } catch (Exception e) {
             AFLog.d("Mongodb initial process error:" + e.getStackTrace()[0]);
+            throw e;
         } finally {
             if (dbConnect != null) {
                 dbConnect.closeConnection();
@@ -107,7 +108,7 @@ public class W_USAGE_MONITORING extends ComplexState {
             dbConnect.getTransactionService().updateTransaction(quotaResponseList, transactionList);
             dbConnect.getProfileService().updateProfileUnLockInitial(dbConnect.getQuotaService().getMinExpireDate());
 
-            usageMonitoringService.buildResponseUsageMonitoringSuccess();
+            usageMonitoringService.buildResponseUsageMonitoring(true);
 
 
         } catch (Exception e) {
@@ -174,7 +175,7 @@ public class W_USAGE_MONITORING extends ComplexState {
             dbConnect.getTransactionService().updateTransaction(quotaResponseList, newResourceTransactions);
             dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
 
-            usageMonitoringService.buildResponseUsageMonitoringSuccess();
+            usageMonitoringService.buildResponseUsageMonitoring(true);
 
 
         } catch (Exception e) {

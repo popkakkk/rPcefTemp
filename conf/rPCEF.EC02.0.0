@@ -52,38 +52,37 @@
                 <property name="log4jProperty2" value="propValue" />
             </Custom>
         </AFLOG>
-
         <!-- resource name -->
         <resource-name-ocf value="rPCEF.ES04.OCF"/>
         <resource-name-sacf value="rPCEF.ES05.SACF"/>
         <resource-name-product value="rPCEF.ES04.PRODUCT"/>
+        <resource-name-refund value="rPCEF.ES05.REFUND"/>
 
         <!-- timeout -->
         <timeout-ocf value = "4" />
         <timeout-product value = "4" />
-
-
         <!-- retry timeout -->
         <retry-ocf-usage-monitoring value="1"/>
         <retry-product-get-resource-id value="1"/>
         <retry-ocf-refund-transaction value="1"/>
-
-
         <!-- http url -->
         <url-product value="/marketplace/v1/products"/>
         <url-ocf-usage-monitoring value="/api/v1/metering-method"/>
+        <!-- log name -->
+        <log-summary-name value="SUMMARY_LOG"/>
+        <log-error-name value="ERROR_LOG"/>
+        <cdr-charging-name value="CDR_CHARGING_SERVICE"/>
+        <cdr-refund-name value="CDR_REFUND_SERVICE"/>
 
-
+        <delay-timeout value="1"/>
 
 
         <!--             MongoDB          -->
         <mongodb-url value = "mongodb://localhost:27017" />
         <mongodb-database-name value = "mydbtest" />
-
         <!-- Interval and retry -->
         <interval-processing value = "3" />
         <retry-processing value = "3" />
-
         <!-- Collection -->
         <collection-transaction-name value = "Transaction" />
         <collection-profile-name value = "Profile" />

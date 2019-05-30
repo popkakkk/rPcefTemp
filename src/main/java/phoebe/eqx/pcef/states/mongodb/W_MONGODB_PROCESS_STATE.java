@@ -54,7 +54,8 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
                 nextState = EMongoState.CHECK_QUOTA_AVAILIABLE;
             }
         } catch (Exception e) {
-
+            setResponseFail();
+            nextState = EMongoState.END;
         }
         return nextState;
     }
@@ -152,6 +153,8 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
                 }
             }
         } catch (Exception e) {
+            setResponseFail();
+            nextState = EMongoState.END;
 
         }
         return nextState;
@@ -188,7 +191,8 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
 
 
         } catch (Exception e) {
-
+            setResponseFail();
+            nextState = EMongoState.END;
         }
         return nextState;
     }
@@ -210,7 +214,8 @@ public class W_MONGODB_PROCESS_STATE extends MongoState {
             }
 
         } catch (Exception e) {
-
+            setResponseFail();
+            nextState = EMongoState.END;
         }
         return nextState;
     }

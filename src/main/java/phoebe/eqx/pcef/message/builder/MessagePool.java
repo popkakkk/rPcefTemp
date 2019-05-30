@@ -114,7 +114,7 @@ public class MessagePool {
         map.put("method", "POST");
         map.put("type", "response");
         map.put("ctype", "text/plain");
-        map.put("to", Config.RESOURCE_NAME_OCF);
+        map.put("to", Config.RESOURCE_NAME_REFUND);
         map.put("timeout", timeout);
         map.put("invoke", invokeId);
         rawData.setRawDataAttributes(map);

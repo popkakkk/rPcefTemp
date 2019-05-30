@@ -10,16 +10,13 @@ import phoebe.eqx.pcef.enums.config.EConfig;
 import phoebe.eqx.pcef.enums.stats.EStatCmd;
 import phoebe.eqx.pcef.enums.stats.EStatMode;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class PCEFUtils {
 
-    public static final SimpleDateFormat startStopDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+    public static final SimpleDateFormat regularDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     public static final SimpleDateFormat datetimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     public static final SimpleDateFormat dtLongFormatterMs = new SimpleDateFormat("yyyyMMddHHmmss SSSS", Locale.US);
     public static final SimpleDateFormat isoDateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -81,14 +78,28 @@ public class PCEFUtils {
             Calendar calendar = Calendar.getInstance();
             long usedTime = calendar.getTimeInMillis() - time;
 
-            abstractAF.getEquinoxUtils().writeLog("PCEF_APP_LOG", "Request : " + req.trim());
-            abstractAF.getEquinoxUtils().writeLog("PCEF_APP_LOG", "Response : " + res.trim());
-            abstractAF.getEquinoxUtils().writeLog("PCEF_APP_LOG", "Summary : " + summaryLog.trim());
-            abstractAF.getEquinoxUtils().writeLog("PCEF_APP_LOG", String.format("Start Time : %s, Used Time : %s, %s", startStopDateFormat.format(startTime), usedTime, msg));
+            abstractAF.getEquinoxUtils().writeLog("rPCEF_APP_LOG", "Request : " + req.trim());
+            abstractAF.getEquinoxUtils().writeLog("rPCEF_APP_LOG", "Response : " + res.trim());
+            abstractAF.getEquinoxUtils().writeLog("rPCEF_APP_LOG", "Summary : " + summaryLog.trim());
+            abstractAF.getEquinoxUtils().writeLog("rPCEF_APP_LOG", String.format("Start Time : %s, Used Time : %s, %s", regularDateFormat.format(startTime), usedTime, msg));
         } catch (Exception e) {
             AFLog.d("WriteLog failed", e);
         }
     }
+
+  /*  public static void writeErrorLog(AbstractAF abstractAF, PCEFException e) {
+        AFLog.d("Write Error Log ..");
+
+        //build
+       *//* ErrorLog errorLog = new ErrorLog(e.getError().getCode(), e.getError().getDesc() + "-" + e.getErrorMsg());
+        String errorStr = gsonToJson(errorLog);
+
+        //write
+        AFLog.e(errorStr);
+        abstractAF.getEquinoxUtils().writeLog(Config.LOG_ERROR_NAME, errorStr);*//*
+    }*/
+
+
 
 
     public static String randomNumber3Digit() {

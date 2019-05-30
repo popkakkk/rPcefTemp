@@ -134,6 +134,8 @@ public class TransactionService extends MongoDBService {
 
 
     private void updateTransactionDoneToCompleteByTid(List<CommitData> commitDataList) {
+        AFLog.d("Update Transaction [Done] to [Complete] by tid..");
+
         BasicDBObject searchQuery = new BasicDBObject();
 
         List<String> tidList = new ArrayList<>();
@@ -287,6 +289,7 @@ public class TransactionService extends MongoDBService {
             );
 
             //update by transaction set mk and Counter
+            AFLog.d("Update transaction and other start transaction..");
             for (Transaction transaction : newResourceTransactions) {
                 BasicDBObject searchQuery = new BasicDBObject();
 

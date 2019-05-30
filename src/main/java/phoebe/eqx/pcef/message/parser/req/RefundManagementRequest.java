@@ -6,7 +6,7 @@ public class RefundManagementRequest {
     private String sessionId;
     private String actualTime;
     private String tid;
-    private String rid;
+    private String rtid;
     private String refId;
 
 
@@ -42,12 +42,12 @@ public class RefundManagementRequest {
         this.tid = tid;
     }
 
-    public String getRid() {
-        return rid;
+    public String getRtid() {
+        return rtid;
     }
 
-    public void setRid(String rid) {
-        this.rid = rid;
+    public void setRtid(String rtid) {
+        this.rtid = rtid;
     }
 
     public String getRefId() {

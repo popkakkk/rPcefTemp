@@ -28,6 +28,11 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
         super(appInstance, dbConnect);
     }
 
+    public void setStateEnd(){
+        setPcefState(EState.END);
+        nextState = EMongoState.END;
+    }
+
     @MessageMongoRecieved(messageType = EMongoState.BEGIN)
     public EMongoState checkProfileAppointmentDate() {
         EMongoState nextState = null;
@@ -45,14 +50,12 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
                     nextState = EMongoState.BEGIN;
                 }
             } else {
-                setPcefState(EState.END);
-                nextState = EMongoState.END;
+                setStateEnd();
             }
         } catch (TimeoutIntervalException e) {
-            setPcefState(EState.END);
-            nextState = EMongoState.END;
+            setStateEnd();
         } catch (Exception e) {
-
+            setStateEnd();
         }
         return nextState;
     }
@@ -89,15 +92,13 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
                     nextState = EMongoState.FIND_QUOTA_EXPIRE;
                 }
             } else {
-                setPcefState(EState.END);
-                nextState = EMongoState.END;
+                setStateEnd();
             }
 
         } catch (TimeoutIntervalException e) {
-            setPcefState(EState.END);
-            nextState = EMongoState.END;
+            setStateEnd();
         } catch (Exception e) {
-
+            setStateEnd();
         }
         return nextState;
     }
@@ -111,6 +112,7 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
 
             int sumTransaction = commitDataList.stream().mapToInt(CommitData::getCount).sum();
             if (sumTransaction > 0) {
+                AFLog.d("Found Transaction usage =" + sumTransaction + ",to build Usage Monitoring Update");
                 setPcefState(EState.W_USAGE_MONITORING_UPDATE);
             } else {
                 int quotaExpireSize = context.getPcefInstance().getQuotaCommitSize();
@@ -118,15 +120,17 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE extends MongoState {
                 AFLog.d("Quota expire size:" + quotaExpireSize + ",All Quota size:" + quotaAllSize);
 
                 if (quotaAllSize > quotaExpireSize) {
+                    AFLog.d("(Quota expire size) < (All Quota size),to build Usage Monitoring Update");
                     setPcefState(EState.W_USAGE_MONITORING_UPDATE);
                 } else if (quotaAllSize == quotaExpireSize) {
+                    AFLog.d("(Quota expire size) == (All Quota size),to build Usage Monitoring Stop");
                     setPcefState(EState.W_USAGE_MONITORING_STOP);
                 }
             }
             nextState = EMongoState.END;
 
         } catch (Exception e) {
-
+            setStateEnd();
         }
         return nextState;
     }

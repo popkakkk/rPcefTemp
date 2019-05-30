@@ -1,4 +1,8 @@
 package phoebe.eqx.pcef.core.exceptions;
 
-public class TimeoutIntervalException extends PCEFException {
+import phoebe.eqx.pcef.enums.EError;
+
+public class TimeoutIntervalException extends Exception {
+
+
 }
