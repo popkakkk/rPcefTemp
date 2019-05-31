@@ -1,0 +1,9 @@
+TRACE|08:17:25|Thread-1|testCustomLog|[]null
+TRACE|08:17:27|Thread-3|testCustomLog|[]null
+TRACE|08:17:27|Thread-5|testCustomLog|[]null
+TRACE|08:18:25|Thread-1|testCustomLog|[]null
+TRACE|08:18:27|Thread-3|testCustomLog|[]null
+TRACE|08:18:27|Thread-5|testCustomLog|[]null
+TRACE|08:19:25|Thread-1|testCustomLog|[]null
+TRACE|08:19:27|Thread-3|testCustomLog|[]null
+TRACE|08:19:27|Thread-5|testCustomLog|[]null

@@ -1,0 +1,12 @@
+TRACE|12:12:18|Thread-1|testCustomLog|[]null
+TRACE|12:12:24|Thread-3|testCustomLog|[]null
+TRACE|12:12:24|Thread-5|testCustomLog|[]null
+TRACE|12:13:20|Thread-1|testCustomLog|[]null
+TRACE|12:13:24|Thread-5|testCustomLog|[]null
+TRACE|12:13:24|Thread-3|testCustomLog|[]null
+TRACE|12:14:20|Thread-1|testCustomLog|[]null
+TRACE|12:14:24|Thread-3|testCustomLog|[]null
+TRACE|12:14:24|Thread-5|testCustomLog|[]null
+TRACE|12:15:20|Thread-1|testCustomLog|[]null
+TRACE|12:15:24|Thread-5|testCustomLog|[]null
+TRACE|12:15:24|Thread-3|testCustomLog|[]null
