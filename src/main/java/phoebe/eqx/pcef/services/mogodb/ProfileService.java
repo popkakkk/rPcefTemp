@@ -79,8 +79,9 @@ public class ProfileService extends MongoDBService {
     }
 
     private void updateProfileUnlock(BasicDBObject updateQuery) {
-
         try {
+            AFLog.d("Update Profile Unlock ..");
+
             updateQuery.put(EProfile.isProcessing.name(), 0);//unlock
             updateQuery.put(EProfile.sequenceNumber.name(), context.getPcefInstance().getProfile().getSequenceNumber());
 
@@ -114,10 +115,8 @@ public class ProfileService extends MongoDBService {
     public void updateProfileUnLock(boolean haveNewQuota, Date minExpireDate) {
         BasicDBObject updateQuery = new BasicDBObject();
         if (haveNewQuota) {
-            if (minExpireDate.before(context.getPcefInstance().getProfile().getAppointmentDate())) {
-                updateQuery.put(EProfile.appointmentDate.name(), minExpireDate);
-                context.getPcefInstance().getProfile().setAppointmentDate(minExpireDate);
-            }
+            updateQuery.put(EProfile.appointmentDate.name(), minExpireDate);
+            context.getPcefInstance().getProfile().setAppointmentDate(minExpireDate);
         }
         updateProfileUnlock(updateQuery);
     }
@@ -178,7 +177,7 @@ public class ProfileService extends MongoDBService {
     }
 
     public void removeProfile(String privateId) {
-        AFLog.d("Delete Profile privateId:" + privateId+" ..");
+        AFLog.d("Delete Profile privateId:" + privateId + " ..");
         BasicDBObject delete = new BasicDBObject(EProfile._id.name(), privateId);
         writeQueryLog("remove", collectionName, delete.toString());
         db.getCollection(collectionName).remove(delete);

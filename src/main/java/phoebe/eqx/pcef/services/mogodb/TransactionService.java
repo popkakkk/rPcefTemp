@@ -62,8 +62,9 @@ public class TransactionService extends MongoDBService {
 
             insertByQuery(transactionBasicObject);
 
-
             context.getPcefInstance().setTransaction(transaction);
+            context.getPcefInstance().setInsertTransaction(true);
+
             PCEFUtils.writeMessageFlow("Insert Transaction", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
             PCEFUtils.writeMessageFlow("Insert Transaction", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
@@ -121,9 +122,10 @@ public class TransactionService extends MongoDBService {
             while (otherTransactionCursor.hasNext()) {
                 Transaction transaction = gson.fromJson(gson.toJson(otherTransactionCursor.next()), Transaction.class);
                 otherStartTransactionList.add(transaction);
+                AFLog.d("[find other transaction start found] tid:" + transaction.getTid() + ",resourceId:" + transaction.getResourceId());
             }
 
-            AFLog.d("find other transaction start found:" + otherStartTransactionList.size());
+            AFLog.d("[find other transaction start found]:" + otherStartTransactionList.size());
             return otherStartTransactionList;
         } catch (Exception e) {
             PCEFUtils.writeMessageFlow("Find Other transaction error" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
@@ -200,6 +202,8 @@ public class TransactionService extends MongoDBService {
                 int index = 0;
                 for (Transaction transaction : newResourceTransactions) {
                     if (transaction.getResourceId().equals(resourceId)) {
+
+                        //add delete transaction
                         deleteList.add(transaction.getTid());
 
                         //filter
@@ -248,6 +252,10 @@ public class TransactionService extends MongoDBService {
                     AFLog.d("Resource Id:" + resourceId + "return description error");
                 }
 
+                if (commitData.get_id().getResourceId().equals(context.getPcefInstance().getTransaction().getResourceId())) {
+
+                }
+
 
                 //remove
                 AFLog.d("remove transaction to commit by resourceId : " + resourceId);
@@ -255,6 +263,8 @@ public class TransactionService extends MongoDBService {
 
                 //filter
                 commitDataList.remove(index);
+            } else {
+
             }
             index++;
         }
@@ -297,17 +307,17 @@ public class TransactionService extends MongoDBService {
                 searchQuery.put(ETransaction.status.name(), EStatusLifeCycle.Waiting.getName());
 
                 BasicDBObject updateQuery = new BasicDBObject();
-                if (context.getPcefInstance().getCommitDatas().size() > 0 && ERequestType.USAGE_MONITORING.equals(context.getRequestType())) {
-                    if (context.getPcefInstance().getTransaction().getTid().equals(transaction.getTid())) {
-
-                        //check this transaction to commit
-                        updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Completed.getName());//waiting -->Complete
-                    } else {
-                        updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Done.getName());//waiting-->Done
-                    }
-                } else {
-                    updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Done.getName());//waiting-->Done
-                }
+//                if (context.getPcefInstance().getCommitDatas().size() > 0 && ERequestType.USAGE_MONITORING.equals(context.getRequestType())) {
+//                    if (context.getPcefInstance().getTransaction().getTid().equals(transaction.getTid())) {
+//
+//                        //check this transaction to commit
+//                        updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Completed.getName());//waiting -->Complete
+//                    } else {
+//                    updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Done.getName());//waiting-->Done
+//                    }
+//                } else {
+                updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Done.getName());//waiting-->Done
+//                }
                 updateQuery.put(ETransaction.monitoringKey.name(), resourceMap.get(transaction.getResourceId()).getMonitoringKey());
                 updateQuery.put(ETransaction.counterId.name(), resourceMap.get(transaction.getResourceId()).getCounterId());
                 updateQuery.put(ETransaction.updateDate.name(), new Date());
@@ -321,6 +331,14 @@ public class TransactionService extends MongoDBService {
             throw e;
         }
 
+    }
+
+
+    public void deleteTransactionError() {
+        if (appInstance.getMyContext().getPcefInstance().isInsertTransaction()) {
+            AFLog.d("Error!!--> Delete Transaction Error..");
+            deleteTransactionByTid(appInstance.getMyContext().getPcefInstance().getTransaction().getTid());
+        }
     }
 
 

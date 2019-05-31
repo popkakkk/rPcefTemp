@@ -113,7 +113,7 @@ public class QuotaService extends MongoDBService {
 
 
     public void removeQuota(String privateId) {
-        AFLog.d("Delete Quota with privateId:" + privateId+" ..");
+        AFLog.d("Delete Quota with privateId:" + privateId + " ..");
 
         BasicDBObject delete = new BasicDBObject(EQuota.userValue.name(), privateId);
         writeQueryLog("remove", collectionName, delete);
@@ -176,6 +176,7 @@ public class QuotaService extends MongoDBService {
                 if (!mkResponses.contains(mkCommit)) {
                     //delete
                     deleteQuotaByKey(mkCommit);
+                    AFLog.d("[QUOTA UPDATE] Delete Quota by monitoringKey:" + mkCommit);
                 } else {
                     mkUpdateCounter.add(mkCommit);
                 }
@@ -190,15 +191,18 @@ public class QuotaService extends MongoDBService {
                     if (commitDataList.size() == 0) {
                         //new quota --> insert
                         insertByQuery(quotaBasicObject);
+                        AFLog.d("[QUOTA UPDATE] Insert New Quota monitoringKey:" + quotaBasicObject.get(EQuota.monitoringKey.name()));
                     } else {
                         if (!mkUpdateCounter.contains(mk)) {
                             //new quota --> insert
                             insertByQuery(quotaBasicObject);
+                            AFLog.d("[QUOTA UPDATE] Insert New Quota monitoringKey:" + quotaBasicObject.get(EQuota.monitoringKey.name()));
                         } else {
                             //new counter(old mk) -->update set
                             BasicDBObject search = new BasicDBObject();
                             search.put(EQuota._id.name(), mk);
                             updateSetByQuery(search, quotaBasicObject);
+                            AFLog.d("[QUOTA UPDATE] Update Quota:" + quotaBasicObject);
                         }
                     }
                     newQuotaList.add(quotaBasicObject);
@@ -209,6 +213,7 @@ public class QuotaService extends MongoDBService {
                     db.getCollection(Config.COLLECTION_QUOTA_NAME).update(search, new BasicDBObject("$push"
                             , new BasicDBObject(EQuota.resources.name()
                             , new BasicDBObject("$each", quotaBasicObject.get(EQuota.resources.name())))));
+                    AFLog.d("[QUOTA UPDATE] Quota Exits, Update Resource Quota:" + quotaBasicObject.get(EQuota.resources.name()));
 
                 }
             }
@@ -216,12 +221,13 @@ public class QuotaService extends MongoDBService {
             if (newQuotaList.size() > 0) {
                 this.haveNewQuota = true;
                 this.minExpireDate = findQuotaGetMinimumExpireDate();
+                AFLog.d("[QUOTA UPDATE] have New Quota:" + haveNewQuota);
+                AFLog.d("[QUOTA UPDATE] minExpireDate:" + PCEFUtils.isoDateFormatter.format(minExpireDate));
             }
 
-
-            PCEFUtils.writeMessageFlow("Update Quota", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Quota Action", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Update Quota error" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Quota Action error-" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
 
@@ -230,10 +236,12 @@ public class QuotaService extends MongoDBService {
 
 
     public void filterTransactionConfirmIsNewResource(List<Transaction> otherTransaction) {
+        AFLog.d("Confirm Resource Is New Resource..");
         int index = 0;
         for (Transaction transaction : otherTransaction) {
             DBCursor quotaCursor = findQuotaByTransaction(transaction);
             if (quotaCursor.hasNext()) {
+                AFLog.d("[Confirm Resource Is New Resource] have quota:" + quotaCursor.next().get(EQuota._id.name()) + ",filter tid:" + transaction.getTid());
                 otherTransaction.remove(index);
             }
             index++;
@@ -340,7 +348,7 @@ public class QuotaService extends MongoDBService {
 
         //find minimum
         Date minExpireDate = (Date) aggregateMatch(match, group).iterator().next().get("minExpireDate");
-        AFLog.d("min ExpireDate:" + PCEFUtils.isoDateFormatter.format(minExpireDate));
+//        AFLog.d("min ExpireDate:" + PCEFUtils.isoDateFormatter.format(minExpireDate));
 
         return minExpireDate;
     }

@@ -2,7 +2,6 @@ package phoebe.eqx.pcef.main;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.mongodb.DBCursor;
 import ec02.af.abstracts.AbstractAF;
 import ec02.af.data.AFDataFactory;
 import ec02.af.utils.AFLog;
@@ -20,8 +19,6 @@ import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.instance.context.RequestContext;
-import phoebe.eqx.pcef.services.VTTimoutService;
-import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 import phoebe.eqx.pcef.states.L1.W_E11_TIMEOUT;
 import phoebe.eqx.pcef.states.L1.W_GyRAR;
 import phoebe.eqx.pcef.states.L1.W_REFUND_MANAGEMENT;

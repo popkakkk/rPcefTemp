@@ -7,9 +7,10 @@ public class CommitData {
 
 
     private ID _id;
-    private List<String> transactionIds;
     private int count;
     private Date expireDate;
+    private String rtid;
+    private List<String> transactionIds;
 
     public Date getExpireDate() {
         return expireDate;
@@ -41,6 +42,14 @@ public class CommitData {
 
     public void setCount(int count) {
         this.count = count;
+    }
+
+    public String getRtid() {
+        return rtid;
+    }
+
+    public void setRtid(String rtid) {
+        this.rtid = rtid;
     }
 }
 

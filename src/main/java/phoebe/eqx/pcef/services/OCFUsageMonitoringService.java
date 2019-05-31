@@ -176,7 +176,7 @@ public class OCFUsageMonitoringService extends PCEFService {
                 resourceRequest.setRtid(context.getPcefInstance().getTransaction().getRtid());
                 resourceRequest.setReportingReason("0");
             } else if (ERequestType.E11_TIMEOUT.equals(requestType)) {
-//                resourceRequest.setRtid(context.getPcefInstance().getTransaction().getRtid()); // last tid of profile
+                resourceRequest.setRtid(commitData.getRtid()); // last tid of profile
 
                 if (unit == 0) {
                     resourceRequest.setReportingReason("1");//sent terminate by resource
@@ -185,7 +185,7 @@ public class OCFUsageMonitoringService extends PCEFService {
                 }
 
             } else if (ERequestType.GyRAR.equals(requestType)) {
-//                resourceRequest.setRtid(context.getPcefInstance().getGyRARRequest().ge);
+                resourceRequest.setRtid(commitData.getRtid());
                 resourceRequest.setReportingReason("0");
             }
             resourceRequestList.add(resourceRequest);

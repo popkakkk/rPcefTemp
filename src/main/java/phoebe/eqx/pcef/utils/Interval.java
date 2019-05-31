@@ -23,6 +23,7 @@ public class Interval {
             throw new TimeoutIntervalException();
         }
         try {
+            AFLog.d("WAIT INTERVAL :" + retry + " TIME!!!");
             Thread.sleep(interval * 1000);
         } catch (InterruptedException e) {
             AFLog.d("Thread has interrupt!!");

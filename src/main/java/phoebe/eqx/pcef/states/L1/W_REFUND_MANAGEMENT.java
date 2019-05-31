@@ -6,7 +6,6 @@ import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.services.RefundManagementService;
 import phoebe.eqx.pcef.services.RefundTransactionService;
-import phoebe.eqx.pcef.services.VTTimoutService;
 import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 import phoebe.eqx.pcef.states.abs.ComplexState;
 import phoebe.eqx.pcef.states.abs.MessageRecieved;
@@ -20,7 +19,7 @@ public class W_REFUND_MANAGEMENT extends ComplexState {
     }
 
     @MessageRecieved(messageType = EState.BEGIN)
-    public void begin() {
+    public void begin() throws Exception {
         EState nextState = null;
 
         RefundManagementService refundManagementService = new RefundManagementService(appInstance);
@@ -54,6 +53,7 @@ public class W_REFUND_MANAGEMENT extends ComplexState {
             }
         } catch (Exception e) {
             AFLog.d(" error:" + e.getStackTrace()[0]);
+            throw e;
         } finally {
             if (dbConnect != null) {
                 dbConnect.closeConnection();
@@ -80,7 +80,8 @@ public class W_REFUND_MANAGEMENT extends ComplexState {
             }
 
         } catch (Exception e) {
-            AFLog.d(" error:" + e.getStackTrace()[0]);
+            AFLog.d(" wRefundTransaction:" + e.getStackTrace()[0]);
+            throw e;
         } finally {
             if (dbConnect != null) {
                 dbConnect.closeConnection();

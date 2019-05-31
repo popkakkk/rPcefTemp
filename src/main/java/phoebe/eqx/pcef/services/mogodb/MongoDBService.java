@@ -142,6 +142,7 @@ public abstract class MongoDBService {
             $group.put("_id", _id);
             $group.put(tempNameTids, tid);
             $group.put(EQuota.expireDate.name(), new BasicDBObject("$max", "$" + EQuota.expireDate.name()));
+            $group.put(ETransaction.rtid.name(), new BasicDBObject("$max", "$" + tempNameTransaction + "." + ETransaction.rtid.name()));
 
             BasicDBObject $project = new BasicDBObject();
 
@@ -153,6 +154,7 @@ public abstract class MongoDBService {
             $project.put(tempNameTids, "$" + tempNameTids);
             $project.put("count", new BasicDBObject("$cond", $cond));
             $project.put(EQuota.expireDate.name(), 1);
+            $project.put(ETransaction.rtid.name(), 1);
 
 
             List<DBObject> pipeline = Arrays.asList(
@@ -176,6 +178,7 @@ public abstract class MongoDBService {
                 AFLog.d("mk:" + commitData.get_id().getMonitoringKey()
                         + " ,resourceId:" + commitData.get_id().getResourceId()
                         + " ,expireDate:" + PCEFUtils.isoDateFormatter.format(commitData.getExpireDate())
+                        + " ,rtid:" + commitData.getRtid()
                         + " ,count transaction:" + commitData.getCount());
                 commitDatas.add(commitData);
             }

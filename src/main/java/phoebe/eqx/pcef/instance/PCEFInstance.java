@@ -32,6 +32,8 @@ public class PCEFInstance {
     List<CommitData> commitDatas = new ArrayList<>();
     List<ResourceRequest> newResources = new ArrayList<>();
 
+    private boolean insertTransaction;
+
     public int getQuotaCommitSize() {
         List<String> mkList = new ArrayList<>();
 
@@ -142,5 +144,13 @@ public class PCEFInstance {
 
     public void setError(boolean error) {
         this.error = error;
+    }
+
+    public boolean isInsertTransaction() {
+        return insertTransaction;
+    }
+
+    public void setInsertTransaction(boolean insertTransaction) {
+        this.insertTransaction = insertTransaction;
     }
 }

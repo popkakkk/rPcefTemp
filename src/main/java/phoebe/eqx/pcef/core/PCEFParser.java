@@ -63,8 +63,8 @@ public class PCEFParser {
 
     public UsageMonitoringRequest translateUsageMonitoringRequest() throws ExtractErrorException {
         try {
-            throw new Exception();
-//            return gson.fromJson(message, UsageMonitoringRequest.class);
+//            throw new Exception();
+            return gson.fromJson(message, UsageMonitoringRequest.class);
         } catch (Exception e) {
             throw new ExtractErrorException(e.getStackTrace()[0].toString(), EError.USAGE_MONITORING_EXTRACT_ERROR);
         }

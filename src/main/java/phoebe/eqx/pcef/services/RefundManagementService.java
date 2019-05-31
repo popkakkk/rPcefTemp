@@ -47,6 +47,8 @@ public class RefundManagementService extends PCEFService {
             RefundManagementResponse refundManagementResponse = new RefundManagementResponse();
             refundManagementResponse.setCommand("refundManagement");
             refundManagementResponse.setSessionId(context.getPcefInstance().getRefundManagementRequest().getSessionId());
+            refundManagementResponse.setRtid(context.getPcefInstance().getRefundManagementRequest().getRtid());
+            refundManagementResponse.setTid(context.getPcefInstance().getRefundManagementRequest().getTid());
 
             if (success) {
                 refundManagementResponse.setStatus(EStatusResponse.SUCCESS.getCode());

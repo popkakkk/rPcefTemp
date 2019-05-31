@@ -51,7 +51,7 @@ public class W_E11_TIMEOUT extends ComplexState {
             }
         } catch (Exception e) {
             AFLog.d("error:" + e.getStackTrace()[0]);
-
+            throw e;
         } finally {
             if (dbConnect != null) {
                 dbConnect.closeConnection();
@@ -88,7 +88,8 @@ public class W_E11_TIMEOUT extends ComplexState {
 
 
         } catch (Exception e) {
-            AFLog.d(" error:" + e.getStackTrace()[0]);
+            AFLog.d(" wUsageMonitoringUpdate:" + e.getStackTrace()[0]);
+            throw e;
         } finally {
             if (dbConnect != null) {
                 dbConnect.closeConnection();
@@ -120,7 +121,7 @@ public class W_E11_TIMEOUT extends ComplexState {
             appInstance.setFinish(true);
 
         } catch (Exception e) {
-
+            AFLog.d(" wUsageMonitoringStop:" + e.getStackTrace()[0]);
 
         } finally {
             if (dbConnect != null) {
@@ -130,11 +131,11 @@ public class W_E11_TIMEOUT extends ComplexState {
         setWorkState(EState.END);
     }
 
-    public void no(MongoDBConnect dbConnect) {
+  /*  public void no(MongoDBConnect dbConnect) {
         dbConnect.getProfileService().updateProfileUnLock(false, null);
         VTTimoutService vtTimoutService = new VTTimoutService(appInstance);
         vtTimoutService.buildRecurringTimout();
-    }
+    }*/
 
 
 }

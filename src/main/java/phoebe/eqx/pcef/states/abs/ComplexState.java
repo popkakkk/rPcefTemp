@@ -1,5 +1,6 @@
 package phoebe.eqx.pcef.states.abs;
 
+import com.mongodb.DBCursor;
 import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.exceptions.PCEFException;
 import phoebe.eqx.pcef.core.model.Profile;
@@ -8,8 +9,8 @@ import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.main.EQX4Wrapper;
-import phoebe.eqx.pcef.services.PCEFService;
-import phoebe.eqx.pcef.services.VTTimoutService;
+import phoebe.eqx.pcef.services.*;
+import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 import phoebe.eqx.pcef.utils.WriteLog;
 
 import java.lang.reflect.InvocationTargetException;
@@ -47,7 +48,8 @@ public abstract class ComplexState extends State {
             try {
                 dispatchToWorkingState(state); //execute state
             } catch (Exception e) {
-                PCEFService.buildErrorResponse(appInstance);
+
+                buildErrorResponse(appInstance);
 //                AFLog.e("working state error-" + e.getStackTrace()[0]);
                 stop = true;
             }
@@ -88,6 +90,73 @@ public abstract class ComplexState extends State {
 
     public void setStop(boolean stop) {
         this.stop = stop;
+    }
+
+
+    private void buildErrorResponse(AppInstance appInstance) {
+        ERequestType requestType = appInstance.getMyContext().getRequestType();
+
+        try {
+            //findProfile
+            boolean foundProfile = false;
+
+            if (appInstance.getMyContext().getPcefInstance().getProfile() != null) {
+                foundProfile = true;
+            } else {
+                //find profile set profile
+
+                MongoDBConnect dbConnect = null;
+                try {
+                    dbConnect = new MongoDBConnect(appInstance);
+                    String privateId = null;
+
+                    //getPrivateId
+                    if (!requestType.equals(ERequestType.REFUND_MANAGEMENT)) {
+                        privateId = appInstance.getMyContext().getEqxPropSession();
+                    }
+
+                    if (privateId != null) {
+                        DBCursor dbCursor = dbConnect.getProfileService().findProfileByPrivateId(privateId);
+                        if (dbCursor.hasNext()) {
+                            foundProfile = true;
+                        }
+                    }
+                } catch (Exception e) {
+                    AFLog.d("find profile for cal E11 timout error-" + e.getStackTrace()[0]);
+
+                } finally {
+                    if (dbConnect != null) {
+                        dbConnect.closeConnection();
+                    }
+                }
+            }
+
+            //profile not found
+            if (!foundProfile) {
+                appInstance.setFinish(true);
+            }
+
+            //build Response Error
+            if (requestType.equals(ERequestType.USAGE_MONITORING)) {
+                UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
+                usageMonitoringService.buildResponseUsageMonitoring(false);
+            } else if (requestType.equals(ERequestType.E11_TIMEOUT)) {
+                VTTimoutService vtTimoutService = new VTTimoutService(appInstance);
+                vtTimoutService.buildRecurringTimout();
+            } else if (requestType.equals(ERequestType.GyRAR)) {
+                GyRARService gyRARRequest = new GyRARService(appInstance);
+                gyRARRequest.buildResponseGyRAR(false);
+            } else if (requestType.equals(ERequestType.REFUND_MANAGEMENT)) {
+                RefundManagementService refundTransactionService = new RefundManagementService(appInstance);
+                refundTransactionService.buildResponseRefundManagement(false);
+            }
+
+        } catch (Exception e) {
+            AFLog.d("build Response Error fail requestType:" + requestType);
+            appInstance.setFinish(true);
+        }
+
+
     }
 
 

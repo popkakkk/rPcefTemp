@@ -119,75 +119,10 @@ abstract public class PCEFService {
         }
 
 
-        return invokeId + "_" /*+ PCEFUtils.getDate(0).getTime()*/;
+        return invokeId + "_" + PCEFUtils.getDate(0).getTime();
     }
 
 
-    public static void buildErrorResponse(AppInstance appInstance) {
-        ERequestType requestType = appInstance.getMyContext().getRequestType();
-
-        try {
-            //findProfile
-            boolean foundProfile = false;
-
-            if (appInstance.getMyContext().getPcefInstance().getProfile() != null) {
-                foundProfile = true;
-            } else {
-                //find profile set profile
-
-                MongoDBConnect dbConnect = null;
-                try {
-                    dbConnect = new MongoDBConnect(appInstance);
-                    String privateId = null;
-
-                    //getPrivateId
-                    if (!requestType.equals(ERequestType.REFUND_MANAGEMENT)) {
-                        privateId = appInstance.getMyContext().getEqxPropSession();
-                    }
-
-                    if (privateId != null) {
-                        DBCursor dbCursor = dbConnect.getProfileService().findProfileByPrivateId(privateId);
-                        if (dbCursor.hasNext()) {
-                            foundProfile = true;
-                        }
-                    }
-                } catch (Exception e) {
-                    AFLog.d("find profile for cal E11 timout error-" + e.getStackTrace()[0]);
-
-                } finally {
-                    if (dbConnect != null) {
-                        dbConnect.closeConnection();
-                    }
-                }
-            }
-
-            //profile not found
-            if (!foundProfile) {
-                appInstance.setFinish(true);
-            }
-
-            //build Response Error
-            if (requestType.equals(ERequestType.USAGE_MONITORING)) {
-                UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
-                usageMonitoringService.buildResponseUsageMonitoring(false);
-            } else if (requestType.equals(ERequestType.E11_TIMEOUT)) {
-                VTTimoutService vtTimoutService = new VTTimoutService(appInstance);
-                vtTimoutService.buildRecurringTimout();
-            } else if (requestType.equals(ERequestType.GyRAR)) {
-                GyRARService gyRARRequest = new GyRARService(appInstance);
-                gyRARRequest.buildResponseGyRAR(false);
-            } else if (requestType.equals(ERequestType.REFUND_MANAGEMENT)) {
-                RefundManagementService refundTransactionService = new RefundManagementService(appInstance);
-                refundTransactionService.buildResponseRefundManagement(false);
-            }
-
-        } catch (Exception e) {
-            AFLog.d("build Response Error fail requestType:" + requestType);
-            appInstance.setFinish(true);
-        }
-
-
-    }
 
 
 }
