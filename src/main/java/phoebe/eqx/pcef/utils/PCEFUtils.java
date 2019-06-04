@@ -5,17 +5,27 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import ec02.af.abstracts.AbstractAF;
 import ec02.af.utils.AFLog;
+import phoebe.eqx.pcef.core.cdr.Opudr;
 import phoebe.eqx.pcef.enums.EEvent;
 import phoebe.eqx.pcef.enums.config.EConfig;
 import phoebe.eqx.pcef.enums.stats.EStatCmd;
 import phoebe.eqx.pcef.enums.stats.EStatMode;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.lang.reflect.Type;
+import java.net.Inet4Address;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class PCEFUtils {
 
+
+    public static String HOST_NAME;
     public static final SimpleDateFormat regularDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     public static final SimpleDateFormat datetimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     public static final SimpleDateFormat dtLongFormatterMs = new SimpleDateFormat("yyyyMMddHHmmss SSSS", Locale.US);
@@ -24,7 +34,30 @@ public class PCEFUtils {
 
     static {
         isoDateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        HOST_NAME = getHostName();
     }
+
+
+    private static String getHostName() {
+        try {
+            return Inet4Address.getLocalHost().getHostName();
+        } catch (Exception e) {
+            try {
+                String hostname;
+                Runtime runtime = Runtime.getRuntime();
+                Process process = runtime.exec("hostname");
+                BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                hostname = br.readLine();
+                process.getErrorStream().close();
+                process.getOutputStream().close();
+                br.close();
+                return hostname;
+            } catch (Exception ee) {
+                return "UNKNOWNHOST";
+            }
+        }
+    }
+
 
     public static final SimpleDateFormat transactionDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 
@@ -100,8 +133,6 @@ public class PCEFUtils {
     }*/
 
 
-
-
     public static String randomNumber3Digit() {
         return String.valueOf(new Random().nextInt(100));
     }
@@ -132,6 +163,24 @@ public class PCEFUtils {
     public static void writeMessageFlow(String message, MessageFlow.Status status, String sessionId) {
         MessageFlow messageFlow = new MessageFlow(message, status.name(), sessionId);
         AFLog.d("[MESSAGE_FLOW] : " + gsonToJson(messageFlow));
+    }
+
+    public static String generateCdr(Opudr opudr) throws JAXBException {
+
+            AFLog.d("Generate CDR");
+
+            StringWriter stringWriter = new StringWriter();
+
+            JAXBContext jaxbContext = JAXBContext.newInstance(Opudr.class);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+
+            marshaller.marshal(opudr, stringWriter);
+
+            return stringWriter.toString();
+
+
+
     }
 
 

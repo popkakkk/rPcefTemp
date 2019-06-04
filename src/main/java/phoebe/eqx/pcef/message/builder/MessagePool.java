@@ -140,12 +140,12 @@ public class MessagePool {
     }
 
 
-    public EquinoxRawData recurringVTTimeout(String timeout) {
+    public EquinoxRawData sentTimeout(String timeout, String type) {
 
         EquinoxRawData rawData = AFDataFactory.createEquinoxRawData();
         Map<String, String> map = new HashMap<>();
         map.put("timeout", timeout);
-        map.put("type", "response");
+        map.put("type", type);
         rawData.setRawDataAttributes(map);
         return rawData;
     }

@@ -26,11 +26,11 @@ public class PCEFInstance {
     private List<Transaction> otherStartTransactions = new ArrayList<>();
 
     private boolean error;
-
+    private transient String resourceId;
     private OCFUsageMonitoringRequest ocfUsageMonitoringRequest;
 
     List<CommitData> commitDatas = new ArrayList<>();
-    List<ResourceRequest> newResources = new ArrayList<>();
+    List<ResourceRequest> newResourcesRequests = new ArrayList<>();
 
     private boolean insertTransaction;
 
@@ -122,6 +122,7 @@ public class PCEFInstance {
         this.refundManagementRequest = refundManagementRequest;
     }
 
+
     public List<CommitData> getCommitDatas() {
         return commitDatas;
     }
@@ -130,12 +131,12 @@ public class PCEFInstance {
         this.commitDatas = commitDatas;
     }
 
-    public List<ResourceRequest> getNewResources() {
-        return newResources;
+    public List<ResourceRequest> getNewResourcesRequests() {
+        return newResourcesRequests;
     }
 
-    public void setNewResources(List<ResourceRequest> newResources) {
-        this.newResources = newResources;
+    public void setNewResourcesRequests(List<ResourceRequest> newResourcesRequests) {
+        this.newResourcesRequests = newResourcesRequests;
     }
 
     public boolean isError() {
@@ -152,5 +153,13 @@ public class PCEFInstance {
 
     public void setInsertTransaction(boolean insertTransaction) {
         this.insertTransaction = insertTransaction;
+    }
+
+    public String getResourceId() {
+        return resourceId;
+    }
+
+    public void setResourceId(String resourceId) {
+        this.resourceId = resourceId;
     }
 }

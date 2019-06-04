@@ -1,39 +1,30 @@
-package phoebe.eqx.pcef.states.mongodb;
+package phoebe.eqx.pcef.states.L2;
 
 
 import com.mongodb.DBObject;
 import phoebe.eqx.pcef.core.model.Profile;
-import phoebe.eqx.pcef.enums.state.EMongoState;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.instance.CommitData;
-import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.message.parser.req.GyRARRequest;
+import phoebe.eqx.pcef.services.E11TimoutService;
 import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
-import phoebe.eqx.pcef.states.mongodb.abs.MessageMongoRecieved;
-import phoebe.eqx.pcef.states.mongodb.abs.MongoState;
-import phoebe.eqx.pcef.utils.Interval;
+import phoebe.eqx.pcef.states.abs.MessageRecieved;
+import phoebe.eqx.pcef.states.abs.MongoState;
 
 import java.util.List;
 
 public class W_MONGODB_PROCESS_GYRAR extends MongoState {
 
 
-    private Interval interval = new Interval(Config.RETRY_PROCESSING, Config.INTERVAL_PROCESSING);
-    private Interval intervalFindAndModProfile = new Interval(Config.RETRY_PROCESSING, Config.INTERVAL_PROCESSING);
-
-
     public W_MONGODB_PROCESS_GYRAR(AppInstance appInstance, MongoDBConnect dbConnect) {
-        super(appInstance, dbConnect);
+        super(appInstance, Level.L2, dbConnect);
     }
 
-    public void setResponseError() {
-        nextState = EMongoState.END;
-        setPcefState(EState.END);
-    }
 
-    @MessageMongoRecieved(messageType = EMongoState.BEGIN)
-    public EMongoState findQuota() {
+    @MessageRecieved(messageType = EState.BEGIN)
+    public void findQuota() {
+        EState nextState = null;
 
         try {
             GyRARRequest gyRARRequest = context.getPcefInstance().getGyRARRequest();
@@ -41,16 +32,17 @@ public class W_MONGODB_PROCESS_GYRAR extends MongoState {
 
             List<CommitData> commitDataList = dbConnect.getQuotaService().findDataToCommit(gyRARRequest.getUserValue(), null, false);
             context.getPcefInstance().setCommitDatas(commitDataList);
-
+            nextState = EState.REMOVE_QUOTA_GYRAR;
         } catch (Exception e) {
-            setResponseError();
+            setResponseFail();
+            nextState = EState.END;
         }
-        return EMongoState.REMOVE_QUOTA_GYRAR;
+        setWorkState(nextState);
     }
 
-    @MessageMongoRecieved(messageType = EMongoState.REMOVE_QUOTA_GYRAR)
-    public EMongoState findAndModifyProfile() {
-        EMongoState nextState = null;
+    @MessageRecieved(messageType = EState.REMOVE_QUOTA_GYRAR)
+    public EState findAndModifyProfile() {
+        EState nextState = null;
         try {
 
             DBObject dbObject = dbConnect.getProfileService().findAndModifyLockProfile(context.getPcefInstance().getGyRARRequest().getUserValue());
@@ -61,15 +53,17 @@ public class W_MONGODB_PROCESS_GYRAR extends MongoState {
                 //remove quota
                 dbConnect.getQuotaService().removeQuota(context.getPcefInstance().getGyRARRequest().getUserValue());
 
-                setPcefState(EState.W_USAGE_MONITORING_UPDATE);
-                nextState = EMongoState.END;
+                setState(EState.W_USAGE_MONITORING_UPDATE);
+                nextState = EState.END;
             } else {
-                intervalFindAndModProfile.waitInterval();
-                nextState = EMongoState.REMOVE_QUOTA_GYRAR;
+                E11TimoutService e11TimoutService = new E11TimoutService(appInstance);
+                e11TimoutService.buildInterval();
+                nextState = EState.REMOVE_QUOTA_GYRAR;
             }
 
         } catch (Exception e) {
-            setResponseError();
+            setResponseFail();
+            nextState = EState.END;
         }
         return nextState;
     }

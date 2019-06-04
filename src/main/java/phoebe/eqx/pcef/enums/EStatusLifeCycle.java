@@ -4,11 +4,8 @@ public enum EStatusLifeCycle {
 
     Waiting("Waiting"),
     Done("Done"),
-    Processing(""),
-    Canceled("Canceled"),
-    Completed("Completed"),
-    WaitingRefund("WaitingRefund"),
-    AlreadyRefund("AlreadyRefund");
+    Completed("Completed");
+
 
     private String status;
 

@@ -49,10 +49,7 @@ public class GetResourceIdService extends PCEFService {
             // logic build
             StringWriter erdHeaderWriter = new StringWriter();
 
-
             try {
-
-
                 JAXBContext jaxbContext = JAXBContext.newInstance(ERDHeader.class);
                 Marshaller marshaller = jaxbContext.createMarshaller();
                 marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
@@ -96,7 +93,7 @@ public class GetResourceIdService extends PCEFService {
     }
 
 
-    public String readGetResourceId() throws ResponseErrorException {
+    public void readGetResourceId() throws ResponseErrorException {
         String resourceId = null;
         try {
             AFLog.d("Read Get ResourceResponse ID Response ..");
@@ -117,6 +114,7 @@ public class GetResourceIdService extends PCEFService {
 //            context.setSummaryLogExternalResponse(operation, SummaryLog.getSummaryLogResponse(operation, testResponseData));
 
             resourceId = getResourceIdResponse.getResultData().getProducts().get(0).getProductId(); // get index = 0
+            appInstance.getMyContext().getPcefInstance().setResourceId(resourceId);
 
             PCEFUtils.writeMessageFlow("Read Get ResourceResponse ID Response :" + resourceId, MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (TimeoutException e) {
@@ -135,7 +133,7 @@ public class GetResourceIdService extends PCEFService {
 
         }
 
-        return resourceId;
+
     }
 
 

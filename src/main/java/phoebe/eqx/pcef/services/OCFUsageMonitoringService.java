@@ -3,26 +3,22 @@ package phoebe.eqx.pcef.services;
 import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
 import org.apache.commons.lang3.StringUtils;
-import phoebe.eqx.pcef.core.data.ResourceQuota;
-import phoebe.eqx.pcef.core.data.ResourceResponse;
-import phoebe.eqx.pcef.core.exceptions.PCEFException;
-import phoebe.eqx.pcef.enums.EError;
-import phoebe.eqx.pcef.enums.ERequestType;
-import phoebe.eqx.pcef.enums.stats.EStatCmd;
-import phoebe.eqx.pcef.enums.stats.EStatMode;
-import phoebe.eqx.pcef.instance.CommitData;
-import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
-import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
 import phoebe.eqx.pcef.core.data.ResourceRequest;
+import phoebe.eqx.pcef.core.exceptions.PCEFException;
 import phoebe.eqx.pcef.core.exceptions.ResponseErrorException;
 import phoebe.eqx.pcef.core.exceptions.TimeoutException;
-import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.core.model.Transaction;
+import phoebe.eqx.pcef.enums.EError;
+import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.enums.Operation;
+import phoebe.eqx.pcef.enums.stats.EStatCmd;
+import phoebe.eqx.pcef.enums.stats.EStatMode;
 import phoebe.eqx.pcef.instance.AppInstance;
+import phoebe.eqx.pcef.instance.CommitData;
 import phoebe.eqx.pcef.instance.PCEFInstance;
 import phoebe.eqx.pcef.message.builder.MessagePool;
 import phoebe.eqx.pcef.message.builder.req.OCFUsageMonitoringRequest;
+import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
 import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 import phoebe.eqx.pcef.utils.MessageFlow;
 import phoebe.eqx.pcef.utils.PCEFUtils;
@@ -32,46 +28,11 @@ import phoebe.eqx.pcef.utils.WriteLog;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class OCFUsageMonitoringService extends PCEFService {
     public OCFUsageMonitoringService(AppInstance appInstance) {
         super(appInstance);
     }
-
-
-    /*public boolean receiveQuotaAndPolicy(OCFUsageMonitoringResponse ocfUsageMonitoringResponse) {
-        boolean checkReceiveQuotaAndPolicy = true;
-
-        List<String> resourceIdResponseList = new ArrayList<>();
-        ocfUsageMonitoringResponse.getResources().forEach(resourceResponse -> resourceIdResponseList.add(resourceResponse.getResourceId()));
-
-        //Check New Resource
-        List<ResourceRequest> newResourceRequestList = context.getPcefInstance().getNewResources();
-
-        for (ResourceRequest newResourceRequest : newResourceRequestList) {
-            if (!resourceIdResponseList.contains(newResourceRequest.getResourceId())) {
-                checkReceiveQuotaAndPolicy = false;
-                break;
-            }
-        }
-
-        //Check Commit Resource
-        List<CommitData> commitDataList = context.getPcefInstance().getCommitDatas();
-        for (CommitData commitData : commitDataList) {
-            if (commitData.getCount() == 0) {
-                continue;
-            } else {
-                String resourceId = commitData.get_id().getResourceId();
-                if (!resourceIdResponseList.contains(resourceId)) {
-                    checkReceiveQuotaAndPolicy = false;
-                    break;
-                }
-            }
-        }
-
-        return checkReceiveQuotaAndPolicy;
-    }*/
 
 
     private String generateSessionId() {
@@ -143,7 +104,7 @@ public class OCFUsageMonitoringService extends PCEFService {
 
                 //add resources
                 umRequest.getResources().add(resourceRequest);
-                context.getPcefInstance().getNewResources().add(resourceRequest);
+                context.getPcefInstance().getNewResourcesRequests().add(resourceRequest);
 
                 //for check duplicate resourceId
                 resourceIdList.add(resourceId);
@@ -185,7 +146,7 @@ public class OCFUsageMonitoringService extends PCEFService {
                 }
 
             } else if (ERequestType.GyRAR.equals(requestType)) {
-                resourceRequest.setRtid(commitData.getRtid());
+                resourceRequest.setRtid(commitData.getRtid());// last tid of profile
                 resourceRequest.setReportingReason("0");
             }
             resourceRequestList.add(resourceRequest);
@@ -205,6 +166,7 @@ public class OCFUsageMonitoringService extends PCEFService {
             resourceRequest.setRtid("UNKNOWN");
             resourceRequest.setUnitType("unit");
             resourceRequest.setUsedUnit("0");
+            resourceRequest.setReportingReason("0");
             resourceRequestList.add(resourceRequest);
         }
         return resourceRequestList;
@@ -401,5 +363,8 @@ public class OCFUsageMonitoringService extends PCEFService {
             throw e;
         }
     }
+
+
+
 
 }

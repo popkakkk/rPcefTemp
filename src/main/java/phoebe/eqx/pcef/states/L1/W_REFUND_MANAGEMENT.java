@@ -4,12 +4,13 @@ import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
+import phoebe.eqx.pcef.services.GenerateCDRService;
 import phoebe.eqx.pcef.services.RefundManagementService;
 import phoebe.eqx.pcef.services.RefundTransactionService;
 import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 import phoebe.eqx.pcef.states.abs.ComplexState;
 import phoebe.eqx.pcef.states.abs.MessageRecieved;
-import phoebe.eqx.pcef.states.mongodb.W_MONGODB_PROCESS_REFUND_MANAGEMENT;
+import phoebe.eqx.pcef.states.L2.W_MONGODB_PROCESS_REFUND_MANAGEMENT;
 
 public class W_REFUND_MANAGEMENT extends ComplexState {
 
@@ -31,25 +32,25 @@ public class W_REFUND_MANAGEMENT extends ComplexState {
             W_MONGODB_PROCESS_REFUND_MANAGEMENT mongodbProcessRefundManagement = new W_MONGODB_PROCESS_REFUND_MANAGEMENT(appInstance, dbConnect);
             mongodbProcessRefundManagement.dispatch();
 
-            nextState = mongodbProcessRefundManagement.getPcefState();
+            nextState = context.getStateL2();
+            if (EState.END.equals(context.getStateL3())) {
+                if (EState.END.equals(nextState)) {
+                    if (mongodbProcessRefundManagement.isResponseSuccess()) {
+                        //refund status done
+                        refundSuccess(dbConnect, refundManagementService, GenerateCDRService.STATUS_CANCELED);
+                    } else {
+                        //refund error
+                        refundManagementService.buildResponseRefundManagement(false);
+                    }
 
-
-            if (EState.END.equals(nextState)) {
-                if (mongodbProcessRefundManagement.isSuccess()) {
-                    //refund status done
-                    refundSuccess(dbConnect, refundManagementService);
                 } else {
-                    //refund error
-                    refundManagementService.buildResponseRefundManagement(false);
-                }
+                    if (EState.W_REFUND_TRANSACTION.equals(nextState)) {
+                        //refund status complete
+                        RefundTransactionService refundTransactionService = new RefundTransactionService(appInstance);
+                        refundTransactionService.buildRefundTransactionRequest();
+                    }
 
-            } else {
-                if (EState.W_REFUND_TRANSACTION.equals(nextState)) {
-                    //refund status complete
-                    RefundTransactionService refundTransactionService = new RefundTransactionService(appInstance);
-                    refundTransactionService.buildRefundTransactionRequest();
                 }
-
             }
         } catch (Exception e) {
             AFLog.d(" error:" + e.getStackTrace()[0]);
@@ -74,7 +75,7 @@ public class W_REFUND_MANAGEMENT extends ComplexState {
 
             RefundManagementService refundManagementService = new RefundManagementService(appInstance);
             if (refundTransactionService.isRefundSuccess()) {
-                refundSuccess(dbConnect, refundManagementService);
+                refundSuccess(dbConnect, refundManagementService, GenerateCDRService.STATUS_AlREADY_REFUND);
             } else {
                 refundManagementService.buildResponseRefundManagement(false);
             }
@@ -92,16 +93,15 @@ public class W_REFUND_MANAGEMENT extends ComplexState {
     }
 
 
-    private void refundSuccess(MongoDBConnect dbConnect, RefundManagementService refundManagementService) {
+    private void refundSuccess(MongoDBConnect dbConnect, RefundManagementService refundManagementService, String cdrStatus) {
 
         Transaction transactionRefund = appInstance.getMyContext().getPcefInstance().getTransaction();
 
         //delete transaction
         dbConnect.getTransactionService().deleteTransactionByTid(transactionRefund.getTid());
 
-        /**
-         ****generate cdr refund
-         */
+        GenerateCDRService generateCDRService = new GenerateCDRService();
+        generateCDRService.buildCDRRefund(cdrStatus, appInstance);
 
         //update quota unlock
         dbConnect.getQuotaService().updateUnLockQuota(transactionRefund.getMonitoringKey());

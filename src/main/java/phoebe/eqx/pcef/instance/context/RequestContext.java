@@ -6,6 +6,7 @@ import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.InvokeManager;
 import phoebe.eqx.pcef.instance.PCEFInstance;
+import phoebe.eqx.pcef.utils.Interval;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,18 +22,28 @@ public class RequestContext {
     private String eqxPropSession;
     private ERequestType requestType;
 
+    private Date timeoutDate;
+
+    private boolean interval;
+    private int intervalRetry;
+
 
     private Date startTime;
     private EState stateL1;
     private EState stateL2;
+    private EState stateL3;
 
     private transient boolean hasRequest;
     private transient String reqMessage;
 
     private PCEFException pcefException;
 
+    //flag
+    private boolean waitForProcess;
+    private boolean lockByMyTransaction;
 
-    public RequestContext(String reqMessage, String invoke, String eqxPropSession,ERequestType requestType) {
+
+    public RequestContext(String reqMessage, String invoke, String eqxPropSession, ERequestType requestType) {
         this.requestInvokeId = invoke;
         this.reqMessage = reqMessage;
         this.requestType = requestType;
@@ -100,6 +111,14 @@ public class RequestContext {
         this.stateL2 = stateL2;
     }
 
+    public EState getStateL3() {
+        return stateL3;
+    }
+
+    public void setStateL3(EState stateL3) {
+        this.stateL3 = stateL3;
+    }
+
     public boolean isHasRequest() {
         return hasRequest;
     }
@@ -130,5 +149,45 @@ public class RequestContext {
 
     public void setEqxPropSession(String eqxPropSession) {
         this.eqxPropSession = eqxPropSession;
+    }
+
+    public Date getTimeoutDate() {
+        return timeoutDate;
+    }
+
+    public void setTimeoutDate(Date timeoutDate) {
+        this.timeoutDate = timeoutDate;
+    }
+
+    public boolean isInterval() {
+        return interval;
+    }
+
+    public void setInterval(boolean interval) {
+        this.interval = interval;
+    }
+
+    public int getIntervalRetry() {
+        return intervalRetry;
+    }
+
+    public void setIntervalRetry(int intervalRetry) {
+        this.intervalRetry = intervalRetry;
+    }
+
+    public boolean isWaitForProcess() {
+        return waitForProcess;
+    }
+
+    public void setWaitForProcess(boolean waitForProcess) {
+        this.waitForProcess = waitForProcess;
+    }
+
+    public boolean isLockByMyTransaction() {
+        return lockByMyTransaction;
+    }
+
+    public void setLockByMyTransaction(boolean lockByMyTransaction) {
+        this.lockByMyTransaction = lockByMyTransaction;
     }
 }

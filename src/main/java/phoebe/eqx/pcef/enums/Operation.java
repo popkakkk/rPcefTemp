@@ -1,7 +1,7 @@
 package phoebe.eqx.pcef.enums;
 
 public enum Operation {
-    TestOperation,
+    TestOperation, WaitInterval,
 
     GetResourceId,
 

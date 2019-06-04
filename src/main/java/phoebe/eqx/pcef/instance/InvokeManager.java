@@ -71,6 +71,9 @@ public class InvokeManager {
         for (InvokeObject invokeObject : list) {
             outList.add(invokeObject.getOperationRawReq());
         }
+
+
+
     }
 
 
@@ -87,6 +90,9 @@ public class InvokeManager {
             int retryNumber = 0;
             if (Operation.GetResourceId.equals(operation)) {
                 retryNumber = Config.RETRY_PRODUCT_GET_RESOURCE_ID;
+            }
+            if (Operation.WaitInterval.equals(operation)) {
+                retryNumber = Config.RETRY_PROCESSING;
             } else if (Operation.UsageMonitoringStart.equals(operation) || Operation.UsageMonitoringUpdate.equals(operation) || Operation.UsageMonitoringStop.equals(operation)) {
                 retryNumber = Config.RETRY_OCF_USAGE_MONITORING;
             }

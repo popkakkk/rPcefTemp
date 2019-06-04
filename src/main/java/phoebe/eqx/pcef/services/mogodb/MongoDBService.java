@@ -76,7 +76,7 @@ public abstract class MongoDBService {
 
     public DBObject findAndModify(BasicDBObject query, BasicDBObject update) {
         BasicDBObject setUpdate = new BasicDBObject("$set", update);
-        writeQueryLog("aggregate", collectionName, query.toString() + "," + setUpdate.toString());
+        writeQueryLog("findAndModify", collectionName, query.toString() + "," + setUpdate.toString());
         return db.getCollection(collectionName).findAndModify(query, setUpdate);
     }
 

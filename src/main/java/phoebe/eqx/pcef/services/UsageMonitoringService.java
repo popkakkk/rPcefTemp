@@ -61,9 +61,13 @@ public class UsageMonitoringService extends PCEFService {
             UsageMonitoringResponse usageMonitoringResponse = new UsageMonitoringResponse();
             usageMonitoringResponse.setCommand("usageMonitoring");
 
-            usageMonitoringResponse.setTid(context.getPcefInstance().getTransaction().getTid());
-            usageMonitoringResponse.setRtid(context.getPcefInstance().getTransaction().getRtid());
-            usageMonitoringResponse.setSessionId(context.getPcefInstance().getTransaction().getSessionId());
+            usageMonitoringResponse.setTid(context.getPcefInstance().getUsageMonitoringRequest().getTid());
+            usageMonitoringResponse.setRtid(context.getPcefInstance().getUsageMonitoringRequest().getRtid());
+
+            if (context.getPcefInstance().getTransaction() != null) {
+                usageMonitoringResponse.setSessionId(context.getPcefInstance().getTransaction().getSessionId());
+            }
+
             if (success) {
                 AFLog.d("Build Usage Monitoring Response Success ..");
                 usageMonitoringResponse.setStatus(EStatusResponse.SUCCESS.getCode());
@@ -83,7 +87,7 @@ public class UsageMonitoringService extends PCEFService {
 
             PCEFUtils.writeMessageFlow("Build Usage Monitoring Response", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Build Usage Monitoring Response-" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
+            PCEFUtils.writeMessageFlow("Build Usage Monitoring Response - " + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
 

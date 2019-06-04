@@ -6,12 +6,13 @@ import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
+import phoebe.eqx.pcef.services.GenerateCDRService;
 import phoebe.eqx.pcef.services.OCFUsageMonitoringService;
-import phoebe.eqx.pcef.services.VTTimoutService;
+import phoebe.eqx.pcef.services.E11TimoutService;
 import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 import phoebe.eqx.pcef.states.abs.ComplexState;
 import phoebe.eqx.pcef.states.abs.MessageRecieved;
-import phoebe.eqx.pcef.states.mongodb.W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE;
+import phoebe.eqx.pcef.states.L2.W_MONGODB_PROCESS_E11_VT_TIMEOUT;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,23 +32,27 @@ public class W_E11_TIMEOUT extends ComplexState {
         try {
             dbConnect = new MongoDBConnect(appInstance);
 
-            W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE mongodbProcessState = new W_MONGODB_PROCESS_E11_VT_TIMEOUT_STATE(appInstance, dbConnect);
+            W_MONGODB_PROCESS_E11_VT_TIMEOUT mongodbProcessState = new W_MONGODB_PROCESS_E11_VT_TIMEOUT(appInstance, dbConnect);
             mongodbProcessState.dispatch();
 
-            nextState = mongodbProcessState.getPcefState();
-            if (EState.END.equals(nextState)) {
-                AFLog.d("Not Do Thing! -->set finish");
-                appInstance.setFinish(true);
-            } else {
-                OCFUsageMonitoringService OCFUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
-                if (EState.W_USAGE_MONITORING_STOP.equals(nextState)) {
-                    //build stop
-                    OCFUsageMonitoringService.buildUsageMonitoringStop();
+            nextState = context.getStateL2();
+            if (EState.END.equals(context.getStateL3())) {
 
-                } else if (EState.W_USAGE_MONITORING_UPDATE.equals(nextState)) {
-                    //check resource used  rr0 rr1
-                    OCFUsageMonitoringService.buildUsageMonitoringUpdate(dbConnect);
+                if (EState.END.equals(nextState)) {
+                    AFLog.d("Not Do Thing! -->set finish");
+                    appInstance.setFinish(true);
+                } else {
+                    OCFUsageMonitoringService OCFUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
+                    if (EState.W_USAGE_MONITORING_STOP.equals(nextState)) {
+                        //build stop
+                        OCFUsageMonitoringService.buildUsageMonitoringStop();
+
+                    } else if (EState.W_USAGE_MONITORING_UPDATE.equals(nextState)) {
+                        //check resource used  rr0 rr1
+                        OCFUsageMonitoringService.buildUsageMonitoringUpdate(dbConnect);
+                    }
                 }
+
             }
         } catch (Exception e) {
             AFLog.d("error:" + e.getStackTrace()[0]);
@@ -74,17 +79,21 @@ public class W_E11_TIMEOUT extends ComplexState {
 
             List<Transaction> newResourceTransactions = appInstance.getMyContext().getPcefInstance().getOtherStartTransactions();
 
-            dbConnect.getTransactionService().filterResourceRequestErrorNewResource(ocfUsageMonitoringResponse, appInstance.getMyContext().getPcefInstance().getNewResources(), newResourceTransactions);
+            dbConnect.getTransactionService().filterResourceRequestErrorNewResource(ocfUsageMonitoringResponse, appInstance.getMyContext().getPcefInstance().getNewResourcesRequests(), newResourceTransactions);
             dbConnect.getTransactionService().filterResourceRequestErrorCommitResource(ocfUsageMonitoringResponse, appInstance.getMyContext().getPcefInstance().getCommitDatas());
 
             ArrayList<Quota> quotaResponseList = dbConnect.getQuotaService().getQuotaFromUsageMonitoringResponse(ocfUsageMonitoringResponse);
 
             dbConnect.getQuotaService().updateQuota(quotaResponseList);
             dbConnect.getTransactionService().updateTransaction(quotaResponseList, newResourceTransactions);
+
+            GenerateCDRService generateCDRService = new GenerateCDRService();
+            generateCDRService.buildCDRCharging(newResourceTransactions, appInstance.getAbstractAF());
+
             dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
 
-            VTTimoutService vtTimoutService = new VTTimoutService(appInstance);
-            vtTimoutService.buildRecurringTimout();
+            E11TimoutService e11TimoutService = new E11TimoutService(appInstance);
+            e11TimoutService.buildRecurringTimout();
 
 
         } catch (Exception e) {
@@ -133,7 +142,7 @@ public class W_E11_TIMEOUT extends ComplexState {
 
   /*  public void no(MongoDBConnect dbConnect) {
         dbConnect.getProfileService().updateProfileUnLock(false, null);
-        VTTimoutService vtTimoutService = new VTTimoutService(appInstance);
+        E11TimoutService vtTimoutService = new E11TimoutService(appInstance);
         vtTimoutService.buildRecurringTimout();
     }*/
 

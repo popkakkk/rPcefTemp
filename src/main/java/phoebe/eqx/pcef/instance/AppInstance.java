@@ -35,7 +35,6 @@ public class AppInstance {
     private transient RequestContext myContext;
 
 
-
     private transient ArrayList<EquinoxRawData> outList = new ArrayList<>();
     private transient boolean finish; //summary and ret 10
     private transient AbstractAF abstractAF;
@@ -59,6 +58,7 @@ public class AppInstance {
 
     public void patchResponse() {
         myContext.getInvokeManager().patchResponse(outList);
+
     }
  /*   public void setSummaryLogExternalResponse(Operation operation, Object resp) throws Exception {
 
@@ -75,6 +75,30 @@ public class AppInstance {
             summaryLog.getSummaryLogDetail().setUsedTime(String.valueOf(usedTime));
         }
     }*/
+
+
+    public RequestContext getRequestContextTimeout() {
+        RequestContext requestContext = null;
+        try {
+            //find min timeoutDate
+            for (RequestContext context : requestContexts) {
+
+                if (requestContext == null) {
+                    requestContext = context;
+                } else {
+                    if (context.getTimeoutDate().before(requestContext.getTimeoutDate())) {
+                        requestContext = context;
+                    }
+                }
+            }
+            AFLog.d("Get min timeout date" + requestContext.getTimeoutDate() + ",request context =" + requestContext.getRequestType());
+        } catch (Exception e) {
+            AFLog.d("Get Request Context Timeout error:" + e.getStackTrace()[0]);
+            throw e;
+        }
+        return requestContext;
+    }
+
 
     public SummaryLog findMatchSummaryLog(String invokeId, String logName) {
         for (SummaryLog summaryLog : summaryLogs) {

@@ -18,6 +18,8 @@ import phoebe.eqx.pcef.core.model.Profile;
 import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.instance.AppInstance;
+import phoebe.eqx.pcef.instance.Config;
+import phoebe.eqx.pcef.instance.InvokeManager;
 import phoebe.eqx.pcef.instance.context.RequestContext;
 import phoebe.eqx.pcef.states.L1.W_E11_TIMEOUT;
 import phoebe.eqx.pcef.states.L1.W_GyRAR;
@@ -175,23 +177,19 @@ public class EQX4Wrapper {
                     AFLog.d("[E11 TIMEOUT] Snap ISODate : " + PCEFUtils.isoDateFormatter.format(requestContext.getPcefInstance().getStartTime()));
                     appInstance.getRequestContexts().add(requestContext);
                 } else {
+                    requestContext = appInstance.getRequestContextTimeout();
 
-                    List<RequestContext> requestContextList = appInstance.getRequestContexts();
-                    for (RequestContext context : requestContextList) {
-
+                    InvokeManager invokeManager = requestContext.getInvokeManager();
+                    if (!requestContext.isInterval()) {
+                        if (!invokeManager.retryTimeout(appInstance)) {
+                            //set event timeout
+                            invokeManager.setEventTimeout();
+                        } else {
+                            //retry success
+                            process = false;
+                        }
                     }
-
-
-                   /* InvokeManager invokeManager = appInstance.getInvokeManager();
-                    if (!invokeManager.retryTimeout(appInstance)) {
-                        //set event timeout
-                        invokeManager.setEventTimeout();
-                    } else {
-                        //retry success
-                        process = false;
-                    }*/
                 }
-
             }
 
             appInstance.setMyContext(requestContext);
@@ -199,11 +197,11 @@ public class EQX4Wrapper {
             ERequestType requestType = requestContext.getRequestType();
             AFLog.d("[Request Type]: " + requestType);
             if (requestType == null) {
-                throw new Exception("Unknown request Type from message");
+                throw new Exception("Unknown Request Type from message");
             }
 
         } catch (Exception e) {
-            AFLog.d("Before process error" + e.getStackTrace()[0]);
+            AFLog.e("Before process error", e);
             process = false;
         }
         return process;
@@ -233,6 +231,7 @@ public class EQX4Wrapper {
             state.dispatch();
 
             appInstance.patchResponse();
+            AFLog.d("Next State [L1]:"+appInstance.getMyContext().getStateL1()+", [L2]:"+appInstance.getMyContext().getStateL2()+", [L3]:"+appInstance.getMyContext().getStateL3());
 
 
         } catch (Exception e) {
@@ -269,10 +268,11 @@ public class EQX4Wrapper {
                 }
             }
 
-            //calculate min query timeout
-            int timeout = calculateMinQueryTimeout(appInstance.getOutList());
-            eqxPropOut.setTimeout(String.valueOf(timeout));
-            AFLog.d("EquinoxProperties timeout =" + timeout);
+
+            String timout = getMinTimeout(appInstance);
+
+            eqxPropOut.setTimeout(timout);
+            AFLog.d("EquinoxProperties timeout =" + timout);
 
             //set Ret
             if (appInstance.isFinish()) {
@@ -353,17 +353,60 @@ public class EQX4Wrapper {
     }
 
 
-    private static int calculateMinQueryTimeout(List<EquinoxRawData> outList) {
-        Integer timeout = null;
-        for (EquinoxRawData out : outList) {
-            int timeoutRaw = Integer.parseInt(out.getRawDataAttribute("timeout"));
-            if (timeout != null) {
-                timeout = Math.min(timeout, timeoutRaw);
-            } else {
-                timeout = timeoutRaw;
+    private static String getMinTimeout(AppInstance appInstance) {
+        String timeoutStr;
+
+        try {
+            Integer timeout = null;
+            for (EquinoxRawData out : appInstance.getOutList()) {
+                int timeoutRaw = Integer.parseInt(out.getRawDataAttribute("timeout"));
+                if (timeout != null) {
+                    timeout = Math.min(timeout, timeoutRaw);
+                } else {
+                    timeout = timeoutRaw;
+                }
             }
+            timeout = (timeout == null) ? 10 : timeout;
+            AFLog.d("[Get Min Timeout] timeout of request context =" + timeout);
+
+
+            //set timeoutDate to context
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.SECOND, timeout);
+            appInstance.getMyContext().setTimeoutDate(calendar.getTime());
+
+            if (appInstance.getRequestContexts().size() == 1) {
+                AFLog.d("[Get Min Timeout] request context size = 1,timeout =" + timeout);
+                timeoutStr = String.valueOf(timeout);
+            } else {
+                int index = 0;
+                Date minTimeoutDate = null;
+                for (RequestContext requestContext : appInstance.getRequestContexts()) {
+                    Date timeoutDate = requestContext.getTimeoutDate();
+                    if (minTimeoutDate != null) {
+                        minTimeoutDate = timeoutDate;
+                    } else {
+                        minTimeoutDate = timeoutDate;
+                    }
+                    index++;
+                }
+                AFLog.d("[Get Min Timeout] min Timout Date =" + minTimeoutDate);
+                Date now = new Date();
+
+
+                if (now.after(minTimeoutDate)) {
+                    timeoutStr = "1";
+                    AFLog.d("[Get Min Timeout] now is after minTimeoutDate =" + timeoutStr);
+                } else {
+                    timeoutStr = String.valueOf((Math.abs(minTimeoutDate.getTime() - now.getTime()) / 1000) + 1);
+                    AFLog.d("[Get Min Timeout] cal timeout =" + timeoutStr);
+                }
+            }
+        } catch (Exception e) {
+            AFLog.d("[Get Min Timeout] cal timeout error +" + e.getStackTrace()[0] + ",return default timeout = 10");
+            timeoutStr = "10";
         }
-        return (timeout == null) ? 10 : timeout;
+        return timeoutStr;
     }
 
 

@@ -179,6 +179,7 @@ public class TransactionService extends MongoDBService {
         for (ResourceRequest resourceRequest : newResourceRequests) {
             boolean found = false;
             boolean error = false;
+            boolean notEnough = false;
 
             String resourceId = resourceRequest.getResourceId();
             for (ResourceResponse resourceResponse : ocfUsageMonitoringResponse.getResources()) {
@@ -190,13 +191,22 @@ public class TransactionService extends MongoDBService {
                     }
                     break;
                 }
+
+                if (newResourceTransactions.size() > resourceResponse.getQuotaByKey().getUnit()) {
+                    notEnough = true;
+                }
             }
 
-            if (!found || error) {
+
+            if (!found || error || notEnough) {
                 if (!found) {
                     AFLog.d("Resource Id:" + resourceId + "no have quota");
-                } else {
+                }
+                if (error) {
                     AFLog.d("Resource Id:" + resourceId + "return description error");
+                }
+                if (notEnough) {
+                    AFLog.d("Resource Id:" + resourceId + "not enough");
                 }
 
                 int index = 0;
@@ -214,6 +224,7 @@ public class TransactionService extends MongoDBService {
             }
         }
 
+
         //remove
         if (deleteList.size() > 0) {
             AFLog.d("remove transaction..");
@@ -223,6 +234,7 @@ public class TransactionService extends MongoDBService {
     }
 
     public void filterResourceRequestErrorCommitResource(OCFUsageMonitoringResponse ocfUsageMonitoringResponse, List<CommitData> commitDataList) {
+
 
         int index = 0;
         for (CommitData commitData : commitDataList) {
@@ -234,6 +246,7 @@ public class TransactionService extends MongoDBService {
             boolean found = false;
             boolean error = false;
             String resourceId = commitData.get_id().getResourceId();
+
             for (ResourceResponse resourceResponse : ocfUsageMonitoringResponse.getResources()) {
                 if (resourceId.equals(resourceResponse.getResourceId())) {
                     found = true;
@@ -252,10 +265,10 @@ public class TransactionService extends MongoDBService {
                     AFLog.d("Resource Id:" + resourceId + "return description error");
                 }
 
-                if (commitData.get_id().getResourceId().equals(context.getPcefInstance().getTransaction().getResourceId())) {
-
+                /*if (commitData.get_id().getResourceId().equals(context.getPcefInstance().getTransaction().getResourceId())) {
+                    thisTransactionSuccess = false;
                 }
-
+*/
 
                 //remove
                 AFLog.d("remove transaction to commit by resourceId : " + resourceId);
@@ -268,6 +281,7 @@ public class TransactionService extends MongoDBService {
             }
             index++;
         }
+
 
     }
 
@@ -282,6 +296,17 @@ public class TransactionService extends MongoDBService {
     }
 
 
+    public Map<String, Quota> resourceIdQuotaMap(ArrayList<Quota> quotas) {
+        Map<String, Quota> resourceMap = new HashMap<>();
+        quotas.forEach(quota ->
+                quota.getResources().forEach(resourceQuota ->
+                        resourceMap.put(resourceQuota.getResourceId(), quota)
+                )
+        );
+        return resourceMap;
+    }
+
+
     public void updateTransaction(ArrayList<Quota> quotas, List<Transaction> newResourceTransactions) {
 
         try {
@@ -291,12 +316,8 @@ public class TransactionService extends MongoDBService {
             }
 
             //get monitoring key by resource
-            Map<String, Quota> resourceMap = new HashMap<>();
-            quotas.forEach(quota ->
-                    quota.getResources().forEach(resourceQuota ->
-                            resourceMap.put(resourceQuota.getResourceId(), quota)
-                    )
-            );
+            Map<String, Quota> resourceMap = resourceIdQuotaMap(quotas);
+
 
             //update by transaction set mk and Counter
             AFLog.d("Update transaction and other start transaction..");
@@ -307,17 +328,8 @@ public class TransactionService extends MongoDBService {
                 searchQuery.put(ETransaction.status.name(), EStatusLifeCycle.Waiting.getName());
 
                 BasicDBObject updateQuery = new BasicDBObject();
-//                if (context.getPcefInstance().getCommitDatas().size() > 0 && ERequestType.USAGE_MONITORING.equals(context.getRequestType())) {
-//                    if (context.getPcefInstance().getTransaction().getTid().equals(transaction.getTid())) {
-//
-//                        //check this transaction to commit
-//                        updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Completed.getName());//waiting -->Complete
-//                    } else {
-//                    updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Done.getName());//waiting-->Done
-//                    }
-//                } else {
+
                 updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Done.getName());//waiting-->Done
-//                }
                 updateQuery.put(ETransaction.monitoringKey.name(), resourceMap.get(transaction.getResourceId()).getMonitoringKey());
                 updateQuery.put(ETransaction.counterId.name(), resourceMap.get(transaction.getResourceId()).getCounterId());
                 updateQuery.put(ETransaction.updateDate.name(), new Date());
@@ -330,7 +342,31 @@ public class TransactionService extends MongoDBService {
             PCEFUtils.writeMessageFlow("Update Transaction error" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
+    }
 
+
+    public void updateTransactionWaitingToComplete(ArrayList<Quota> quotas) {
+        AFLog.d("Update My Transaction Complete..");
+        try {
+            //get monitoring key by resource
+            Transaction transaction = context.getPcefInstance().getTransaction();
+
+            Map<String, Quota> resourceMap = resourceIdQuotaMap(quotas);
+            BasicDBObject searchQuery = new BasicDBObject();
+
+            searchQuery.put(ETransaction.tid.name(), transaction.getTid());
+            searchQuery.put(ETransaction.status.name(), EStatusLifeCycle.Waiting.getName());
+
+            BasicDBObject updateQuery = new BasicDBObject();
+            updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Completed.getName());//waiting -->Complete
+            updateQuery.put(ETransaction.monitoringKey.name(), resourceMap.get(transaction.getResourceId()).getMonitoringKey());
+            updateQuery.put(ETransaction.counterId.name(), resourceMap.get(transaction.getResourceId()).getCounterId());
+            updateQuery.put(ETransaction.updateDate.name(), new Date());
+            updateSetByQuery(searchQuery, updateQuery);
+        } catch (Exception e) {
+            AFLog.d("Update My Transaction Complete Error -" + e.getStackTrace()[0]);
+            throw e;
+        }
     }
 
 

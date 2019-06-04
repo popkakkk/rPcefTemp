@@ -18,6 +18,16 @@ public class WriteLog {
         abstractAF.getEquinoxUtils().writeLog(Config.LOG_ERROR_NAME, errorStr);
     }
 
+    public static void writeCDRRefund(AbstractAF abstractAF, String cdr) {
+        AFLog.d("Write CDR Refund Log ..");
+        abstractAF.getEquinoxUtils().writeLog(Config.CDR_REFUND_NAME, cdr);
+    }
+
+    public static void writeCDRCharging(AbstractAF abstractAF, String cdr) {
+        AFLog.d("Write CDR Charging Log ..");
+        abstractAF.getEquinoxUtils().writeLog(Config.CDR_CHARGING_NAME, cdr);
+    }
+
     public static void writeErrorLogUsageMonitoring(AbstractAF abstractAF, PCEFException e, UsageMonitoringRequest usageMonitoringRequest, String resourceId) {
 
         try {

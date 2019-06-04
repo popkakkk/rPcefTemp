@@ -3,15 +3,11 @@ package phoebe.eqx.pcef.states.abs;
 import com.mongodb.DBCursor;
 import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.exceptions.PCEFException;
-import phoebe.eqx.pcef.core.model.Profile;
-import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
-import phoebe.eqx.pcef.main.EQX4Wrapper;
 import phoebe.eqx.pcef.services.*;
 import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
-import phoebe.eqx.pcef.utils.WriteLog;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -53,6 +49,12 @@ public abstract class ComplexState extends State {
 //                AFLog.e("working state error-" + e.getStackTrace()[0]);
                 stop = true;
             }
+
+            //reset interval retry
+            if (!appInstance.getMyContext().isInterval()) {
+                appInstance.getMyContext().setIntervalRetry(0);
+            }
+
             EState workState = getWorkState();
             continueWork = !this.appInstance.getMyContext().isHasRequest();
             if (EState.END.equals(workState)) {
@@ -141,8 +143,8 @@ public abstract class ComplexState extends State {
                 UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
                 usageMonitoringService.buildResponseUsageMonitoring(false);
             } else if (requestType.equals(ERequestType.E11_TIMEOUT)) {
-                VTTimoutService vtTimoutService = new VTTimoutService(appInstance);
-                vtTimoutService.buildRecurringTimout();
+                E11TimoutService e11TimoutService = new E11TimoutService(appInstance);
+                e11TimoutService.buildRecurringTimout();
             } else if (requestType.equals(ERequestType.GyRAR)) {
                 GyRARService gyRARRequest = new GyRARService(appInstance);
                 gyRARRequest.buildResponseGyRAR(false);
@@ -152,7 +154,7 @@ public abstract class ComplexState extends State {
             }
 
         } catch (Exception e) {
-            AFLog.d("build Response Error fail requestType:" + requestType);
+            AFLog.d("Build Response Error(500) ... fail!! ,requestType:" + requestType);
             appInstance.setFinish(true);
         }
 

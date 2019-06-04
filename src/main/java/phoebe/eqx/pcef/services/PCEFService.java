@@ -74,10 +74,11 @@ abstract public class PCEFService {
         context.setHasRequest(true);
         Date reqTime = PCEFUtils.getDate(0);
         //add Summary Log
-        reqLogObj = SummaryLog.getSummaryLogRequest(operation, reqLogObj);
-        SummaryLog summaryLog = new SummaryLog(operation.name(), rawData.getInvoke(), reqTime, reqLogObj);
-        appInstance.getSummaryLogs().add(summaryLog);
-
+        if (operation != Operation.WaitInterval) {
+            reqLogObj = SummaryLog.getSummaryLogRequest(operation, reqLogObj);
+            SummaryLog summaryLog = new SummaryLog(operation.name(), rawData.getInvoke(), reqTime, reqLogObj);
+            appInstance.getSummaryLogs().add(summaryLog);
+        }
         //add invoke object to list
         context.getInvokeManager().addToInvokeList(rawData.getInvoke(), rawData, operation, reqTime);
 
@@ -119,10 +120,8 @@ abstract public class PCEFService {
         }
 
 
-        return invokeId + "_" + PCEFUtils.getDate(0).getTime();
+        return invokeId + "_" /*+ PCEFUtils.getDate(0).getTime()*/;
     }
-
-
 
 
 }
