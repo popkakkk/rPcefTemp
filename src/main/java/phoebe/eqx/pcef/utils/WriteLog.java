@@ -4,6 +4,7 @@ import ec02.af.abstracts.AbstractAF;
 import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.exceptions.PCEFException;
 import phoebe.eqx.pcef.core.logs.ErrorLog;
+import phoebe.eqx.pcef.core.model.Profile;
 import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.message.parser.req.GyRARRequest;
 import phoebe.eqx.pcef.message.parser.req.RefundManagementRequest;
@@ -106,15 +107,19 @@ public class WriteLog {
 
     }
 
-    public static void writeErrorE11Timeout(AbstractAF abstractAF, PCEFException e, String sessionId, String userType, String userValue) {
+    public static void writeErrorE11Timeout(AbstractAF abstractAF, PCEFException e, Profile profile) {
 
         try {
             //build
             ErrorLog errorLog = new ErrorLog(e.getError().getCode(), e.getError().getDesc(), e.getErrorMsg());
             errorLog.setCommand("E11 Timeout");
-            errorLog.setSessionId(sessionId);
-            errorLog.setUserType(userType);
-            errorLog.setUserValue(userValue);
+
+            if (profile != null) {
+                errorLog.setSessionId(profile.getSessionId());
+                errorLog.setUserType(profile.getUserType());
+                errorLog.setUserValue(profile.getUserValue());
+            }
+
             String errorStr = PCEFUtils.gsonToJson(errorLog);
 
             writeLogError(abstractAF, errorStr);

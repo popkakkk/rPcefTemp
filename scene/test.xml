@@ -1,69 +1,174 @@
 <dummy-request>
     <dummy-message id="1">
-        <EquinoxMessage from="rPCEF.E11.0" via="rPCEF.E11.0" session="0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" timeout="10" ret="0" diag="3:2:0">
-            <EquinoxRawData to="rPCEF.ES00.SERV" name="HTTP" type="response" ctype="text/plain" invoke="umStart_" ecode="200" method="POST" url="/api/v1/metering-method" val="{
-&quot;command&quot;:&quot;usageMonitoringStart&quot;,
-&quot;devMessage&quot;:&quot;SUCCESS&quot;,
-&quot;requestNumber&quot;:&quot;1&quot;,
-&quot;resources&quot;:[
-   {
-      &quot;counterId&quot;:&quot;4001000001&quot;,
-      &quot;monitoringKey&quot;:&quot;1005176999&quot;,
-      &quot;quotaByKey&quot;:
-         {
-            &quot;unit&quot;:&quot;5&quot;,
-            &quot;unitType&quot;:&quot;unit&quot;,
-            &quot;validityTime&quot;:&quot;30&quot;
-         }
-      ,
-      &quot;rateLimitByKey&quot;:
-         {
-            &quot;transactionPerTime&quot;:&quot;100|60&quot;
-         }
-      ,
-      &quot;resourceId&quot;:&quot;000000100000010000001&quot;,
-      &quot;resourceName&quot;:&quot;GSSO/sendOneTimePwd&quot;,
-      &quot;resultCode&quot;:&quot;20000&quot;,
-      &quot;resultDesc&quot;:&quot;SUCCESS&quot;,
-      &quot;rtid&quot;:&quot;R-TRAN-0001&quot;
-   },
-   {
-      &quot;resourceName&quot;:&quot;GSSO/sendOneTimePwd&quot;,
-      &quot;resultCode&quot;:&quot;20000&quot;,
-      &quot;resultDesc&quot;:&quot;SUCCESS&quot;,
-      &quot;rtid&quot;:&quot;R-TRAN-0001&quot;
-   },
-   {
-      &quot;counterId&quot;:&quot;4001000001&quot;,
-      &quot;monitoringKey&quot;:&quot;1005177000&quot;,
-      &quot;quotaByKey&quot;:
-         {
-            &quot;unit&quot;:&quot;5&quot;,
-            &quot;unitType&quot;:&quot;unit&quot;,
-            &quot;validityTime&quot;:&quot;30&quot;
-         }
-      ,
-      &quot;rateLimitByKey&quot;:
-         {
-            &quot;transactionPerTime&quot;:&quot;100|60&quot;
-         }
-      ,
-      &quot;resourceId&quot;:&quot;000000100000020000002&quot;,
-      &quot;resourceName&quot;:&quot;SMS&quot;,
-      &quot;resultCode&quot;:&quot;20000&quot;,
-      &quot;resultDesc&quot;:&quot;SUCCESS&quot;,
-      &quot;rtid&quot;:&quot;R-TRAN-0002&quot;
+        <EquinoxMessage from="rPCEF_may.E11.0" via="rPCEF_may.E11.0" session="0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" timeout="10" ret="0" diag="5:4:0">
+            <EquinoxRawData to="rPCEF_may.ES00.SERV" name="HTTP" type="response" ctype="text/xml" invoke="getResourceId_" ecode="200" method="GET" url="/marketplace/v1/products?category=IoT&am
+p;page=1&amp;limit=20&amp;sort=id&amp;order=desc&amp;keyword=SMS" orig="rPCEF_may.ES04.Product.0" ret="0">
+                <ERDHeader>
+                    <Header name="Pragma" value="hop=2:rPCEF_may_tm.ES05.Product.0; end=" />
+                    <Header name="Set-Cookie" value="host=; port=31601; via=auto; session=2" />
+                    <Header name="Content-Type" value="application/json" />
+                    <Header name="Content-Length" value="5870" />
+                </ERDHeader>
+                <ERDData value="{
+   &quot;resultCode&quot;: &quot;20000&quot;,
+   &quot;developerMessage&quot;: &quot;Query product success&quot;,
+   &quot;userMessage&quot;: &quot;Transaction success.&quot;,
+   &quot;moreInfo&quot;: &quot;&quot;,
+   &quot;resultData&quot;:    {
+      &quot;products&quot;: [      {
+         &quot;_id&quot;: &quot;5caf0d8edd70922b00cc4d4e&quot;,
+         &quot;productId&quot;: &quot;PD-30000&quot;,
+         &quot;productCategory&quot;:          {
+            &quot;categoryId&quot;: &quot;5a829fec874d4f770a093414&quot;,
+            &quot;categoryName&quot;: &quot;IoT&quot;,
+            &quot;categoryOrder&quot;: 1
+         },
+         &quot;productSubCategory&quot;:          {
+            &quot;subCategoryId&quot;: &quot;5a829fec874d4f770a093414&quot;,
+            &quot;subCategoryName&quot;: &quot;IOT Solution&quot;,
+            &quot;subCategoryOrder&quot;: 1
+         },
+         &quot;status&quot;: &quot;Active&quot;,
+         &quot;productPublic&quot;: true,
+         &quot;productName&quot;: &quot;Amazon Echo&quot;,
+         &quot;productShortDesc&quot;: &quot;Echo (1st Generation) - Smart speaker with Alexa - Charcoal Fabric&quot;,
+         &quot;productPriceDetail&quot;:          {
+            &quot;priceMethod&quot;: &quot;Price Plan&quot;,
+            &quot;conditionPricing&quot;:             [
+                              {
+                  &quot;priceCode&quot;: &quot;PC-00001&quot;,
+                  &quot;name&quot;: &quot;Plan A - Flat&quot;,
+                  &quot;conditionType&quot;: &quot;amount&quot;,
+                  &quot;conditionDetail&quot;:                   {
+                     &quot;amount&quot;:                      {
+                        &quot;data&quot;: 1,
+                        &quot;unit&quot;: &quot;Piece&quot;
+                     },
+                     &quot;price&quot;:                      {
+                        &quot;data&quot;: 6499,
+                        &quot;unit&quot;: &quot;THB&quot;
+                     },
+                     &quot;pricingMethod&quot;: &quot;flat&quot;
+                  }
+               },
+                              {
+                  &quot;priceCode&quot;: &quot;PC-00002&quot;,
+                  &quot;name&quot;: &quot;Plan B - Tier&quot;,
+                  &quot;conditionType&quot;: &quot;amount&quot;,
+                  &quot;conditionDetail&quot;:                   {
+                     &quot;amount&quot;:                      {
+                        &quot;data&quot;: 1,
+                        &quot;unit&quot;: &quot;Pieces&quot;
+                     },
+                     &quot;price&quot;:                      {
+                        &quot;data&quot;: 6499,
+                        &quot;unit&quot;: &quot;THB&quot;
+                     },
+                     &quot;pricingMethod&quot;: &quot;tier&quot;,
+                     &quot;pricing&quot;:                      [
+                                                {
+                           &quot;from&quot;: 1,
+                           &quot;to&quot;: 1,
+                           &quot;price&quot;: 6499
+                        },
+                                                {
+                           &quot;from&quot;: 2,
+                           &quot;to&quot;: 100,
+                           &quot;price&quot;: 6399
+                        },
+                                                {
+                           &quot;from&quot;: 101,
+                           &quot;to&quot;: 300,
+                           &quot;price&quot;: 6299
+                        },
+                                                {
+                           &quot;from&quot;: 301,
+                           &quot;to&quot;: 500,
+                           &quot;price&quot;: 6199
+                        },
+                                                {
+                           &quot;from&quot;: 501,
+                           &quot;to&quot;: -1,
+                           &quot;price&quot;: 5899
+                        }
+                     ]
+                  }
+               },
+                              {
+                  &quot;priceCode&quot;: &quot;e;,
+                  &quot;name&quot;: &quot;Plan C - Volumn&quot;,
+                  &quot;conditionType&quot;: &quot;amount&quot;,
+                  &quot;conditionDetail&quot;:                   {
+                     &quot;amount&quot;:                      {
+                        &quot;data&quot;: 1,
+                        &quot;unit&quot;: &quot;Pieces&quot;
+                     },
+                     &quot;price&quot;:                      {
+                        &quot;data&quot;: 6499,
+                        &quot;unit&quot;: &quot;THB&quot;
+                     },
+                     &quot;pricingMethod&quot;: &quot;volumn&quot;,
+                     &quot;pricing&quot;:                      [
+                                                {
+                           &quot;from&quot;: 1,
+                           &quot;to&quot;: 1,
+                           &quot;price&quot;: 6499
+                        },
+                                                {
+                           &quot;from&quot;: 2,
+                           &quot;to&quot;: 100,
+                           &quot;price&quot;: 6450
+                        },
+                                                {
+                           &quot;from&quot;: 101,
+                           &quot;to&quot;: 300,
+                           &quot;price&quot;: 6250
+                        },
+                                                {
+                           &quot;from&quot;: 301,
+                           &quot;to&quot;: 500,
+                           &quot;price&quot;: 6199
+                        },
+                                                {
+                           &quot;from&quot;: 501,
+                           &quot;to&quot;: -1,
+                           &quot;price&quot;: 6000
+                        }
+                     ]
+                  }
+               }
+            ]
+         },
+         &quot;productImage&quot;:          [
+                        {
+               &quot;type&quot;: &quot;thumbnail&quot;,
+               &quot;imagePath&quot;: &quot;https://assets.pcmag.com/media/images/522880-amazon-echo-plus.jpg&quot;
+            },
+                        {
+               &quot;type&quot;: &quot;gallery&quot;,
+               &quot;imagePath&quot;: &quot;https://assets.pcmag.com/media/images/522880-amazon-echo-plus.jpg&quot;
+            },
+                        {
+               &quot;type&quot;: &quot;gallery&quot;,
+               &quot;imagePath&quot;: &quot;https://brain-images-ssl.cdn.dixons.com/4/8/10171184/l_10171184_003.jpg&quot;
+            },
+                        {
+               &quot;type&quot;: &quot;gallery&quot;,
+               &quot;imagePath&quot;: &quot;https://brain-images-ssl.cdn.dixons.com/4/8/10171184/l_10171184_006.jpg&quot;
+            },
+                        {
+               &quot;type&quot;: &quot;gallery&quot;,
+               &quot;imagePath&quot;: &quot;https://brain-images-ssl.cdn.dixons.com/4/8/10171184/l_10171184_007.jpg&quot;
+            }
+         ]
+      }],
+      &quot;productTotal&quot;: 2
    }
-]
-,
-&quot;sessionId&quot;:&quot;sessionIdFromPCEF&quot;,
-&quot;status&quot;:&quot;200&quot;,
-&quot;tid&quot;:&quot;transactionId1&quot;,
-&quot;userType&quot;:&quot;privateId&quot;,
-&quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;
-}" charset="" desc="host=; port=41500; via=auto; session=21" orig="rPCEF.ES04.rOCF.0" ret="0" />
+}
+" />
+            </EquinoxRawData>
             <EquinoxInstance>
-                <value val="1::ACTIVE::false::ZUY2MVZtdHY0am9RL1NzcjYzNmtKUWtFUXIreHZHN1U4cmdFdHBXV0NubURTNzFOYk9vNFVCYjF2OSt4SFY0dDBHVzFyVlFCOW5nOG5uUG16S3lRSU04cFNXU05NMGxlWklLdXZxL1FMQ1FQUGtza1ppRkJWeXVVa0NTaG5Qa1RkSVVDODcxcU80V2lXeXA3NnJOVXJsUnJBLzliQStVUW5CSnlRR000YUx0dXhTcVV2S0pqdVlVY1NoTThKVzNPcU9TQ3NtbmZYS3o4aHp5T01WUGUzOWdvZjJmY0xhbU9zRnByWHRUcldYd1ZGYUFGZitCTFpBYTkyNHROL0x2N09KUXBqa3p3eUxIc2l1VTZubDBzRkp3aW5NYXpHWGl2Y2Y1RXlaZCt5bUFwakNoaFV1Y2xiRTErRlBFdnlxSjQ4ZXgxM0dhOWRUZi9yN01ZWHRjS3JqT2ZPeFBpUFN4clE1LzZjREJOaUJnc1o1QWtOQk4wamlVQkoyYjVHNDVTdFc3ZFZlNWF5eGY1OHRUKzlmT3gwN3ZyUitWZXY5SXNQbmY1enh0WnRkMmlWM2JMbnVjV1BCV2VJQWxQUlVnNldPVWV0WUtnbTA4SW0zUVpVUy9xTFNib05RZTM4UWNhYVZUSE9sdm5Ydk1Ka2RPa0ozaW9jR1pUWUkzQ0hEZ0ozT3VrOFE4aXNxVXRCVGVVYUFvZTkycU5wbnFZRkpnbEFDRHc5RnpLZmtTTGoyaDFtamFma0xBMTFKcDRpdHVXWmU5Ly9CNGZjaWplbE9NMVdZSXpWWEFTeXhSMEFOMWlLaFVpUUhOQmdLRjErTjh0YXJ0U0JNYk9Kc2UyL21hOTBLUUswTTdWL1lBMWw0OUVCRnBvdHFnYjZmcFFManhySTFXbmNMZmgyYWR3Vi92SGNYYy90OFRmNCs0WStKMzN1QWZ0QUJiL0VHZkg4eXdYWEIvQWVidjFXVGpmQS9HZ01WQUp4TU1LWFZoZ1pOSFBkTTdnL2ZkSzRSUWJMRkNZMVVaaHowLy9LZDgyZXIwSFRsTTI1MCtralJrMFNaQzhGWXBvSW5VM05qdjYwalRXckI4RG9ueEdCRFpxaDRiN25WWGI3SnIwTVdUdFdUbVZwdWVRMEhJdW9YRHhaZU01cFl5L2dJWEtjaE1vemNYeW4vMVZQNTVGNEU3Wkt4L0MyRmFsMUhIR1JENXlGVnl2R3d6QUxNenVVT05FZmhaaHFob2xNMDNwMzhHZ0I3L01pL2JmSXpuOEZrck5MeHVCVmJ3VTNWb1RURE5uMlpRQ0M2bUl3RENQWnpRL3QvTndPVkhEeEVVV2hTcmFtUEFVTW9kc2hacUt0akdISnAxMTJ5RjdZbnloUWlLN3E1M3JUdmUyQTZ2WjQ5clFqUUFJOExJYXJjZVRFYm9hdlIxUWRLcEhLRGZhemluYTdGMkwwallnS0hwM3AxZjVFMXR2WlE4MEhVOGJtZld0eHVqRi9hRkVuMXozRjcyL0dTWTJXM3FjMEh0bmRmb3NLRE5TSkhEK095UmlXMnpHNGFIT3MzZFF6U0xhOU1BMFlnelhLUWtPem1RalZYZW43MTByMytGN1FmMSs0eDVJTmRRZ2VnVzZQT0lFQkNhTmdFQVBPRXFJbXF1a2dOWUlZNG4rdHA1SlFCTUJzN2VEYnNIeWREVm5jUHE2cUhYcDJyWlg4Q3FsVXFtc1dHWm0zelVuZzJxck1XNTNPLzZnMi9jN0xUQTRQa1dyOWt4dWJQRDR0ZEh5RldYTmlnTXJ0K1BoRzFmallGRHREK0IxWUpiQ2tDMldOM3hxbERQaTAvV29TT1JhVlBVVXVpTTQwOTB0SlR0YkwzVWlNWVZhM0JPb2QvYWJIRzJwV3lxV0hlZUxaYm1leVFRRXJyK29tV09sVVFEeDJ3UjNSTnNPaStJSDBlM0k1L0c0QU1JamNkMi8vZzhSbEJFQg==::" />
+                <value val="1::ACTIVE::false::ZUY3RlZsMXoyamdVL1N1TVpoOURrSTBOZHZaaGg0S2huZ1pDRGRsa1pwTmhWS09BZ3BHTUxQUFJEUDk5cnl5VEVOcDA2ZE8reWVkS1IrZCs2RjYvSUVsWE9jMVVXM0JGdHlwRFYvKzhvRFNtVHlIUEZPRXhSVmN2S0tOWnhnUVBwK2dLalZydDdzaDgvMm41RGN2RjJITjhkSUZndTFSanRvUVRsdXY2VGR6MHZZWmpPeGNvejhpTTlnVm5Ta2pHWjVHNVVSUEhZcmtrWE5PZTdORjg1MXlxMkVGVHRkT3g2NDdiYUhxK0JRdmY5MjBna2VXRzRWMjExZnFKbmNRcUo0bFJqV3hzK2JpQlhjdXk2bllEVHBNMEJXbHRJUmFNVnFLY0F4UW5qSEpWUkNMdVRiODU1RHZqeVhLejhnWnV0OU83WDM4ZGJHNi90T3V1dlY3YlUrbzk3ZHEzSVF2aFlKNVJPZDZsRUIyVVNyWW1pZ0tKZ2Y4bVNhNXhmTy9mOTNaYnRWMzB2ei9QQjhQN0tHa09JNy9yckc3RTg3VnFXYTdqTmQybTU3bDF6OUhPMFV6a01xWURvb09PUnYwUjJsOGdvZVpVam9wa1NNSXo4QkJTcC9QNmVJR29sRUtpcXllU1pCUjhnZWd6MVNHS2xHWk9OMUhKbVpWWktpMk1nL3hqd3BJRTdtTjhMUmEwVHpna0diaGZVTUl5VlpTUnNSU3htbEYxWUE2bkU5QXVVaXFKVmdiRzNySHgyQllSMExQU25NcEVqc2JZdnB5QzRNdGdsVE11dHJCRDYrK0NsMEx1L25pUGhzczBBVHE5WDNOSXM3ZWxWQ0Z6U2RWY2FHMjlZS3dUVzE0Qk9VOVlYRWlyUFdlZzd3SnhFOS9QNC9FUXZveFhQL05KQ1VEbHNCMTBKMHV5dXd4RzJMa2NTakhOWXdYblN2N3l2UUdReXdUMjE1WkVMcWhLRXhMVDJ0cXFwZVpBOWhkb29ETnc2aUhIdUQ0TnhWZ3Y3RVlLWVRhUVpZQ0VRUklOWW1NRFpVS1dDSnNhUk1ncGxXYlRsR2F4QVJkMHR3R0RnWFgxZ0VoNHZ5S0g5Q0ZIMXhLRUxGaER2WmVGZThzWFhHeDBTT2d4T3ZneXVMa2JBRnBHdUE4dkYxUUNTVUVkQjFIbk15VUhBVVo5YkpDS2pxMFI4QUFQRFhvUVYxVjkyd09xclBXek9OaE8wL0tBYW9YcFk3WnRGYzVVQy80VHJoRTBvVHdoa3FuZE9UVHhuSEJPazFPV3UrRFRPYWZWMnlPc1FqWk9wT2hpT1c0N3VIRU9KOG5WdkNwRjhxTm40VG5IZFN1cWxuVjRLdWkzZXRESlpiV1RSS005bE5DY1FDdko4Z1JxcW13N2tpcTVneUdoR3hpc0J2bnltMjRjV0grdmZoZ2c5ZWIrVVZlaUdScGgwV3lLbHVMWVRldzNHZzdXNWJqYXdrTkx5N2tFeHQ5eVExZXVvVC9VK2FqVkN5YjltMEU0dm9uQ1FlL3RZVUN6T1pwdlBuWWNjSU5CMlVxbzFsY1BEMEJrUEFYUFBoNk9ZRkgwMmdMTm40SmVxRitSUVd4QTdpYlFteVpSTUxxNWpkckJKT3lBZFVPWTZnb0o3c2J3ekY2dlRFUzhBT3lKSmFDdkNQUWUrbjJXdzN5VnUyc3hNNE05RWJOeVdKejIzRi8xNmplV0RsV0VnWisvN3UydmFYdzNVYkZkd1o2bi94VEFEczRWQzVDRlh2YTZVR0J1dklxN2ZmL0RVQXd6Mkg2a01WOFdvSjRrLzZIdWFPY0h1dHdLaGgrSGMzVDlEMEZyVkxCVGIzNGc3bkgvTDhoN0tjWT0=::" />
             </EquinoxInstance>
         </EquinoxMessage>
     </dummy-message>

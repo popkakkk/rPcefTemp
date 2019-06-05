@@ -1,6 +1,7 @@
 package phoebe.eqx.pcef.states.L1;
 
 import ec02.af.utils.AFLog;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.state.EState;
@@ -55,7 +56,7 @@ public class W_E11_TIMEOUT extends ComplexState {
 
             }
         } catch (Exception e) {
-            AFLog.d("error:" + e.getStackTrace()[0]);
+            AFLog.d("error:" + ExceptionUtils.getStackTrace(e));
             throw e;
         } finally {
             if (dbConnect != null) {
@@ -97,7 +98,7 @@ public class W_E11_TIMEOUT extends ComplexState {
 
 
         } catch (Exception e) {
-            AFLog.d(" wUsageMonitoringUpdate:" + e.getStackTrace()[0]);
+            AFLog.d(" wUsageMonitoringUpdate:" +  ExceptionUtils.getStackTrace(e));
             throw e;
         } finally {
             if (dbConnect != null) {

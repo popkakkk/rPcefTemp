@@ -2,9 +2,7 @@ package phoebe.eqx.pcef.services;
 
 import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
-import phoebe.eqx.pcef.core.exceptions.PCEFException;
-import phoebe.eqx.pcef.core.exceptions.ResponseErrorException;
-import phoebe.eqx.pcef.core.exceptions.TimeoutException;
+import phoebe.eqx.pcef.core.exceptions.*;
 import phoebe.eqx.pcef.enums.EError;
 import phoebe.eqx.pcef.enums.Operation;
 import phoebe.eqx.pcef.enums.stats.EStatCmd;
@@ -16,6 +14,7 @@ import phoebe.eqx.pcef.message.parser.res.product.GetResourceIdResponse;
 import phoebe.eqx.pcef.utils.MessageFlow;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 import phoebe.eqx.pcef.utils.ValidateMessage;
+import phoebe.eqx.pcef.utils.WriteLog;
 import phoebe.eqx.pcef.utils.erd.ERDHeader;
 import phoebe.eqx.pcef.utils.erd.Header;
 
@@ -87,50 +86,45 @@ public class GetResourceIdService extends PCEFService {
         } catch (PCEFException e) {
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.sent_Get_Product_request);
             PCEFUtils.writeMessageFlow("Build Get ResourceResponse ID Request", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
-//            PCEFUtils.writeErrorLog(abstractAF, e);
+            context.setPcefException(e);
             throw e;
         }
     }
 
 
-    public void readGetResourceId() throws ResponseErrorException {
-        String resourceId = null;
+    public void readGetResourceId() throws PCEFException {
         try {
-            AFLog.d("Read Get ResourceResponse ID Response ..");
+            try {
+                AFLog.d("Read Get ResourceResponse ID Response ..");
+                String resourceId;
 
-            //extract
-            Operation operation = Operation.GetResourceId;
+                Operation operation = Operation.GetResourceId;
+                GetResourceIdResponse getResourceIdResponse = (GetResourceIdResponse) extractResponse(operation);
 
-            GetResourceIdResponse getResourceIdResponse = (GetResourceIdResponse) extractResponse(operation);
+                ValidateMessage.validateGetResourceIdResponse(getResourceIdResponse, abstractAF);
 
-
-            //validate
-            ValidateMessage.validateGetResourceIdResponse(getResourceIdResponse);
-
-            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.receive_Get_Product_response);
-
-
-            //summarylog res
+                //summarylog res
 //            context.setSummaryLogExternalResponse(operation, SummaryLog.getSummaryLogResponse(operation, testResponseData));
 
-            resourceId = getResourceIdResponse.getResultData().getProducts().get(0).getProductId(); // get index = 0
-            appInstance.getMyContext().getPcefInstance().setResourceId(resourceId);
+                resourceId = getResourceIdResponse.getResultData().getProducts().get(0).getProductId(); // get index = 0
+                appInstance.getMyContext().getPcefInstance().setResourceId(resourceId);
 
-            PCEFUtils.writeMessageFlow("Read Get ResourceResponse ID Response :" + resourceId, MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
-        } catch (TimeoutException e) {
-            // handle time out
-            PCEFUtils.increaseStatistic(abstractAF, EStatMode.TIMEOUT, EStatCmd.receive_Get_Product_response);
-        } catch (ResponseErrorException e) {
-            // handle ret error
-            PCEFUtils.increaseStatistic(abstractAF, EStatMode.EQUINOX_ERROR, EStatCmd.receive_Get_Product_response);
-            throw e;
+                PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.receive_Get_Product_response);
+                PCEFUtils.writeMessageFlow("Read Get ResourceResponse ID Response :" + resourceId, MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
+            } catch (TimeoutException e) {
+                PCEFUtils.increaseStatistic(abstractAF, EStatMode.TIMEOUT, EStatCmd.receive_Get_Product_response);
+                e.setError(EError.GET_PRODUCT_RESPONSE_TIMEOUT);
+                throw e;
+            } catch (ResponseErrorException e) {
+                PCEFUtils.increaseStatistic(abstractAF, EStatMode.EQUINOX_ERROR, EStatCmd.receive_Get_Product_response);
+                e.setError(EError.GET_PRODUCT_RESPONSE_EQUINOX_ERROR);
+                throw e;
+            }
         } catch (PCEFException e) {
-            PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.receive_Get_Product_response);
-            //increase stat fail
+            context.setPcefException(e);
             //summarylog fail
-            // read fail
             PCEFUtils.writeMessageFlow("Read Get ResourceResponse ID Response", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
-
+            throw e;
         }
 
 

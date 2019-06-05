@@ -236,9 +236,9 @@ public class QuotaService extends MongoDBService {
 
 
     public void filterTransactionConfirmIsNewResource(List<Transaction> otherTransaction) {
-        AFLog.d("Confirm Resource Is New Resource..");
         int index = 0;
         for (Transaction transaction : otherTransaction) {
+            AFLog.d("Confirm Resource Is New Resource..");
             DBCursor quotaCursor = findQuotaByTransaction(transaction);
             if (quotaCursor.hasNext()) {
                 AFLog.d("[Confirm Resource Is New Resource] have quota:" + quotaCursor.next().get(EQuota._id.name()) + ",filter tid:" + transaction.getTid());

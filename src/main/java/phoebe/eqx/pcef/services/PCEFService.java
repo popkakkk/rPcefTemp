@@ -1,24 +1,19 @@
 package phoebe.eqx.pcef.services;
 
-import com.mongodb.DBCursor;
 import ec02.af.abstracts.AbstractAF;
 import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.core.PCEFParser;
 import phoebe.eqx.pcef.core.data.InvokeObject;
 import phoebe.eqx.pcef.core.exceptions.ExtractErrorException;
-import phoebe.eqx.pcef.core.exceptions.PCEFException;
 import phoebe.eqx.pcef.core.exceptions.ResponseErrorException;
 import phoebe.eqx.pcef.core.exceptions.TimeoutException;
 import phoebe.eqx.pcef.core.logs.summary.SummaryLog;
 import phoebe.eqx.pcef.enums.EEvent;
-import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.enums.Operation;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.instance.context.RequestContext;
-import phoebe.eqx.pcef.message.parser.req.GyRARRequest;
-import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 
 import java.util.Date;
@@ -58,9 +53,9 @@ abstract public class PCEFService {
         } else if (Operation.RefundTransaction.equals(operation)) {
             parser = new PCEFParser(equinoxRawData.getRawDataAttribute("val"));
             result = parser.translateRefundTransactionResponse();
-        } else if (Operation.UsageMonitoringStart.equals(operation) || Operation.UsageMonitoringUpdate.equals(operation)) {
+        } else if (Operation.UsageMonitoringStart.equals(operation) || Operation.UsageMonitoringUpdate.equals(operation) || Operation.UsageMonitoringStop.equals(operation)) {
             parser = new PCEFParser(equinoxRawData.getRawDataAttribute("val"));
-            result = parser.translateUsageMonitoringResponse();
+            result = parser.translateOCFUsageMonitoringResponse(operation);
         } else if (Operation.GetResourceId.equals(operation)) {
             parser = new PCEFParser(equinoxRawData.getRawDataMessage());
             result = parser.translateGetResourceId();
@@ -73,12 +68,12 @@ abstract public class PCEFService {
 
         context.setHasRequest(true);
         Date reqTime = PCEFUtils.getDate(0);
+
         //add Summary Log
-        if (operation != Operation.WaitInterval) {
-            reqLogObj = SummaryLog.getSummaryLogRequest(operation, reqLogObj);
-            SummaryLog summaryLog = new SummaryLog(operation.name(), rawData.getInvoke(), reqTime, reqLogObj);
-            appInstance.getSummaryLogs().add(summaryLog);
-        }
+        reqLogObj = SummaryLog.getSummaryLogRequest(operation, reqLogObj);
+        SummaryLog summaryLog = new SummaryLog(operation.name(), rawData.getInvoke(), reqTime, reqLogObj);
+        appInstance.getSummaryLogs().add(summaryLog);
+
         //add invoke object to list
         context.getInvokeManager().addToInvokeList(rawData.getInvoke(), rawData, operation, reqTime);
 

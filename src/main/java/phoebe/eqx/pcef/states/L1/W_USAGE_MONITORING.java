@@ -43,7 +43,6 @@ public class W_USAGE_MONITORING extends ComplexState {
         setWorkState(EState.W_MONGO_PROCESS_USAGE_MONITORING);
     }
 
-
     @MessageRecieved(messageType = EState.W_MONGO_PROCESS_USAGE_MONITORING)
     public void wMongoUsageMonitoring() throws Exception {
         MongoDBConnect dbConnect = null;
@@ -156,25 +155,32 @@ public class W_USAGE_MONITORING extends ComplexState {
 
             Transaction thisTransaction = appInstance.getMyContext().getPcefInstance().getTransaction();
             List<CommitData> commitDataList = appInstance.getMyContext().getPcefInstance().getCommitDatas();
-            if (appInstance.getMyContext().getPcefInstance().getCommitDatas().size() == 0) {
-                newResourceTransactions.add(thisTransaction); //this transaction new resource
-            } else {
-                for (CommitData commitData : commitDataList) {
+//            if (appInstance.getMyContext().getPcefInstance().getCommitDatas().size() == 0) {
+            newResourceTransactions.add(thisTransaction); //this transaction new resource
+//            } else {
+               /* for (CommitData commitData : commitDataList) {
                     if (commitData.get_id().getResourceId().equals(thisTransaction.getResourceId())) {
                         commitData.getTransactionIds().add(thisTransaction.getTid());//this transaction commit resource -- to filter error
                         break;
                     }
-                }
-            }
-
-
+                }*/
+//            }
             newResourceTransactions.addAll(appInstance.getMyContext().getPcefInstance().getOtherStartTransactions());
 
             dbConnect.getTransactionService().filterResourceRequestErrorNewResource(ocfUsageMonitoringResponse, appInstance.getMyContext().getPcefInstance().getNewResourcesRequests(), newResourceTransactions);
             dbConnect.getTransactionService().filterResourceRequestErrorCommitResource(ocfUsageMonitoringResponse, appInstance.getMyContext().getPcefInstance().getCommitDatas());
 
-
             boolean transactionError = true;
+            for (Transaction t : newResourceTransactions) {
+                if (t.getResourceId().equals(thisTransaction.getResourceId())) {
+                    transactionError = false;
+                }
+            }
+
+
+
+
+          /*  boolean transactionError = true;
             if (commitDataList.size() > 0) {  //check my transaction commit error and set to update
                 for (CommitData commitData : commitDataList) {
                     if (thisTransaction.getResourceId().equals(commitData.get_id().getResourceId())) {
@@ -191,7 +197,7 @@ public class W_USAGE_MONITORING extends ComplexState {
                     }
                 }
 
-            }
+            }*/
 
             ArrayList<Quota> quotaResponseList = dbConnect.getQuotaService().getQuotaFromUsageMonitoringResponse(ocfUsageMonitoringResponse);
 
@@ -204,10 +210,10 @@ public class W_USAGE_MONITORING extends ComplexState {
             dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
 
             if (!transactionError) {
-                dbConnect.getTransactionService().updateTransactionWaitingToComplete(quotaResponseList);
+//                dbConnect.getTransactionService().updateTransactionWaitingToComplete(quotaResponseList);
                 usageMonitoringService.buildResponseUsageMonitoring(true);
             } else {
-                dbConnect.getTransactionService().deleteTransactionError();
+//                dbConnect.getTransactionService().deleteTransactionError();
                 usageMonitoringService.buildResponseUsageMonitoring(false);
             }
 

@@ -37,7 +37,8 @@ public abstract class MongoDBService {
     public void insertByObject(Object object) {
         String json = gson.toJson(object);
         writeQueryLog("insert", collectionName, json);
-        db.getCollection(collectionName).insert(BasicDBObject.parse(json));
+        WriteResult writeResult = db.getCollection(collectionName).insert(BasicDBObject.parse(json));
+        System.out.println(writeResult);
     }
 
     public void insertByQuery(BasicDBObject basicDBObject) {

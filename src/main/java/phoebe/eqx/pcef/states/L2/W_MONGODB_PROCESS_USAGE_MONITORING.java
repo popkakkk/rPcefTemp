@@ -79,7 +79,7 @@ public class W_MONGODB_PROCESS_USAGE_MONITORING extends MongoState {
         try {
             DBCursor QuotaCursor = dbConnect.getQuotaService().findQuotaByTransaction(context.getPcefInstance().getTransaction());
             if (!QuotaCursor.hasNext()) {
-                if (context.isLockByMyTransaction()) {
+                if (context.isLockProfile()) {
                     setState(EState.W_USAGE_MONITORING_UPDATE);
                     nextState = EState.END;
                 } else {
@@ -94,12 +94,12 @@ public class W_MONGODB_PROCESS_USAGE_MONITORING extends MongoState {
                     List<CommitData> commitDataList = dbConnect.getQuotaService().findDataToCommit(quota.getUserValue(), quota.getMonitoringKey(), false);
 
                     //count resourceId this transaction + 1
-                    for (CommitData commitData : commitDataList) {
+                    /*for (CommitData commitData : commitDataList) {
                         if (commitData.get_id().getResourceId().equals(context.getPcefInstance().getTransaction().getResourceId())) {
                             commitData.setCount(commitData.getCount() + 1);
                             break;
                         }
-                    }
+                    }*/
 
                     int sumTransaction = commitDataList.stream().mapToInt(CommitData::getCount).sum();
                     int quotaUnit = quota.getQuotaByKey().getUnit();
@@ -171,10 +171,10 @@ public class W_MONGODB_PROCESS_USAGE_MONITORING extends MongoState {
                     }
                 }
             } else {
-                context.setLockByMyTransaction(true);
+                context.setLockProfile(true);
                 context.setWaitForProcess(true);
                 AFLog.d("waitForProcess:" + context.isWaitForProcess());
-                AFLog.d("lockByMyTransaction:" + context.isLockByMyTransaction());
+                AFLog.d("lockByMyTransaction:" + context.isLockProfile());
                 E11TimoutService e11TimoutService = new E11TimoutService(appInstance);
                 e11TimoutService.buildInterval();
                 nextState = EState.FIND_AND_MOD_PROFILE_FOR_WAIT_PROCESS;

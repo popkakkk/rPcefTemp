@@ -1,14 +1,11 @@
 package phoebe.eqx.pcef.instance.context;
 
-import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.exceptions.PCEFException;
 import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.InvokeManager;
 import phoebe.eqx.pcef.instance.PCEFInstance;
-import phoebe.eqx.pcef.utils.Interval;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 public class RequestContext {
@@ -27,7 +24,6 @@ public class RequestContext {
     private boolean interval;
     private int intervalRetry;
 
-
     private Date startTime;
     private EState stateL1;
     private EState stateL2;
@@ -36,11 +32,13 @@ public class RequestContext {
     private transient boolean hasRequest;
     private transient String reqMessage;
 
-    private PCEFException pcefException;
+    private transient PCEFException pcefException;
 
     //flag
     private boolean waitForProcess;
-    private boolean lockByMyTransaction;
+
+    private boolean lockProfile;
+//    private boolean lockQuota;
 
 
     public RequestContext(String reqMessage, String invoke, String eqxPropSession, ERequestType requestType) {
@@ -183,11 +181,11 @@ public class RequestContext {
         this.waitForProcess = waitForProcess;
     }
 
-    public boolean isLockByMyTransaction() {
-        return lockByMyTransaction;
+    public boolean isLockProfile() {
+        return lockProfile;
     }
 
-    public void setLockByMyTransaction(boolean lockByMyTransaction) {
-        this.lockByMyTransaction = lockByMyTransaction;
+    public void setLockProfile(boolean lockProfile) {
+        this.lockProfile = lockProfile;
     }
 }

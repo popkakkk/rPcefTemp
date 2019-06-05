@@ -1,8 +1,10 @@
 package phoebe.eqx.pcef.core;
 
 import com.google.gson.Gson;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import phoebe.eqx.pcef.core.exceptions.ExtractErrorException;
 import phoebe.eqx.pcef.enums.EError;
+import phoebe.eqx.pcef.enums.Operation;
 import phoebe.eqx.pcef.message.builder.res.RefundManagementResponse;
 import phoebe.eqx.pcef.message.parser.req.GyRARRequest;
 import phoebe.eqx.pcef.message.parser.req.RefundManagementRequest;
@@ -31,11 +33,20 @@ public class PCEFParser {
         return new TestResponseData();
     }
 
-    public OCFUsageMonitoringResponse translateUsageMonitoringResponse() throws ExtractErrorException {
+    public OCFUsageMonitoringResponse translateOCFUsageMonitoringResponse(Operation operation) throws ExtractErrorException {
         try {
             return gson.fromJson(message, OCFUsageMonitoringResponse.class);
         } catch (Exception e) {
-            throw new ExtractErrorException(e.getStackTrace()[0].toString(), EError.USAGE_MONITORING_EXTRACT_ERROR);
+            String errMeg = ExceptionUtils.getStackTrace(e);
+            EError eError = null;
+            if (operation.equals(Operation.UsageMonitoringStart)) {
+                eError = EError.USAGE_MONITORING_START_RESPONSE_EXTRACT_ERROR;
+            } else if (operation.equals(Operation.UsageMonitoringUpdate)) {
+                eError = EError.USAGE_MONITORING_UPDATE_RESPONSE_EXTRACT_ERROR;
+            } else if (operation.equals(Operation.UsageMonitoringStop)) {
+                eError = EError.USAGE_MONITORING_STOP_RESPONSE_EXTRACT_ERROR;
+            }
+            throw new ExtractErrorException(errMeg, eError);
         }
     }
 
@@ -43,7 +54,7 @@ public class PCEFParser {
         try {
             return gson.fromJson(message, RefundManagementResponse.class);
         } catch (Exception e) {
-            throw new ExtractErrorException(e.getStackTrace()[0].toString(), EError.USAGE_MONITORING_EXTRACT_ERROR);
+            throw new ExtractErrorException(e.getStackTrace()[0].toString(), EError.REFUND_TRANSACTION_RESPONSE_EXTRACT_ERROR);
         }
     }
 
@@ -57,7 +68,7 @@ public class PCEFParser {
             ERDData erdData = (ERDData) dataUnMarshaller.unmarshal(new StringReader(erdStr));
             return gson.fromJson(erdData.getValue(), GetResourceIdResponse.class);
         } catch (Exception e) {
-            throw new ExtractErrorException(e.getStackTrace()[0].toString(), EError.USAGE_MONITORING_EXTRACT_ERROR);
+            throw new ExtractErrorException(e.getStackTrace()[0].toString(), EError.GET_PRODUCT_RESPONSE_EXTRACT_ERROR);
         }
     }
 
@@ -74,7 +85,7 @@ public class PCEFParser {
         try {
             return gson.fromJson(message, GyRARRequest.class);
         } catch (Exception e) {
-            throw new ExtractErrorException(e.getStackTrace()[0].toString(), EError.USAGE_MONITORING_EXTRACT_ERROR);
+            throw new ExtractErrorException(e.getStackTrace()[0].toString(), EError.GYRAR_EXTRACT_ERROR);
         }
     }
 
@@ -82,7 +93,7 @@ public class PCEFParser {
         try {
             return gson.fromJson(message, RefundManagementRequest.class);
         } catch (Exception e) {
-            throw new ExtractErrorException(e.getStackTrace()[0].toString(), EError.USAGE_MONITORING_EXTRACT_ERROR);
+            throw new ExtractErrorException(e.getStackTrace()[0].toString(), EError.REFUND_MANAGEMENT_EXTRACT_ERROR);
         }
     }
 

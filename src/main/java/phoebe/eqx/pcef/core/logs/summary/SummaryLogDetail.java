@@ -19,11 +19,6 @@ public class SummaryLogDetail {
         this.res = "{}";
     }
 
-    //Details E01
-    public SummaryLogDetail(String invokeId, String reqTime, String reqKey) {
-        this.invokeId = invokeId;
-        this.reqTime = reqTime;
-    }
 
     public String getInvokeId() {
         return invokeId;

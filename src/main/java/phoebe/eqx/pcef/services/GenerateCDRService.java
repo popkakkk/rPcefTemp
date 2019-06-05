@@ -46,7 +46,7 @@ public class GenerateCDRService {
 
                 String cdrStr = PCEFUtils.generateCdr(opudr);
                 AFLog.d("CDR STR :" + cdrStr);
-                WriteLog.writeCDRRefund(abstractAF, cdrStr);
+                WriteLog.writeCDRCharging(abstractAF, cdrStr);
             }
 
         } catch (Exception e) {

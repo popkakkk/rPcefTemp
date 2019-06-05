@@ -36,7 +36,7 @@ public class TestParser {
 
     public static void main(String[] args) {
         PCEFParser ocfUsageMonitoringParser = new PCEFParser(ocfUsageMonitoring);
-//        ocfUsageMonitoringParser.translateUsageMonitoringResponse();
+//        ocfUsageMonitoringParser.translateOCFUsageMonitoringResponse();
 
     }
 }

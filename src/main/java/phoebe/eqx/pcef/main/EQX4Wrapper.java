@@ -18,7 +18,6 @@ import phoebe.eqx.pcef.core.model.Profile;
 import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.instance.AppInstance;
-import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.instance.InvokeManager;
 import phoebe.eqx.pcef.instance.context.RequestContext;
 import phoebe.eqx.pcef.states.L1.W_E11_TIMEOUT;
@@ -231,7 +230,7 @@ public class EQX4Wrapper {
             state.dispatch();
 
             appInstance.patchResponse();
-            AFLog.d("Next State [L1]:"+appInstance.getMyContext().getStateL1()+", [L2]:"+appInstance.getMyContext().getStateL2()+", [L3]:"+appInstance.getMyContext().getStateL3());
+            AFLog.d("Next State [L1]:" + appInstance.getMyContext().getStateL1() + ", [L2]:" + appInstance.getMyContext().getStateL2() + ", [L3]:" + appInstance.getMyContext().getStateL3());
 
 
         } catch (Exception e) {
@@ -245,10 +244,9 @@ public class EQX4Wrapper {
         try {
 
 
-//            if (appInstance.getMyContext().getPcefException() != null) {
-//                writeErrorLog(abstractAF, appInstance);
-//                buildErrorResponse(appInstance, equinoxPropertiesAF);
-//            }
+            if (appInstance.getMyContext().getPcefException() != null) {
+                writeErrorLog(appInstance);
+            }
 
 
             //sent Outgoing Message
@@ -270,21 +268,8 @@ public class EQX4Wrapper {
 
 
             String timout = getMinTimeout(appInstance);
-
             eqxPropOut.setTimeout(timout);
             AFLog.d("EquinoxProperties timeout =" + timout);
-
-            //set Ret
-            if (appInstance.isFinish()) {
-//                writeSummaryLog(eqxPropOut, abstractAF, equinoxRawDatas, appInstance);
-                eqxPropOut.setState(EStateApp.IDLE.getName());
-                eqxPropOut.setRet(EEquinoxMessage.Ret.END);
-                AFLog.d("set State:" + EStateApp.IDLE.getName() + ", set Ret:" + EEquinoxMessage.Ret.END);
-            } else {
-                eqxPropOut.setState(EStateApp.ACTIVE.getName());
-                eqxPropOut.setRet(EEquinoxMessage.Ret.NORMAL);
-                AFLog.d("set State:" + EStateApp.ACTIVE.getName() + ", set Ret:" + EEquinoxMessage.Ret.NORMAL);
-            }
 
 
             //clear request context
@@ -297,9 +282,21 @@ public class EQX4Wrapper {
 
             if (response) {
                 AFLog.d("clear context:" + appInstance.getMyContext().getRequestType());
+//                writeSummaryLog(eqxPropOut, abstractAF, equinoxRawDatas, appInstance);
                 appInstance.removeRequestContext();
             }
 
+
+            //set Ret
+            if (appInstance.isFinish()) {
+                eqxPropOut.setState(EStateApp.IDLE.getName());
+                eqxPropOut.setRet(EEquinoxMessage.Ret.END);
+                AFLog.d("set State:" + EStateApp.IDLE.getName() + ", set Ret:" + EEquinoxMessage.Ret.END);
+            } else {
+                eqxPropOut.setState(EStateApp.ACTIVE.getName());
+                eqxPropOut.setRet(EEquinoxMessage.Ret.NORMAL);
+                AFLog.d("set State:" + EStateApp.ACTIVE.getName() + ", set Ret:" + EEquinoxMessage.Ret.NORMAL);
+            }
 
         } catch (Exception e) {
             AFLog.e("After process error", e);
@@ -307,7 +304,7 @@ public class EQX4Wrapper {
     }
 
 
-    private static void writeErrorLog(AbstractAF abstractAF, AppInstance appInstance) {
+    private static void writeErrorLog( AppInstance appInstance) {
         ERequestType requestType = appInstance.getMyContext().getRequestType();
         PCEFException pcefException = appInstance.getMyContext().getPcefException();
 
@@ -320,17 +317,7 @@ public class EQX4Wrapper {
             WriteLog.writeErrorLogUsageMonitoring(appInstance.getAbstractAF(), pcefException, appInstance.getMyContext().getPcefInstance().getUsageMonitoringRequest(), resourceId);
         } else if (requestType.equals(ERequestType.E11_TIMEOUT)) {
             Profile profile = appInstance.getMyContext().getPcefInstance().getProfile();
-            String sessionId = "";
-            String userType = "";
-            String userValue = "";
-
-            if (profile != null) {
-                sessionId = profile.getSessionId();
-                userType = profile.getUserType();
-                userValue = profile.getUserValue();
-            }
-
-            WriteLog.writeErrorE11Timeout(appInstance.getAbstractAF(), pcefException, sessionId, userType, userValue);
+            WriteLog.writeErrorE11Timeout(appInstance.getAbstractAF(), pcefException, profile);
         } else if (requestType.equals(ERequestType.REFUND_MANAGEMENT)) {
             WriteLog.writeErrorLogRefundManagement(appInstance.getAbstractAF(), pcefException, appInstance.getMyContext().getPcefInstance().getRefundManagementRequest());
         } else if (requestType.equals(ERequestType.GyRAR)) {

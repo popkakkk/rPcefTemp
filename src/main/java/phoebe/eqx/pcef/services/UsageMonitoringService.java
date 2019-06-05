@@ -2,14 +2,11 @@ package phoebe.eqx.pcef.services;
 
 import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import phoebe.eqx.pcef.core.PCEFParser;
-import phoebe.eqx.pcef.core.exceptions.ExtractErrorException;
-import phoebe.eqx.pcef.core.exceptions.MissingParameterException;
 import phoebe.eqx.pcef.core.exceptions.PCEFException;
-import phoebe.eqx.pcef.core.exceptions.WrongFormatException;
 import phoebe.eqx.pcef.enums.EError;
 import phoebe.eqx.pcef.enums.EStatusResponse;
-import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.enums.stats.EStatCmd;
 import phoebe.eqx.pcef.enums.stats.EStatMode;
 import phoebe.eqx.pcef.instance.AppInstance;
@@ -41,11 +38,10 @@ public class UsageMonitoringService extends PCEFService {
 
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.Receive_Usage_Monitoring_Request);
             PCEFUtils.writeMessageFlow("Read Usage Monitoring Request", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
-
         } catch (PCEFException e) {
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.Receive_Usage_Monitoring_Request);
             PCEFUtils.writeMessageFlow("Read Usage Monitoring Request", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
-            WriteLog.writeErrorLogUsageMonitoring(abstractAF, e, context.getPcefInstance().getUsageMonitoringRequest(), "");
+            context.setPcefException(e);
             throw e;
         }
 
@@ -88,11 +84,24 @@ public class UsageMonitoringService extends PCEFService {
             PCEFUtils.writeMessageFlow("Build Usage Monitoring Response", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
             PCEFUtils.writeMessageFlow("Build Usage Monitoring Response - " + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
+
+            String resourceId = "";
+            if (context.getPcefInstance().getTransaction() != null) {
+                resourceId = context.getPcefInstance().getTransaction().getResourceId();
+            }
+            PCEFException pcefException = new PCEFException();
+            pcefException.setError(EError.USAGE_MONITORING_BUILD_RESPONSE_ERROR); //new add
+            pcefException.setErrorMsg(ExceptionUtils.getStackTrace(e));
+
+            context.setPcefException(pcefException);
             throw e;
         }
-
-
     }
+
+
+
+
+
 
 
 }

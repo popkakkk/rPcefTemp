@@ -8,7 +8,7 @@ public class PCEFException extends Exception {
     public PCEFException() {
     }
 
-    private String errorMsg;
+    private String errorMsg = "";
     private EError error;
 
     public PCEFException(String errorMsg, EError error) {

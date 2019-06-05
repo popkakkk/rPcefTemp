@@ -4,27 +4,31 @@ package phoebe.eqx.pcef.core.cdr;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "Ctudr")
 @XmlAccessorType(XmlAccessType.FIELD)
+/*@XmlType(propOrder = {"cid", "actualtime", "resourceid", "clientid", "unittype",
+        "usedunit", "rtid", "usertype", "tid", "counterid", "hostname",
+        "resourcename", "monitoringkey", "uservalue", "cid", "status"})*/
 public class Ctudr {
 
-    private String app;
+    private String cid;
+    private String tid;
+    private String rtid;
     private String actualtime;
-    private String resourceid;
+    private String app;
     private String clientid;
+    private String usertype;
+    private String uservalue;
+    private String counterid;
+    private String monitoringkey;
+    private String resourceid;
+    private String resourcename;
     private String unittype;
     private String usedunit;
-    private String rtid;
-    private String usertype;
-    private String tid;
-    private String counterid;
-    private String hostname;
-    private String resourcename;
-    private String monitoringkey;
-    private String uservalue;
-    private String cid;
     private String status;
+    private String hostname;
 
 
     public String getApp() {

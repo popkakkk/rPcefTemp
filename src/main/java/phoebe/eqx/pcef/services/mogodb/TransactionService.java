@@ -179,7 +179,7 @@ public class TransactionService extends MongoDBService {
         for (ResourceRequest resourceRequest : newResourceRequests) {
             boolean found = false;
             boolean error = false;
-            boolean notEnough = false;
+
 
             String resourceId = resourceRequest.getResourceId();
             for (ResourceResponse resourceResponse : ocfUsageMonitoringResponse.getResources()) {
@@ -192,22 +192,18 @@ public class TransactionService extends MongoDBService {
                     break;
                 }
 
-                if (newResourceTransactions.size() > resourceResponse.getQuotaByKey().getUnit()) {
-                    notEnough = true;
-                }
+
             }
 
 
-            if (!found || error || notEnough) {
+            if (!found || error) {
                 if (!found) {
                     AFLog.d("Resource Id:" + resourceId + "no have quota");
                 }
                 if (error) {
                     AFLog.d("Resource Id:" + resourceId + "return description error");
                 }
-                if (notEnough) {
-                    AFLog.d("Resource Id:" + resourceId + "not enough");
-                }
+
 
                 int index = 0;
                 for (Transaction transaction : newResourceTransactions) {
@@ -224,6 +220,26 @@ public class TransactionService extends MongoDBService {
             }
         }
 
+
+        //Not Enough transaction to delete
+        for (ResourceResponse resourceResponse : ocfUsageMonitoringResponse.getResources()) {
+            if (resourceResponse.getQuotaByKey() != null) {
+                int unit = resourceResponse.getQuotaByKey().getUnit();
+                int index = 0;
+                for (Transaction transaction : newResourceTransactions) {
+                    if (transaction.getResourceId().equals(resourceResponse.getResourceId())) {
+                        if (unit <= 0) {
+                            AFLog.d("Unit Not Enough ,tid:" + transaction.getTid());
+                            deleteList.add(transaction.getTid());
+                            newResourceTransactions.remove(index);
+                        } else {
+                            unit--;
+                        }
+                    }
+                    index++;
+                }
+            }
+        }
 
         //remove
         if (deleteList.size() > 0) {
@@ -328,11 +344,16 @@ public class TransactionService extends MongoDBService {
                 searchQuery.put(ETransaction.status.name(), EStatusLifeCycle.Waiting.getName());
 
                 BasicDBObject updateQuery = new BasicDBObject();
+                Date now = new Date();
+                transaction.setMonitoringKey(resourceMap.get(transaction.getResourceId()).getMonitoringKey());
+                transaction.setStatus(EStatusLifeCycle.Done.getName());
+                transaction.setCounterId(resourceMap.get(transaction.getResourceId()).getCounterId());
+                transaction.setUpdateDate(now);
 
-                updateQuery.put(ETransaction.status.name(), EStatusLifeCycle.Done.getName());//waiting-->Done
-                updateQuery.put(ETransaction.monitoringKey.name(), resourceMap.get(transaction.getResourceId()).getMonitoringKey());
-                updateQuery.put(ETransaction.counterId.name(), resourceMap.get(transaction.getResourceId()).getCounterId());
-                updateQuery.put(ETransaction.updateDate.name(), new Date());
+                updateQuery.put(ETransaction.status.name(), transaction.getStatus());//waiting-->Done
+                updateQuery.put(ETransaction.monitoringKey.name(), transaction.getMonitoringKey());
+                updateQuery.put(ETransaction.counterId.name(), transaction.getCounterId());
+                updateQuery.put(ETransaction.updateDate.name(), transaction.getUpdateDate());
 
                 updateSetByQuery(searchQuery, updateQuery);
             }

@@ -2,18 +2,25 @@ package phoebe.eqx.pcef.services;
 
 import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import phoebe.eqx.pcef.core.exceptions.PCEFException;
 import phoebe.eqx.pcef.core.exceptions.ResponseErrorException;
 import phoebe.eqx.pcef.core.exceptions.TimeoutException;
 import phoebe.eqx.pcef.core.model.Transaction;
+import phoebe.eqx.pcef.enums.EError;
 import phoebe.eqx.pcef.enums.EStatusResponse;
 import phoebe.eqx.pcef.enums.Operation;
+import phoebe.eqx.pcef.enums.stats.EStatCmd;
+import phoebe.eqx.pcef.enums.stats.EStatMode;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.message.builder.MessagePool;
 import phoebe.eqx.pcef.message.builder.req.RefundTransactionRequest;
 import phoebe.eqx.pcef.message.builder.res.RefundManagementResponse;
+import phoebe.eqx.pcef.message.parser.res.RefundTransactionResponse;
 import phoebe.eqx.pcef.utils.MessageFlow;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 import phoebe.eqx.pcef.utils.ValidateMessage;
+import phoebe.eqx.pcef.utils.WriteLog;
 
 import java.util.Date;
 
@@ -47,56 +54,57 @@ public class RefundTransactionService extends PCEFService {
             refundTransactionRequest.setUnitType("unit");
             refundTransactionRequest.setUsedUnit("1");
             refundTransactionRequest.setReportingReason("0");
+
             MessagePool messagePool = new MessagePool(abstractAF);
             EquinoxRawData equinoxRawData = messagePool.getRefundTransactionRequest(refundTransactionRequest, invokeId);
             invokeExternal(equinoxRawData, operation, messagePool.getRequestObj());
 
-
             PCEFUtils.writeMessageFlow("Build Refund Transaction Request", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.sent_Refund_Transaction_request);
         } catch (Exception e) {
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.sent_Refund_Transaction_request);
             PCEFUtils.writeMessageFlow("Build Refund Transaction Stop Request", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
+            PCEFException pcefException = new PCEFException();
+            pcefException.setErrorMsg(ExceptionUtils.getStackTrace(e));
+            pcefException.setError(EError.REFUND_TRANSACTION_BUILD_REQUEST_ERROR);
+
+            context.setPcefException(pcefException);
+            throw e;
         }
     }
 
 
     public void readRefundTransactionResponse() throws Exception {
         try {
-            AFLog.d("Read Refund Transaction Response ..");
-            Operation operation = Operation.RefundTransaction;
+            try {
+                AFLog.d("Read Refund Transaction Response ..");
+                Operation operation = Operation.RefundTransaction;
 
-            //extract
-            RefundManagementResponse refundManagementResponse = (RefundManagementResponse) extractResponse(operation);
-            this.refundSuccess = refundManagementResponse.getStatus().equals(EStatusResponse.SUCCESS.getCode());
+                RefundTransactionResponse refundManagementResponse = (RefundTransactionResponse) extractResponse(operation);
+                this.refundSuccess = refundManagementResponse.getStatus().equals(EStatusResponse.SUCCESS.getCode());
 
-            //validate
-            ValidateMessage.validateTestData();
+                ValidateMessage.validateRefundTransaction(refundManagementResponse, abstractAF);
 
-
-            //increase stat success
-//            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.PCEF_RECEIVE_TEST_DATA);
-
-            //summarylog res
+                //summarylog res
 //            context.setSummaryLogExternalResponse(Operation.TestOperation, SummaryLog.getSummaryLogResponse(Operation.TestOperation, testResponseData));
 
-            PCEFUtils.writeMessageFlow("Read Refund Transaction Response", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
-        } catch (TimeoutException e) {
-            // handle time out
-            throw e;
-        } catch (ResponseErrorException e) {
-
-            // handle ret error
-            throw e;
-        } catch (Exception e) {
-            //increase stat fail
+                PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.receive_Refund_Transaction_response);
+                PCEFUtils.writeMessageFlow("Read Refund Transaction Response", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
+            } catch (TimeoutException e) {
+                PCEFUtils.increaseStatistic(abstractAF, EStatMode.TIMEOUT, EStatCmd.receive_Refund_Transaction_response);
+                e.setError(EError.REFUND_TRANSACTION_RESPONSE_TIMEOUT);
+                throw e;
+            } catch (ResponseErrorException e) {
+                PCEFUtils.increaseStatistic(abstractAF, EStatMode.EQUINOX_ERROR, EStatCmd.receive_Refund_Transaction_response);
+                e.setError(EError.REFUND_TRANSACTION_RESPONSE_EQUINOX_ERROR);
+                throw e;
+            }
+        } catch (PCEFException e) {
             //summarylog fail
-            // read fail
-
-
+            context.setPcefException(e);
             PCEFUtils.writeMessageFlow("Read Refund Transaction Response", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
-
-
     }
 
     public boolean isRefundSuccess() {

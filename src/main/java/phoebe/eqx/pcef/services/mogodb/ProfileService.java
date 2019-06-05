@@ -90,6 +90,7 @@ public class ProfileService extends MongoDBService {
             searchQuery.put(EProfile.isProcessing.name(), 1);
 
             updateSetByQuery(searchQuery, updateQuery);
+            appInstance.getMyContext().setLockProfile(false);
             PCEFUtils.writeMessageFlow("Update Profile Unlock", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
             PCEFUtils.writeMessageFlow("Update Profile Unlock error-" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
@@ -133,6 +134,7 @@ public class ProfileService extends MongoDBService {
             DBObject dbObject = findAndModify(query, update);
 
             if (dbObject != null) {
+                appInstance.getMyContext().setLockProfile(true);
                 PCEFUtils.writeMessageFlow("Find and Modify Profile Lock privateId:" + privateId + ",[Found]", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
             } else {
                 PCEFUtils.writeMessageFlow("Find and Modify Profile Lock privateId:" + privateId + ",[Not Found]", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
