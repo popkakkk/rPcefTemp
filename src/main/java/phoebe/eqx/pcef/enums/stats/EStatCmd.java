@@ -32,7 +32,38 @@ public enum EStatCmd {
 
     //Get Product
     sent_Get_Product_request("sent Get Product request"),
-    receive_Get_Product_response("receive Get Product response");
+    receive_Get_Product_response("receive Get Product response"),
+
+
+    //transaction
+    sent_insert_Transaction_request("sent insert Transaction request"),
+    receive_insert_Transaction_response("receive insert Transaction response"),
+    sent_read_Transaction_request("sent read Transaction request"),
+    receive_read_Transaction_response("receive read Transaction response"),
+    sent_update_Transaction_request("sent update Transaction request"),
+    receive_update_Transaction_response("receive update Transaction response"),
+    sent_delete_Transaction_request("sent delete Transaction request"),
+    receive_delete_Transaction_response("receive delete Transaction response"),
+
+    //profile
+    sent_insert_Profile_request("sent insert Profile request"),
+    receive_insert_Profile_response("receive insert Profile response"),
+    sent_read_Profile_request("sent read Profile request"),
+    receive_read_Profile_response("receive read Profile response"),
+    sent_update_Profile_request("sent update Profile request"),
+    receive_update_Profile_response("receive update Profile response"),
+    sent_delete_Profile_request("sent delete Profile request"),
+    receive_delete_Profile_response("receive delete Profile response"),
+
+    //Quota
+    sent_insert_Quota_request("sent insert Quota request"),
+    receive_insert_Quota_response("receive insert Quota response"),
+    sent_read_Quota_request("sent read Quota request"),
+    receive_read_Quota_response("receive read Quota response"),
+    sent_update_Quota_request("sent update Quota request"),
+    receive_update_Quota_response("receive update Quota response"),
+    sent_delete_Quota_request("sent delete Quota request"),
+    receive_delete_Quota_response("receive delete Quota response");
 
 
     String cmd;

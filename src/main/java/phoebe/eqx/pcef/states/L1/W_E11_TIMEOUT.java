@@ -7,13 +7,12 @@ import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
-import phoebe.eqx.pcef.services.GenerateCDRService;
-import phoebe.eqx.pcef.services.OCFUsageMonitoringService;
 import phoebe.eqx.pcef.services.E11TimoutService;
+import phoebe.eqx.pcef.services.OCFUsageMonitoringService;
 import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
+import phoebe.eqx.pcef.states.L2.W_MONGODB_PROCESS_E11_VT_TIMEOUT;
 import phoebe.eqx.pcef.states.abs.ComplexState;
 import phoebe.eqx.pcef.states.abs.MessageRecieved;
-import phoebe.eqx.pcef.states.L2.W_MONGODB_PROCESS_E11_VT_TIMEOUT;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,8 +70,11 @@ public class W_E11_TIMEOUT extends ComplexState {
 
     @MessageRecieved(messageType = EState.W_USAGE_MONITORING_UPDATE)
     public void wUsageMonitoringUpdate() throws Exception {
+
+
         OCFUsageMonitoringService ocfUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
         OCFUsageMonitoringResponse ocfUsageMonitoringResponse = ocfUsageMonitoringService.readUsageMonitoringUpdate();
+        ArrayList<Quota> quotaResponseList = ocfUsageMonitoringService.getQuotaFromUsageMonitoringResponse(ocfUsageMonitoringResponse);
 
         MongoDBConnect dbConnect = null;
         try {
@@ -80,25 +82,16 @@ public class W_E11_TIMEOUT extends ComplexState {
 
             List<Transaction> newResourceTransactions = appInstance.getMyContext().getPcefInstance().getOtherStartTransactions();
 
-            dbConnect.getTransactionService().filterResourceRequestErrorNewResource(ocfUsageMonitoringResponse, appInstance.getMyContext().getPcefInstance().getNewResourcesRequests(), newResourceTransactions);
-            dbConnect.getTransactionService().filterResourceRequestErrorCommitResource(ocfUsageMonitoringResponse, appInstance.getMyContext().getPcefInstance().getCommitDatas());
 
-            ArrayList<Quota> quotaResponseList = dbConnect.getQuotaService().getQuotaFromUsageMonitoringResponse(ocfUsageMonitoringResponse);
-
-            dbConnect.getQuotaService().updateQuota(quotaResponseList);
-            dbConnect.getTransactionService().updateTransaction(quotaResponseList, newResourceTransactions);
-
-            GenerateCDRService generateCDRService = new GenerateCDRService();
-            generateCDRService.buildCDRCharging(newResourceTransactions, appInstance.getAbstractAF());
-
+            ocfUsageMonitoringService.processUpdate(dbConnect, ocfUsageMonitoringResponse, quotaResponseList, newResourceTransactions);
             dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
+
 
             E11TimoutService e11TimoutService = new E11TimoutService(appInstance);
             e11TimoutService.buildRecurringTimout();
 
-
         } catch (Exception e) {
-            AFLog.d(" wUsageMonitoringUpdate:" +  ExceptionUtils.getStackTrace(e));
+            AFLog.d(" wUsageMonitoringUpdate:" + ExceptionUtils.getStackTrace(e));
             throw e;
         } finally {
             if (dbConnect != null) {

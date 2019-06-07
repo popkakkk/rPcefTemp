@@ -4,7 +4,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.MongoClient;
 import ec02.af.utils.AFLog;
-import phoebe.eqx.pcef.core.data.ResourceRequest;
+import phoebe.eqx.pcef.core.data.ResourceQuota;
 import phoebe.eqx.pcef.core.data.ResourceResponse;
 import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.core.model.Transaction;
@@ -41,14 +41,10 @@ public class TransactionService extends MongoDBService {
             transaction.setResourceId(resourceId);
             transaction.setResourceName(usageMonitoringRequest.getResourceName());
             transaction.setMonitoringKey("");// "" is initial
+            transaction.setCounterId("");// "" is initial
             transaction.setApp(usageMonitoringRequest.getApp());
 
             Date now = new Date();
-//            TimeZone tz = TimeZone.getTimeZone("UTC");
-//            SimpleDateFormat isoDateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-//            isoDateFormatter.setTimeZone(tz);
-//            System.out.println("datetime zone = "+isoDateFormatter.format(now));
-
             transaction.setCreateDate(now);
             transaction.setUpdateDate(now);
             transaction.setStatus(EStatusLifeCycle.Waiting.getName());
@@ -172,16 +168,16 @@ public class TransactionService extends MongoDBService {
     }
 
 
-    public void filterResourceRequestErrorNewResource(OCFUsageMonitoringResponse ocfUsageMonitoringResponse, List<ResourceRequest> newResourceRequests, List<Transaction> newResourceTransactions) {
+    public void filterTransactionErrorNewResource(OCFUsageMonitoringResponse ocfUsageMonitoringResponse, List<Transaction> newResourceTransactions, ArrayList<Quota> quotas) {
 
         List<String> deleteList = new ArrayList<>();
 
-        for (ResourceRequest resourceRequest : newResourceRequests) {
+        List<Transaction> filterNewTransactions = new ArrayList<>();
+        for (Transaction transaction : newResourceTransactions) {
             boolean found = false;
             boolean error = false;
 
-
-            String resourceId = resourceRequest.getResourceId();
+            String resourceId = transaction.getResourceId();
             for (ResourceResponse resourceResponse : ocfUsageMonitoringResponse.getResources()) {
                 if (resourceId.equals(resourceResponse.getResourceId())) {
                     found = true;
@@ -191,68 +187,114 @@ public class TransactionService extends MongoDBService {
                     }
                     break;
                 }
-
-
             }
-
 
             if (!found || error) {
                 if (!found) {
-                    AFLog.d("Resource Id:" + resourceId + "no have quota");
+                    AFLog.d("Resource Id:" + resourceId + "not have quota return");
                 }
                 if (error) {
                     AFLog.d("Resource Id:" + resourceId + "return description error");
                 }
+                //add delete transaction
+                deleteList.add(transaction.getTid());
 
-
-                int index = 0;
-                for (Transaction transaction : newResourceTransactions) {
-                    if (transaction.getResourceId().equals(resourceId)) {
-
-                        //add delete transaction
-                        deleteList.add(transaction.getTid());
-
-                        //filter
-                        newResourceTransactions.remove(index);
-                    }
-                    index++;
-                }
+                //filter
+                filterNewTransactions.add(transaction);
             }
         }
-
-
-        //Not Enough transaction to delete
-        for (ResourceResponse resourceResponse : ocfUsageMonitoringResponse.getResources()) {
-            if (resourceResponse.getQuotaByKey() != null) {
-                int unit = resourceResponse.getQuotaByKey().getUnit();
-                int index = 0;
-                for (Transaction transaction : newResourceTransactions) {
-                    if (transaction.getResourceId().equals(resourceResponse.getResourceId())) {
-                        if (unit <= 0) {
-                            AFLog.d("Unit Not Enough ,tid:" + transaction.getTid());
-                            deleteList.add(transaction.getTid());
-                            newResourceTransactions.remove(index);
-                        } else {
-                            unit--;
-                        }
-                    }
-                    index++;
-                }
-            }
-        }
+        newResourceTransactions.removeAll(filterNewTransactions);
 
         //remove
         if (deleteList.size() > 0) {
-            AFLog.d("remove transaction..");
+            AFLog.d("remove transaction receive quota error..");
+            removeManyTransactionByTid(deleteList);
+        }
+    }
+
+    public void filterTransactionAndQuotaCheckUnitEnough(ArrayList<Quota> quotaResponses, List<Transaction> newResourceTransactions) {
+        List<String> deleteList = new ArrayList<>();
+
+        ArrayList<Quota> filterQuotaResponses = new ArrayList<>();
+
+        for (Quota quota : quotaResponses) {
+            int available;
+
+            //exist quota
+            if (quota.getQuotaByKey() == null) {
+                List<CommitData> commitDataList = findDataToCommit(quota.getUserValue(), quota.getMonitoringKey(), false);
+                int sumTransaction = commitDataList.stream().mapToInt(CommitData::getCount).sum();
+                int quotaUnit = commitDataList.get(0).getQuotaByKey().getUnit();
+                available = quotaUnit - sumTransaction;
+
+                if (available <= 0) {
+                    if (context.getRequestType().equals(ERequestType.USAGE_MONITORING)) { //flow USAGE MONITORING UPDATE ONLY
+                        boolean contain = resourceIdContainQuotaResponse(context.getPcefInstance().getTransaction(), quota);
+                        if (contain) {
+                            newResourceTransactions.remove(0);//index 0 is  this Transaction
+                            context.getPcefInstance().setSameMkExhaust(true);
+                            context.getPcefInstance().setCommitDataNewList(commitDataList);
+                        }
+                    }
+                    AFLog.d("Exist Quota Exhaust mk:" + quota.getMonitoringKey());
+                    filterQuotaResponses.add(quota);
+                }
+            }
+
+            //new quota
+            else {
+                available = quota.getQuotaByKey().getUnit();
+            }
+
+            List<Transaction> filterNewTransactions = new ArrayList<>();
+            for (Transaction transaction : newResourceTransactions) {
+                boolean contain = resourceIdContainQuotaResponse(transaction, quota);
+
+                if (contain) {
+                    //not enough
+                    if (available <= 0) {
+                        AFLog.d("Unit Not Enough ,tid:" + transaction.getTid());
+                        deleteList.add(transaction.getTid());
+                        filterNewTransactions.add(transaction);
+                    } else {
+                        //enough
+                        available--;
+                    }
+                }
+            }
+            newResourceTransactions.removeAll(filterNewTransactions);
+        }
+        quotaResponses.removeAll(filterQuotaResponses);
+
+        //remove
+        if (deleteList.size() > 0) {
+            AFLog.d("remove transaction unit not enough..");
             removeManyTransactionByTid(deleteList);
         }
 
     }
 
+
+    private boolean resourceIdContainQuotaResponse(Transaction transaction, Quota quota) {
+        boolean contain = false;
+
+        //check contains
+        for (ResourceQuota resourceResponse : quota.getResources()) {
+            if (transaction.getResourceId().equals(resourceResponse.getResourceId())) {
+                contain = true;
+                break;
+            }
+        }
+        return contain;
+    }
+
+
     public void filterResourceRequestErrorCommitResource(OCFUsageMonitoringResponse ocfUsageMonitoringResponse, List<CommitData> commitDataList) {
 
 
         int index = 0;
+
+        List<CommitData> filterCommitDatas = new ArrayList<>();
         for (CommitData commitData : commitDataList) {
 
             if (commitData.getCount() == 0) { //rr1 : not check
@@ -291,13 +333,12 @@ public class TransactionService extends MongoDBService {
                 removeManyTransactionByTid(commitData.getTransactionIds());
 
                 //filter
-                commitDataList.remove(index);
-            } else {
-
+                filterCommitDatas.add(commitData);
             }
             index++;
         }
 
+        commitDataList.removeAll(filterCommitDatas);
 
     }
 
@@ -322,7 +363,6 @@ public class TransactionService extends MongoDBService {
         return resourceMap;
     }
 
-
     public void updateTransaction(ArrayList<Quota> quotas, List<Transaction> newResourceTransactions) {
 
         try {
@@ -330,6 +370,7 @@ public class TransactionService extends MongoDBService {
             if (context.getPcefInstance().getCommitDatas().size() > 0) {
                 updateTransactionDoneToCompleteByTid(context.getPcefInstance().getCommitDatas());
             }
+
 
             //get monitoring key by resource
             Map<String, Quota> resourceMap = resourceIdQuotaMap(quotas);

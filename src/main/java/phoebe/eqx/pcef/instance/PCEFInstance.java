@@ -2,6 +2,7 @@ package phoebe.eqx.pcef.instance;
 
 import phoebe.eqx.pcef.core.data.ResourceRequest;
 import phoebe.eqx.pcef.core.model.Profile;
+import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.message.builder.req.OCFUsageMonitoringRequest;
 import phoebe.eqx.pcef.message.parser.req.GyRARRequest;
@@ -29,10 +30,18 @@ public class PCEFInstance {
     private transient String resourceId;
     private OCFUsageMonitoringRequest ocfUsageMonitoringRequest;
 
-    List<CommitData> commitDatas = new ArrayList<>();
-    List<ResourceRequest> newResourcesRequests = new ArrayList<>();
+    private List<CommitData> commitDatas = new ArrayList<>();
+
+    private transient List<CommitData> commitDataNewList = new ArrayList<>();
+    private  boolean sameMkExhaust;
+
+    private List<ResourceRequest> newResourcesRequests = new ArrayList<>();
 
     private boolean insertTransaction;
+
+
+    private List<Quota> quotaModifyList = new ArrayList<>();
+
 
     public int getQuotaCommitSize() {
         List<String> mkList = new ArrayList<>();
@@ -161,5 +170,29 @@ public class PCEFInstance {
 
     public void setResourceId(String resourceId) {
         this.resourceId = resourceId;
+    }
+
+    public List<CommitData> getCommitDataNewList() {
+        return commitDataNewList;
+    }
+
+    public void setCommitDataNewList(List<CommitData> commitDataNewList) {
+        this.commitDataNewList = commitDataNewList;
+    }
+
+    public List<Quota> getQuotaModifyList() {
+        return quotaModifyList;
+    }
+
+    public void setQuotaModifyList(List<Quota> quotaModifyList) {
+        this.quotaModifyList = quotaModifyList;
+    }
+
+    public boolean isSameMkExhaust() {
+        return sameMkExhaust;
+    }
+
+    public void setSameMkExhaust(boolean sameMkExhaust) {
+        this.sameMkExhaust = sameMkExhaust;
     }
 }

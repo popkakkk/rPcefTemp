@@ -91,7 +91,7 @@ public class GenerateCDRService {
 
 
     private String generateCID() {
-        return "CDR" + PCEFUtils.regularDateFormat.format(new Date());
+        return "CDR" + PCEFUtils.cdrDateFormat.format(new Date());
     }
 
 

@@ -9,14 +9,20 @@ import phoebe.eqx.pcef.core.exceptions.ExtractErrorException;
 import phoebe.eqx.pcef.core.exceptions.ResponseErrorException;
 import phoebe.eqx.pcef.core.exceptions.TimeoutException;
 import phoebe.eqx.pcef.core.logs.summary.SummaryLog;
+import phoebe.eqx.pcef.core.model.Quota;
+import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.EEvent;
 import phoebe.eqx.pcef.enums.Operation;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.instance.context.RequestContext;
+import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
+import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 abstract public class PCEFService {
     protected AbstractAF abstractAF;
@@ -96,6 +102,41 @@ abstract public class PCEFService {
             AFLog.d("timeout=" + timeout + " second");
             return String.valueOf(timeout);
         }
+    }
+
+
+    public void processUpdate(MongoDBConnect dbConnect, OCFUsageMonitoringResponse ocfUsageMonitoringResponse, ArrayList<Quota> quotaResponseList, List<Transaction> newResourceTransactions) {
+        dbConnect.getTransactionService().filterTransactionErrorNewResource(ocfUsageMonitoringResponse, newResourceTransactions, quotaResponseList);
+        dbConnect.getTransactionService().filterTransactionAndQuotaCheckUnitEnough(quotaResponseList, newResourceTransactions);
+        dbConnect.getTransactionService().filterResourceRequestErrorCommitResource(ocfUsageMonitoringResponse, context.getPcefInstance().getCommitDatas());
+
+        dbConnect.getQuotaService().updateQuota(quotaResponseList);
+        dbConnect.getTransactionService().updateTransaction(quotaResponseList, newResourceTransactions);
+
+        GenerateCDRService generateCDRService = new GenerateCDRService();
+        generateCDRService.buildCDRCharging(newResourceTransactions, appInstance.getAbstractAF());
+
+    }
+
+    public void processFirstUsage(MongoDBConnect dbConnect, OCFUsageMonitoringResponse ocfUsageMonitoringResponse, ArrayList<Quota> quotaResponseList, List<Transaction> newResourceTransactions) {
+        dbConnect.getTransactionService().filterTransactionErrorNewResource(ocfUsageMonitoringResponse, newResourceTransactions, quotaResponseList);
+
+        processInitial(dbConnect, quotaResponseList, newResourceTransactions);
+    }
+
+    public void processGyRar(MongoDBConnect dbConnect, OCFUsageMonitoringResponse ocfUsageMonitoringResponse, ArrayList<Quota> quotaResponseList, List<Transaction> newResourceTransactions) {
+        dbConnect.getTransactionService().filterTransactionErrorNewResource(ocfUsageMonitoringResponse, newResourceTransactions, quotaResponseList);
+        dbConnect.getTransactionService().filterResourceRequestErrorCommitResource(ocfUsageMonitoringResponse, context.getPcefInstance().getCommitDatas());
+
+        processInitial(dbConnect, quotaResponseList, newResourceTransactions);
+    }
+
+    private void processInitial(MongoDBConnect dbConnect, ArrayList<Quota> quotaResponseList, List<Transaction> newResourceTransactions) {
+        dbConnect.getQuotaService().insertQuotaInitial(quotaResponseList);
+        dbConnect.getTransactionService().updateTransaction(quotaResponseList, newResourceTransactions);
+
+        GenerateCDRService generateCDRService = new GenerateCDRService();
+        generateCDRService.buildCDRCharging(newResourceTransactions, appInstance.getAbstractAF());
     }
 
 

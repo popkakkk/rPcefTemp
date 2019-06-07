@@ -14,7 +14,6 @@ import phoebe.eqx.pcef.instance.AppInstance;
 
 import phoebe.eqx.pcef.instance.CommitData;
 import phoebe.eqx.pcef.instance.Config;
-import phoebe.eqx.pcef.instance.PCEFInstance;
 import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
 import phoebe.eqx.pcef.utils.MessageFlow;
 import phoebe.eqx.pcef.utils.PCEFUtils;
@@ -40,49 +39,7 @@ public class QuotaService extends MongoDBService {
     }
 
 
-    public ArrayList<Quota> getQuotaFromUsageMonitoringResponse(OCFUsageMonitoringResponse OCFUsageMonitoringResponse) {
-        Map<String, Quota> quotaMap = new HashMap<>();
-        for (ResourceResponse resourceResponse : OCFUsageMonitoringResponse.getResources()) {
 
-            if (resourceResponse.getResultDesc().toLowerCase().contains("error") && !resourceResponse.getResultDesc().toLowerCase().contains("commit_error")) {
-                continue;
-            }
-
-            String monitoringKey = resourceResponse.getMonitoringKey();
-            String resourceName = resourceResponse.getResourceName();
-            String resourceId = resourceResponse.getResourceId();
-
-            ResourceQuota resourceQuota = new ResourceQuota();
-            resourceQuota.setResourceId(resourceId);
-            resourceQuota.setResourceName(resourceName);
-
-            Quota myQuota = quotaMap.get(monitoringKey);
-            if (myQuota == null) {
-                Quota quota = new Quota();
-                quota.set_id(resourceResponse.getMonitoringKey());
-                quota.setUserType(OCFUsageMonitoringResponse.getUserType());
-                quota.setUserValue(OCFUsageMonitoringResponse.getUserValue());
-                quota.setProcessing(0);
-                quota.setMonitoringKey(resourceResponse.getMonitoringKey());
-                quota.setCounterId(resourceResponse.getCounterId());
-
-                if (resourceResponse.getQuotaByKey() != null) {
-                    quota.setQuotaByKey(resourceResponse.getQuotaByKey());
-                    quota.setRateLimitByKey(resourceResponse.getRateLimitByKey());
-
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.add(Calendar.SECOND, resourceResponse.getQuotaByKey().getValidityTime());
-                    quota.setExpireDate(calendar.getTime());
-                }
-                quota.getResources().add(resourceQuota);
-                quotaMap.put(monitoringKey, quota);
-            } else {
-                //Same Quota --> update resourceResponse
-                myQuota.getResources().add(resourceQuota);
-            }
-        }
-        return new ArrayList<>(quotaMap.values());
-    }
 
 
     private List<BasicDBObject> getQuotaToBasicObjectList(ArrayList<Quota> quotaResponses) {
@@ -141,6 +98,20 @@ public class QuotaService extends MongoDBService {
     }
 
 
+    public List<Quota> getQuotaForModify(List<CommitData> commitDataList) {
+
+        List<Quota> quotaForModify = new ArrayList<>();
+        List<String> mkCommits = getMkFromCommitData(commitDataList);
+        mkCommits.forEach(s -> {
+            Quota quota = new Quota();
+            quota.setMonitoringKey(s);
+            quota.setProcessing(0);
+            quotaForModify.add(quota);
+        });
+        return quotaForModify;
+    }
+
+
     public List<String> getMkFromCommitData(List<CommitData> commitDataList) {
         List<String> mkCommits = new ArrayList<>();
         if (commitDataList.size() > 0) {
@@ -154,6 +125,14 @@ public class QuotaService extends MongoDBService {
         return mkCommits;
 
     }
+
+
+    public void processQuotaResponse(ArrayList<Quota> quotaResponses) {
+        //filter to check quota available
+
+
+    }
+
 
     public void updateQuota(ArrayList<Quota> quotaResponses) {
 
@@ -394,7 +373,7 @@ public class QuotaService extends MongoDBService {
     }
 
 
-    public boolean findAndModifyLockQuotaExpire(List<Quota> quotaCommits) {
+    public boolean findAndModifyLockQuotaList(List<Quota> quotaCommits) {
         boolean canProcess = true;
         for (Quota quota : quotaCommits) {
             if (quota.getProcessing() == 1) {
@@ -409,14 +388,19 @@ public class QuotaService extends MongoDBService {
             } else {
                 //not success do waiting
                 canProcess = false;
-                break;
             }
         }
+
+        if (canProcess) {
+            //reset
+            context.getPcefInstance().setQuotaModifyList(new ArrayList<>());
+        }
+
         return canProcess;
     }
 
 
-    /*  public boolean findAndModifyLockQuotaExpire() {
+    /*  public boolean findAndModifyLockQuotaList() {
         boolean canProcess = true;
         for (Quota quota : quotaExpireList) {
             if (quota.getProcessing() == 1) {

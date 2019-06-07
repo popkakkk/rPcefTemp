@@ -77,8 +77,8 @@ public class W_MONGODB_PROCESS_USAGE_MONITORING extends MongoState {
         EState nextState = null;
         context.setWaitForProcess(false);
         try {
-            DBCursor QuotaCursor = dbConnect.getQuotaService().findQuotaByTransaction(context.getPcefInstance().getTransaction());
-            if (!QuotaCursor.hasNext()) {
+            DBCursor quotaCursor = dbConnect.getQuotaService().findQuotaByTransaction(context.getPcefInstance().getTransaction());
+            if (!quotaCursor.hasNext()) {
                 if (context.isLockProfile()) {
                     setState(EState.W_USAGE_MONITORING_UPDATE);
                     nextState = EState.END;
@@ -86,8 +86,8 @@ public class W_MONGODB_PROCESS_USAGE_MONITORING extends MongoState {
                     nextState = EState.FIND_AND_MOD_PROFILE_FOR_WAIT_PROCESS;
                 }
             } else {
-                if (dbConnect.getQuotaService().checkMkCanProcess(QuotaCursor)) {
-                    Quota quota = new Gson().fromJson(new Gson().toJson(QuotaCursor.iterator().next()), Quota.class);
+                if (dbConnect.getQuotaService().checkMkCanProcess(quotaCursor)) {
+                    Quota quota = new Gson().fromJson(new Gson().toJson(quotaCursor.iterator().next()), Quota.class);
 
                     /*----------------- [Check Quota Exhaust]------------------------------------*/
                     //count transaction

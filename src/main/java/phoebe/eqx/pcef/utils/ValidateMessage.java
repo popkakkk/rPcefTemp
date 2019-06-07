@@ -17,12 +17,6 @@ import phoebe.eqx.pcef.services.OCFUsageMonitoringService;
 
 public class ValidateMessage {
 
-    public static void validateTestData() throws Exception {
-        if (1 == 2) {
-            throw new Exception("");
-        }
-
-    }
 
 
     public static void validateUsageMonitoringRequest(UsageMonitoringRequest usageMonitoringRequest) throws MissingParameterException, WrongFormatException {
@@ -67,8 +61,8 @@ public class ValidateMessage {
                 StringUtils.isBlank(ocfUsageMonitoringResponse.getUserType()) ||
                 StringUtils.isBlank(ocfUsageMonitoringResponse.getUserValue()) ||
                 StringUtils.isBlank(ocfUsageMonitoringResponse.getStatus()) ||
-                StringUtils.isBlank(ocfUsageMonitoringResponse.getDevMessage()) ||
-                ocfUsageMonitoringResponse.getResources() == null) {
+                StringUtils.isBlank(ocfUsageMonitoringResponse.getDevMessage()) /*||
+                ocfUsageMonitoringResponse.getResources() == null*/) {
             return true;
         }
         return false;
@@ -105,7 +99,7 @@ public class ValidateMessage {
     public static void validateUsageMonitoringStop(OCFUsageMonitoringResponse ocfUsageMonitoringResponse, AbstractAF abstractAF) throws MissingParameterException, WrongFormatException {
 
         if (checkOCFUsageMonitoringMissingParameter(ocfUsageMonitoringResponse)) {
-            PCEFUtils.increaseStatistic(abstractAF, EStatMode.WRONG_FORMAT, EStatCmd.receive_Usage_Monitoring_Stop_response);
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.MISSING_PARAMETER, EStatCmd.receive_Usage_Monitoring_Stop_response);
             throw new MissingParameterException("", EError.USAGE_MONITORING_STOP_RESPONSE_MISSING_PARAMETER);
         }
 

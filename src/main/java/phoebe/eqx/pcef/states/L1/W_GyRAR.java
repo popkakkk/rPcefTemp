@@ -6,13 +6,12 @@ import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
-import phoebe.eqx.pcef.services.GenerateCDRService;
 import phoebe.eqx.pcef.services.GyRARService;
 import phoebe.eqx.pcef.services.OCFUsageMonitoringService;
 import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
+import phoebe.eqx.pcef.states.L2.W_MONGODB_PROCESS_GYRAR;
 import phoebe.eqx.pcef.states.abs.ComplexState;
 import phoebe.eqx.pcef.states.abs.MessageRecieved;
-import phoebe.eqx.pcef.states.L2.W_MONGODB_PROCESS_GYRAR;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +67,7 @@ public class W_GyRAR extends ComplexState {
     public void wUsageMonitoringUpdate() throws Exception {
         OCFUsageMonitoringService ocfUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
         OCFUsageMonitoringResponse ocfUsageMonitoringResponse = ocfUsageMonitoringService.readUsageMonitoringUpdate();
+        ArrayList<Quota> quotaResponseList = ocfUsageMonitoringService.getQuotaFromUsageMonitoringResponse(ocfUsageMonitoringResponse);
 
         MongoDBConnect dbConnect = null;
         try {
@@ -75,21 +75,12 @@ public class W_GyRAR extends ComplexState {
 
             List<Transaction> newResourceTransactions = appInstance.getMyContext().getPcefInstance().getOtherStartTransactions();
 
-            dbConnect.getTransactionService().filterResourceRequestErrorNewResource(ocfUsageMonitoringResponse, appInstance.getMyContext().getPcefInstance().getNewResourcesRequests(), newResourceTransactions);
-            dbConnect.getTransactionService().filterResourceRequestErrorCommitResource(ocfUsageMonitoringResponse, appInstance.getMyContext().getPcefInstance().getCommitDatas());
 
-            ArrayList<Quota> quotaResponseList = dbConnect.getQuotaService().getQuotaFromUsageMonitoringResponse(ocfUsageMonitoringResponse);
-            dbConnect.getQuotaService().insertQuotaInitial(quotaResponseList);
-            dbConnect.getTransactionService().updateTransaction(quotaResponseList, newResourceTransactions);
-
-            GenerateCDRService generateCDRService = new GenerateCDRService();
-            generateCDRService.buildCDRCharging(newResourceTransactions, appInstance.getAbstractAF());
-
+            ocfUsageMonitoringService.processGyRar(dbConnect, ocfUsageMonitoringResponse, quotaResponseList, newResourceTransactions);
             dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
 
             GyRARService gyRARService = new GyRARService(appInstance);
             gyRARService.buildResponseGyRAR(true);
-
 
         } catch (Exception e) {
             AFLog.d(" error:" + e.getStackTrace()[0]);

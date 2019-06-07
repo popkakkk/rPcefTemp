@@ -62,7 +62,7 @@ public class GetResourceIdService extends PCEFService {
                         new Header("x-app-name", "Singularity"),
                         new Header("x-channel", "WEB"),
                         new Header("x-transaction-id", generateTransactionId()), //gen to get product
-                        new Header("x-auth-role", "SI"),
+                        new Header("x-auth-role", "SGL-00003"),
                         new Header("x-user-request", context.getPcefInstance().getUsageMonitoringRequest().getUserValue())
                 );
 

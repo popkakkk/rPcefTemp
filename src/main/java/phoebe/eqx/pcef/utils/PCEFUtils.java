@@ -27,6 +27,7 @@ public class PCEFUtils {
 
     public static String HOST_NAME;
     public static final SimpleDateFormat regularDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+    public static final SimpleDateFormat cdrDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     public static final SimpleDateFormat datetimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     public static final SimpleDateFormat dtLongFormatterMs = new SimpleDateFormat("yyyyMMddHHmmss SSSS", Locale.US);
     public static final SimpleDateFormat isoDateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");

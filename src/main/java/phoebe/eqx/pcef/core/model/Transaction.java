@@ -9,6 +9,8 @@ public class Transaction {
     private String rtid;
     private String tid;
     private String actualTime;
+    private String app;
+    private String clientId;
     private String userType;
     private String userValue;
     private String resourceId;
@@ -18,14 +20,12 @@ public class Transaction {
     private String monitoringKey;
     private String counterId;
 
-    private String status;
     private Date createDate;
     private Date updateDate;
-    private String app;
-    private String clientId;
 
-    private Integer firstTime;
+
     private Integer isActive;
+    private String status;
 
 
     public String getSessionId() {
@@ -132,13 +132,7 @@ public class Transaction {
         this.clientId = clientId;
     }
 
-    public Integer getFirstTime() {
-        return firstTime;
-    }
 
-    public void setFirstTime(Integer firstTime) {
-        this.firstTime = firstTime;
-    }
 
     public Integer getIsActive() {
         return isActive;

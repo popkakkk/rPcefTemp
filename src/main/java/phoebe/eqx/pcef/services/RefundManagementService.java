@@ -65,15 +65,13 @@ public class RefundManagementService extends PCEFService {
             if (success) {
                 refundManagementResponse.setStatus(EStatusResponse.SUCCESS.getCode());
                 refundManagementResponse.setDevMessage(EStatusResponse.SUCCESS.getDescription());
+                PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.Sent_Refund_Management_Response);
+
             } else {
                 refundManagementResponse.setStatus(EStatusResponse.FAIL.getCode());
                 refundManagementResponse.setDevMessage(EStatusResponse.FAIL.getDescription());
-
+                PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.Sent_Refund_Management_Response);
             }
-
-            //increase stat
-//            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.PCEF_RECEIVE_TEST_DATA);
-
 
             //build message
             MessagePool messagePool = new MessagePool(abstractAF);
@@ -90,7 +88,6 @@ public class RefundManagementService extends PCEFService {
             pcefException.setErrorMsg(ExceptionUtils.getStackTrace(e));
             WriteLog.writeErrorLogRefundManagement(abstractAF, pcefException, context.getPcefInstance().getRefundManagementRequest());
        */
-
 
 
         }

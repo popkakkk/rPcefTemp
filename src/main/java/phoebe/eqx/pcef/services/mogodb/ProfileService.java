@@ -27,13 +27,15 @@ public class ProfileService extends MongoDBService {
             profile.setUserType("privateId");
             profile.setUserValue(usageMonitoringRequest.getUserValue());
             profile.setIsProcessing(1);
-
-            int firstNumber = 0;
-            profile.setSequenceNumber(firstNumber);
+            profile.setSequenceNumber(0);
+            profile.setAppointmentDate(new Date());
+            profile.setSequenceNumber(0);
             context.getPcefInstance().setProfile(profile);
 
+            BasicDBObject profileBasicObject = BasicDBObject.parse(gson.toJson(profile));
+            profileBasicObject.put(EProfile.appointmentDate.name(), profile.getAppointmentDate());
 
-            insertByObject(profile);
+            insertByQuery(profileBasicObject);
             PCEFUtils.writeMessageFlow("Insert Profile", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (DuplicateKeyException e) {
             PCEFUtils.writeMessageFlow("Insert Profile Duplicate Key", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());

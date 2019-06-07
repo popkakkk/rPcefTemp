@@ -14,7 +14,6 @@ import phoebe.eqx.pcef.states.abs.MessageRecieved;
 import phoebe.eqx.pcef.states.abs.MongoState;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class W_MONGODB_PROCESS_E11_VT_TIMEOUT extends MongoState {
@@ -64,22 +63,18 @@ public class W_MONGODB_PROCESS_E11_VT_TIMEOUT extends MongoState {
             AFLog.d("Find Quota Expire");
             AFLog.d("Current Date:" + PCEFUtils.isoDateFormatter.format(context.getPcefInstance().getStartTime()));
 
-            List<CommitData> commitDataList = dbConnect.getQuotaService().findDataToCommit(context.getPcefInstance().getProfile().getUserValue(), null, true);
-            context.getPcefInstance().setCommitDatas(commitDataList);
 
-            if (commitDataList.size() > 0) {
+            if (context.getPcefInstance().getQuotaModifyList().size() == 0) {
+                List<CommitData> commitDataList = dbConnect.getQuotaService().findDataToCommit(context.getPcefInstance().getProfile().getUserValue(), null, true);
+                context.getPcefInstance().setCommitDatas(commitDataList);
 
-                List<String> mkCommits = dbConnect.getQuotaService().getMkFromCommitData(commitDataList);
-                List<Quota> quotaCommits = new ArrayList<>();
-                mkCommits.forEach(s -> {
-                    Quota quota = new Quota();
-                    quota.setMonitoringKey(s);
-                    quota.setProcessing(0);
-                    quotaCommits.add(quota);
-                });
+                List<Quota> quotaList = dbConnect.getQuotaService().getQuotaForModify(commitDataList);
+                context.getPcefInstance().setQuotaModifyList(quotaList);
+            }
 
 
-                boolean modProcessing = dbConnect.getQuotaService().findAndModifyLockQuotaExpire(quotaCommits);
+            if (context.getPcefInstance().getCommitDatas().size() > 0) {
+                boolean modProcessing = dbConnect.getQuotaService().findAndModifyLockQuotaList(context.getPcefInstance().getQuotaModifyList());
                 if (modProcessing) {
                     nextState = EState.FIND_USAGE_RESOURCE;
                 } else {

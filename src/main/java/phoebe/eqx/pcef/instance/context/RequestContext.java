@@ -34,6 +34,9 @@ public class RequestContext {
 
     private transient PCEFException pcefException;
 
+    private transient boolean quotaExhaust;
+
+
     //flag
     private boolean waitForProcess;
 
@@ -188,4 +191,14 @@ public class RequestContext {
     public void setLockProfile(boolean lockProfile) {
         this.lockProfile = lockProfile;
     }
+
+    public boolean isQuotaExhaust() {
+        return quotaExhaust;
+    }
+
+    public void setQuotaExhaust(boolean quotaExhaust) {
+        this.quotaExhaust = quotaExhaust;
+    }
+
+
 }

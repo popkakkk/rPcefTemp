@@ -1,5 +1,7 @@
 package phoebe.eqx.pcef.instance;
 
+import phoebe.eqx.pcef.core.data.QuotaByKey;
+
 import java.util.Date;
 import java.util.List;
 
@@ -9,8 +11,10 @@ public class CommitData {
     private ID _id;
     private int count;
     private Date expireDate;
-    private String rtid;
+
     private List<String> transactionIds;
+    private List<String> lastRtid;
+    private QuotaByKey quotaByKey;
 
     public Date getExpireDate() {
         return expireDate;
@@ -44,12 +48,22 @@ public class CommitData {
         this.count = count;
     }
 
-    public String getRtid() {
-        return rtid;
+    public QuotaByKey getQuotaByKey() {
+        return quotaByKey;
     }
 
-    public void setRtid(String rtid) {
-        this.rtid = rtid;
+    public void setQuotaByKey(QuotaByKey quotaByKey) {
+        this.quotaByKey = quotaByKey;
+    }
+
+    public String getLastRtid() {
+        if (lastRtid != null) {
+            if (lastRtid.size() == 1) {
+                return lastRtid.get(0);
+            }
+
+        }
+        return "UNKNOWN";
     }
 }
 

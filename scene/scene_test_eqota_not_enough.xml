@@ -1,0 +1,469 @@
+<dummy-request>
+    <dummy-message id="1">
+
+
+        <EquinoxMessage from="rPCEF_au.E11.0" via="rPCEF_au.E11.0" session="0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" timeout="10" ret="0" diag="1:0:0">
+
+            <EquinoxRawData name="HTTP" invoke="1033578817" type="request" method="POST" url="/rpcef/v1/metering-method" ctype="text/plain" val="{
+
+        &quot;command&quot;:&quot;usageMonitoring&quot;,
+
+        &quot;sessionId&quot;:&quot;SessionA123456781234679ACTIVE&quot;,
+
+        &quot;tid&quot;:&quot;SACF-756&quot;,
+
+        &quot;rtid&quot;:&quot;SPW-A1234567891234679100&quot;,
+
+        &quot;actualTime&quot;:&quot;20181105174020&quot;,
+
+        &quot;app&quot;:&quot;Cookie Run&quot;,
+
+        &quot;clientId&quot;:&quot;cGdb4azinlmwq8N5FDGXvQNwUKC352vv2de8fyCUIiI&quot;,
+
+        &quot;userType&quot;:&quot;privateId&quot;,
+
+        &quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;,
+
+        &quot;resourceName&quot;:&quot;GSSO/sendOneTimePwd&quot;
+
+}" to="rPCEF_au.ES00" orig="rPCEF_au.ES05.SACF.0" ret="0" />
+
+            <EquinoxInstance>
+
+                <value val="" />
+
+            </EquinoxInstance>
+
+        </EquinoxMessage>
+    </dummy-message>
+
+    <dummy-message id="2">
+        <EquinoxMessage from="mOCHKF.E11.0" via="mOCHKF.E11.0"
+                        session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615"
+                        timeout="10" ret="0" diag="">
+
+            <EquinoxRawData orig="mOCHKF.ES05.DAMOCLES.0" name="HTTP" invoke="getResourceId_" type="response"
+                            method="POST"
+                            url="" ctype="text/json"
+                            to="mOCHKF.ES00" ret="0">
+
+
+
+            <ERDHeader>
+            </ERDHeader>
+            <ERDData value="{
+
+   &quot;resultCode&quot;: &quot;20000&quot;,
+
+   &quot;developerMessage&quot;: &quot;Query product success&quot;,
+
+   &quot;userMessage&quot;: &quot;Transaction success.&quot;,
+
+   &quot;moreInfo&quot;: &quot;&quot;,
+
+   &quot;resultData&quot;:    {
+
+      &quot;products&quot;: [      {
+
+         &quot;_id&quot;: &quot;5caf0d8edd70922b00cc4d4e&quot;,
+
+         &quot;productId&quot;: &quot;PD-1112&quot;,
+
+         &quot;productCategory&quot;:          {
+
+            &quot;categoryId&quot;: &quot;5a829fec874d4f770a093414&quot;,
+
+            &quot;categoryName&quot;: &quot;IoT&quot;,
+
+            &quot;categoryOrder&quot;: 1
+
+         },
+
+         &quot;productSubCategory&quot;:          {
+
+            &quot;subCategoryId&quot;: &quot;5a829fec874d4f770a093414&quot;,
+
+            &quot;subCategoryName&quot;: &quot;IOT Solution&quot;,
+
+            &quot;subCategoryOrder&quot;: 1
+
+         },
+
+         &quot;status&quot;: &quot;Active&quot;,
+
+         &quot;productPublic&quot;: true,
+
+         &quot;productName&quot;: &quot;Amazon Echo&quot;,
+
+         &quot;productShortDesc&quot;: &quot;Echo (1st Generation) - Smart speaker with Alexa - Charcoal Fabric&quot;,
+
+         &quot;productPriceDetail&quot;:          {
+
+            &quot;priceMethod&quot;: &quot;Price Plan&quot;,
+
+            &quot;conditionPricing&quot;:             [
+
+                              {
+
+                  &quot;priceCode&quot;: &quot;PC-00001&quot;,
+
+                  &quot;name&quot;: &quot;Plan A - Flat&quot;,
+
+                  &quot;conditionType&quot;: &quot;amount&quot;,
+
+                  &quot;conditionDetail&quot;:                   {
+
+                     &quot;amount&quot;:                      {
+
+                        &quot;data&quot;: 1,
+
+                        &quot;unit&quot;: &quot;Piece&quot;
+
+                     },
+
+                     &quot;price&quot;:                      {
+
+                        &quot;data&quot;: 6499,
+
+                        &quot;unit&quot;: &quot;THB&quot;
+
+                     },
+
+                     &quot;pricingMethod&quot;: &quot;flat&quot;
+
+                  }
+
+               },
+
+                              {
+
+                  &quot;priceCode&quot;: &quot;PC-00002&quot;,
+
+                  &quot;name&quot;: &quot;Plan B - Tier&quot;,
+
+                  &quot;conditionType&quot;: &quot;amount&quot;,
+
+                  &quot;conditionDetail&quot;:                   {
+
+                     &quot;amount&quot;:                      {
+
+                        &quot;data&quot;: 1,
+
+                        &quot;unit&quot;: &quot;Pieces&quot;
+
+                     },
+
+                     &quot;price&quot;:                      {
+
+                        &quot;data&quot;: 6499,
+
+                        &quot;unit&quot;: &quot;THB&quot;
+
+                     },
+
+                     &quot;pricingMethod&quot;: &quot;tier&quot;,
+
+                     &quot;pricing&quot;:                      [
+
+                                                {
+
+                           &quot;from&quot;: 1,
+
+                           &quot;to&quot;: 1,
+
+                           &quot;price&quot;: 6499
+
+                        },
+
+                                                {
+
+                           &quot;from&quot;: 2,
+
+                           &quot;to&quot;: 100,
+
+                           &quot;price&quot;: 6399
+
+                        },
+
+                                                {
+
+                           &quot;from&quot;: 101,
+
+                           &quot;to&quot;: 300,
+
+                           &quot;price&quot;: 6299
+
+                        },
+
+                                                {
+
+                           &quot;from&quot;: 301,
+
+                           &quot;to&quot;: 500,
+
+                           &quot;price&quot;: 6199
+
+                        },
+
+                                                {
+
+                           &quot;from&quot;: 501,
+
+                           &quot;to&quot;: -1,
+
+                           &quot;price&quot;: 5899
+
+                        }
+
+                     ]
+
+                  }
+
+               },
+
+                              {
+
+                  &quot;priceCode&quot;: &quot;PC-00003&quot;,
+
+                  &quot;name&quot;: &quot;Plan C - Volumn&quot;,
+
+                  &quot;conditionType&quot;: &quot;amount&quot;,
+
+                  &quot;conditionDetail&quot;:                   {
+
+                     &quot;amount&quot;:                      {
+
+                        &quot;data&quot;: 1,
+
+                        &quot;unit&quot;: &quot;Pieces&quot;
+
+                     },
+
+                     &quot;price&quot;:                      {
+
+                        &quot;data&quot;: 6499,
+
+                        &quot;unit&quot;: &quot;THB&quot;
+
+                     },
+
+                     &quot;pricingMethod&quot;: &quot;volumn&quot;,
+
+                     &quot;pricing&quot;:                      [
+
+                                                {
+
+                           &quot;from&quot;: 1,
+
+                           &quot;to&quot;: 1,
+
+                           &quot;price&quot;: 6499
+
+                        },
+
+                                                {
+
+                           &quot;from&quot;: 2,
+
+                           &quot;to&quot;: 100,
+
+                           &quot;price&quot;: 6450
+
+                        },
+
+                                                {
+
+                           &quot;from&quot;: 101,
+
+                           &quot;to&quot;: 300,
+
+                           &quot;price&quot;: 6250
+
+                        },
+
+                                                {
+
+                           &quot;from&quot;: 301,
+
+                           &quot;to&quot;: 500,
+
+                           &quot;price&quot;: 6199
+
+                        },
+
+                                                {
+
+                           &quot;from&quot;: 501,
+
+                           &quot;to&quot;: -1,
+
+                           &quot;price&quot;: 6000
+
+                        }
+
+                     ]
+
+                  }
+
+               }
+
+            ]
+
+         },
+
+         &quot;productImage&quot;:          [
+
+                        {
+
+               &quot;type&quot;: &quot;thumbnail&quot;,
+
+               &quot;imagePath&quot;: &quot;https://assets.pcmag.com/media/images/522880-amazon-echo-plus.jpg&quot;
+
+            },
+
+                        {
+
+               &quot;type&quot;: &quot;gallery&quot;,
+
+               &quot;imagePath&quot;: &quot;https://assets.pcmag.com/media/images/522880-amazon-echo-plus.jpg&quot;
+
+            },
+
+                        {
+
+               &quot;type&quot;: &quot;gallery&quot;,
+
+               &quot;imagePath&quot;: &quot;https://brain-images-ssl.cdn.dixons.com/4/8/10171184/l_10171184_003.jpg&quot;
+
+            },
+
+                        {
+
+               &quot;type&quot;: &quot;gallery&quot;,
+
+               &quot;imagePath&quot;: &quot;https://brain-images-ssl.cdn.dixons.com/4/8/10171184/l_10171184_006.jpg&quot;
+
+            },
+
+                        {
+
+               &quot;type&quot;: &quot;gallery&quot;,
+
+               &quot;imagePath&quot;: &quot;https://brain-images-ssl.cdn.dixons.com/4/8/10171184/l_10171184_007.jpg&quot;
+
+            }
+
+         ]
+
+      }],
+
+      &quot;productTotal&quot;: 2
+
+   }
+
+}"/>
+
+            </EquinoxRawData>
+
+
+            <EquinoxInstance>
+                <value val=""/>
+            </EquinoxInstance>
+        </EquinoxMessage>
+    </dummy-message>
+
+    <dummy-message id="3">
+        <EquinoxMessage from="mOCHKF.E11.0" via="mOCHKF.E11.0"
+                        session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615"
+                        timeout="10" ret="0" diag="">
+
+            <EquinoxRawData orig="mOCHKF.ES05.DAMOCLES.0" name="HTTP" invoke="umUpdate_" type="response" method="POST"
+                            url="/rpcef/api/v1/metering-method" ctype="text/plain" val="{
+    &quot;command&quot;:&quot;usageMonitoringUpdate&quot;,
+    &quot;sessionId&quot;:&quot;SessionA1234567891234679ACTIVE&quot;,
+    &quot;tid&quot;:&quot;TRANSACTION001&quot;,
+    &quot;requestNumber&quot;:&quot;1&quot;,
+    &quot;userType&quot;:&quot;privateId&quot;,
+    &quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;,
+    &quot;status&quot;:&quot;207&quot;,
+   &quot;devMessage&quot;:&quot;PARTIAL_SUCCESS&quot;,
+    &quot;resources&quot;:[
+        {
+            &quot;resourceId&quot;:&quot;PD-1112&quot;,
+            &quot;resourceName&quot;:&quot;API_A&quot;,
+           &quot;rtid&quot;:&quot;R-TRAN-001&quot;,
+            &quot;resultCode&quot;:&quot;20000&quot;,
+            &quot;resultDesc&quot;:&quot;SUCCESS&quot;,
+            &quot;monitoringKey&quot;:&quot;1001&quot;,
+           &quot;counterId&quot;:&quot;4001000001&quot;
+        }]
+}"
+                            to="mOCHKF.ES00" ret="0"/>
+            <EquinoxInstance>
+                <value val=""/>
+            </EquinoxInstance>
+        </EquinoxMessage>
+    </dummy-message>
+
+    <dummy-message id="3">
+        <EquinoxMessage from="mOCHKF.E11.0" via="mOCHKF.E11.0"
+                        session="668691208055774|4051|3G Internet 19Baht 1Mbps 1Day UL|20181225:083613|20181226:083615"
+                        timeout="10" ret="0" diag="">
+
+            <EquinoxRawData orig="mOCHKF.ES05.DAMOCLES.0" name="HTTP" invoke="umUpdate_" type="response" method="POST"
+                            url="/rpcef/api/v1/metering-method" ctype="text/plain" val="{
+    &quot;command&quot;:&quot;usageMonitoringUpdate&quot;,
+    &quot;sessionId&quot;:&quot;SessionA1234567891234679ACTIVE&quot;,
+    &quot;tid&quot;:&quot;TRANSACTION001&quot;,
+    &quot;requestNumber&quot;:&quot;1&quot;,
+    &quot;userType&quot;:&quot;privateId&quot;,
+    &quot;userValue&quot;:&quot;0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384&quot;,
+    &quot;status&quot;:&quot;207&quot;,
+   &quot;devMessage&quot;:&quot;PARTIAL_SUCCESS&quot;,
+    &quot;resources&quot;:[
+        {
+            &quot;resourceId&quot;:&quot;PD-1112&quot;,
+            &quot;resourceName&quot;:&quot;API_A&quot;,
+           &quot;rtid&quot;:&quot;R-TRAN-001&quot;,
+            &quot;resultCode&quot;:&quot;20000&quot;,
+            &quot;resultDesc&quot;:&quot;SUCCESS&quot;,
+            &quot;monitoringKey&quot;:&quot;1001&quot;,
+           &quot;counterId&quot;:&quot;4001000001&quot;,
+            &quot;quotaByKey&quot;:{
+                &quot;unitType&quot;:&quot;unit&quot;,
+                &quot;unit&quot;:&quot;100&quot;,
+                &quot;validityTime&quot;:&quot;3600&quot;
+            },
+            &quot;rateLimitByKey&quot;:{
+                &quot;transactionPerTime&quot;:&quot;100|60&quot;
+            }
+        },
+         {
+            &quot;resourceId&quot;:&quot;PD-1112&quot;,
+            &quot;resourceName&quot;:&quot;API_A&quot;,
+           &quot;rtid&quot;:&quot;R-TRAN-001&quot;,
+            &quot;resultCode&quot;:&quot;20000&quot;,
+            &quot;resultDesc&quot;:&quot;SUCCESS&quot;,
+            &quot;monitoringKey&quot;:&quot;1001&quot;,
+           &quot;counterId&quot;:&quot;4001000001&quot;,
+            &quot;quotaByKey&quot;:{
+                &quot;unitType&quot;:&quot;unit&quot;,
+                &quot;unit&quot;:&quot;100&quot;,
+                &quot;validityTime&quot;:&quot;3600&quot;
+            },
+            &quot;rateLimitByKey&quot;:{
+                &quot;transactionPerTime&quot;:&quot;100|60&quot;
+            }
+        }
+
+
+    ]
+}"
+                            to="mOCHKF.ES00" ret="0"/>
+            <EquinoxInstance>
+                <value val=""/>
+            </EquinoxInstance>
+        </EquinoxMessage>
+    </dummy-message>
+
+</dummy-request>

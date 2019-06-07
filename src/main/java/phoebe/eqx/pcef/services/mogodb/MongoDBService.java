@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.mongodb.*;
 import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.enums.EStatusLifeCycle;
+import phoebe.eqx.pcef.enums.model.EProfile;
 import phoebe.eqx.pcef.enums.model.EQuota;
 import phoebe.eqx.pcef.enums.model.ETransaction;
 import phoebe.eqx.pcef.enums.model.element.EResourceQuota;
@@ -13,7 +14,6 @@ import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.instance.context.RequestContext;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public abstract class MongoDBService {
@@ -98,6 +98,7 @@ public abstract class MongoDBService {
 
             String tempNameTransaction = "transactionData";
             String tempNameTids = "transactionIds";
+            String tempNameRtids = "rtids";
 
             BasicDBObject $lookupTransaction = new BasicDBObject();
             $lookupTransaction.put("from", Config.COLLECTION_TRANSACTION_NAME);
@@ -106,6 +107,10 @@ public abstract class MongoDBService {
             List<BasicDBObject> lookupCondition = new ArrayList<>();
             lookupCondition.add(new BasicDBObject("$eq", new String[]{"$" + ETransaction.resourceId.name(), "$$" + EResourceQuota.resourceId.name()}));
             lookupCondition.add(new BasicDBObject("$eq", new String[]{"$" + ETransaction.status.name(), EStatusLifeCycle.Done.getName()}));
+
+            if (privateId != null) {
+                lookupCondition.add(new BasicDBObject("$eq", new String[]{"$" + ETransaction.userValue.name(), privateId}));
+            }
 
             BasicDBObject lookupExpression = new BasicDBObject();
             lookupExpression.put("$match", new BasicDBObject("$expr", new BasicDBObject("$and", lookupCondition)));
@@ -118,10 +123,8 @@ public abstract class MongoDBService {
             $unwindTransactionData.put("path", "$" + tempNameTransaction);
             $unwindTransactionData.put("preserveNullAndEmptyArrays", true);
 
+
             BasicDBObject $match = new BasicDBObject();
-            if (privateId != null) {
-                $match.put(EQuota.userValue.name(), privateId);
-            }
 
             if (monitoringKey != null) {
                 $match.put(tempNameTransaction + "." + ETransaction.monitoringKey.name(), monitoringKey);
@@ -140,10 +143,14 @@ public abstract class MongoDBService {
             BasicDBObject tid = new BasicDBObject();
             tid.put("$push", "$" + tempNameTransaction + "." + ETransaction.tid.name());
 
+            BasicDBObject rtid = new BasicDBObject();
+            rtid.put("$push", "$" + tempNameTransaction + "." + ETransaction.rtid.name());
+
             $group.put("_id", _id);
             $group.put(tempNameTids, tid);
+            $group.put(tempNameRtids, rtid);
             $group.put(EQuota.expireDate.name(), new BasicDBObject("$max", "$" + EQuota.expireDate.name()));
-            $group.put(ETransaction.rtid.name(), new BasicDBObject("$max", "$" + tempNameTransaction + "." + ETransaction.rtid.name()));
+            $group.put(EQuota.quotaByKey.name(), new BasicDBObject("$max", "$" + EQuota.quotaByKey.name()));
 
             BasicDBObject $project = new BasicDBObject();
 
@@ -155,13 +162,19 @@ public abstract class MongoDBService {
             $project.put(tempNameTids, "$" + tempNameTids);
             $project.put("count", new BasicDBObject("$cond", $cond));
             $project.put(EQuota.expireDate.name(), 1);
-            $project.put(ETransaction.rtid.name(), 1);
+            $project.put(EQuota.quotaByKey.name(), 1);
+
+            ArrayList slice = new ArrayList();
+            slice.add("$" + tempNameRtids);
+            slice.add(-1);
+            $project.put("lastRtid", new BasicDBObject("$slice", slice));
 
 
             List<DBObject> pipeline = Arrays.asList(
                     new BasicDBObject("$unwind", "$" + EQuota.resources.name()), //unwind resources
                     new BasicDBObject("$lookup", $lookupTransaction), //join transaction by resourceId
                     new BasicDBObject("$unwind", $unwindTransactionData), //unwind transactionData
+                    new BasicDBObject("$sort", new BasicDBObject(tempNameTransaction + "." + ETransaction.createDate.name(), -1)), //sort createDate
                     new BasicDBObject("$match", $match),//status Done
                     new BasicDBObject("$group", $group),
                     new BasicDBObject("$project", $project));
@@ -179,7 +192,8 @@ public abstract class MongoDBService {
                 AFLog.d("mk:" + commitData.get_id().getMonitoringKey()
                         + " ,resourceId:" + commitData.get_id().getResourceId()
                         + " ,expireDate:" + PCEFUtils.isoDateFormatter.format(commitData.getExpireDate())
-                        + " ,rtid:" + commitData.getRtid()
+                        + " ,quota available unit:" + commitData.getQuotaByKey().getUnit()
+                        + " ,lastRtid:" + commitData.getLastRtid()
                         + " ,count transaction:" + commitData.getCount());
                 commitDatas.add(commitData);
             }
@@ -189,8 +203,6 @@ public abstract class MongoDBService {
             AFLog.d("find data to commit error-" + e.getStackTrace()[0]);
             throw e;
         }
-
-
     }
 
 

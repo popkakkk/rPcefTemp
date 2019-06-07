@@ -5,16 +5,15 @@ import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
-import phoebe.eqx.pcef.instance.CommitData;
 import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
-import phoebe.eqx.pcef.services.GenerateCDRService;
 import phoebe.eqx.pcef.services.GetResourceIdService;
 import phoebe.eqx.pcef.services.OCFUsageMonitoringService;
 import phoebe.eqx.pcef.services.UsageMonitoringService;
 import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
+import phoebe.eqx.pcef.states.L2.W_MOD_PROCESS;
+import phoebe.eqx.pcef.states.L2.W_MONGODB_PROCESS_USAGE_MONITORING;
 import phoebe.eqx.pcef.states.abs.ComplexState;
 import phoebe.eqx.pcef.states.abs.MessageRecieved;
-import phoebe.eqx.pcef.states.L2.W_MONGODB_PROCESS_USAGE_MONITORING;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,30 +96,22 @@ public class W_USAGE_MONITORING extends ComplexState {
     @MessageRecieved(messageType = EState.W_USAGE_MONITORING_START)
     public void wUsageMonitoringStart() throws Exception {
         OCFUsageMonitoringService ocfUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
-        OCFUsageMonitoringResponse ocfUsageMonitoringResponse = null;
+        OCFUsageMonitoringResponse ocfUsageMonitoringResponse = ocfUsageMonitoringService.readUsageMonitoringStart();
+        ArrayList<Quota> quotaResponseList = ocfUsageMonitoringService.getQuotaFromUsageMonitoringResponse(ocfUsageMonitoringResponse);
 
         MongoDBConnect dbConnect = null;
         try {
 
             dbConnect = new MongoDBConnect(appInstance);
-            ocfUsageMonitoringResponse = ocfUsageMonitoringService.readUsageMonitoringStart();
-
-
             UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
 
             List<Transaction> transactionList = new ArrayList<>();
             transactionList.add(appInstance.getMyContext().getPcefInstance().getTransaction());
             transactionList.addAll(appInstance.getMyContext().getPcefInstance().getOtherStartTransactions());
 
-            dbConnect.getTransactionService().filterResourceRequestErrorNewResource(ocfUsageMonitoringResponse, appInstance.getMyContext().getPcefInstance().getNewResourcesRequests(), transactionList);
-            ArrayList<Quota> quotaResponseList = dbConnect.getQuotaService().getQuotaFromUsageMonitoringResponse(ocfUsageMonitoringResponse);
+            dbConnect.getTransactionService().filterTransactionErrorNewResource(ocfUsageMonitoringResponse, transactionList, quotaResponseList);
 
-            dbConnect.getQuotaService().insertQuotaInitial(quotaResponseList);
-            dbConnect.getTransactionService().updateTransaction(quotaResponseList, transactionList);
-
-            GenerateCDRService generateCDRService = new GenerateCDRService();
-            generateCDRService.buildCDRCharging(transactionList, appInstance.getAbstractAF());
-
+            ocfUsageMonitoringService.processFirstUsage(dbConnect, ocfUsageMonitoringResponse, quotaResponseList, transactionList);
             dbConnect.getProfileService().updateProfileUnLockInitial(dbConnect.getQuotaService().getMinExpireDate());
 
             usageMonitoringService.buildResponseUsageMonitoring(true);
@@ -144,32 +135,31 @@ public class W_USAGE_MONITORING extends ComplexState {
     public void wUsageMonitoringUpdate() throws Exception {
         OCFUsageMonitoringService ocfUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
         OCFUsageMonitoringResponse ocfUsageMonitoringResponse = ocfUsageMonitoringService.readUsageMonitoringUpdate();
+        ArrayList<Quota> quotaResponseList = ocfUsageMonitoringService.getQuotaFromUsageMonitoringResponse(ocfUsageMonitoringResponse);
+
+        EState nextState = null;
 
         MongoDBConnect dbConnect = null;
         try {
             dbConnect = new MongoDBConnect(appInstance);
             UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
 
-
             List<Transaction> newResourceTransactions = new ArrayList<>();
 
             Transaction thisTransaction = appInstance.getMyContext().getPcefInstance().getTransaction();
-            List<CommitData> commitDataList = appInstance.getMyContext().getPcefInstance().getCommitDatas();
-//            if (appInstance.getMyContext().getPcefInstance().getCommitDatas().size() == 0) {
+
             newResourceTransactions.add(thisTransaction); //this transaction new resource
-//            } else {
-               /* for (CommitData commitData : commitDataList) {
-                    if (commitData.get_id().getResourceId().equals(thisTransaction.getResourceId())) {
-                        commitData.getTransactionIds().add(thisTransaction.getTid());//this transaction commit resource -- to filter error
-                        break;
-                    }
-                }*/
-//            }
             newResourceTransactions.addAll(appInstance.getMyContext().getPcefInstance().getOtherStartTransactions());
 
-            dbConnect.getTransactionService().filterResourceRequestErrorNewResource(ocfUsageMonitoringResponse, appInstance.getMyContext().getPcefInstance().getNewResourcesRequests(), newResourceTransactions);
-            dbConnect.getTransactionService().filterResourceRequestErrorCommitResource(ocfUsageMonitoringResponse, appInstance.getMyContext().getPcefInstance().getCommitDatas());
+            //filter
 
+
+
+
+
+            ocfUsageMonitoringService.processUpdate(dbConnect, ocfUsageMonitoringResponse, quotaResponseList, newResourceTransactions);
+
+            //check My Transaction Error
             boolean transactionError = true;
             for (Transaction t : newResourceTransactions) {
                 if (t.getResourceId().equals(thisTransaction.getResourceId())) {
@@ -178,44 +168,20 @@ public class W_USAGE_MONITORING extends ComplexState {
             }
 
 
-
-
-          /*  boolean transactionError = true;
-            if (commitDataList.size() > 0) {  //check my transaction commit error and set to update
-                for (CommitData commitData : commitDataList) {
-                    if (thisTransaction.getResourceId().equals(commitData.get_id().getResourceId())) {
-                        commitData.getTransactionIds().remove(commitDataList.size() - 1);
-                        transactionError = false;
-                        break;
-                    }
-                }
-            } else {
-                for (Transaction t : newResourceTransactions) {
-                    if (thisTransaction.getResourceId().equals(t.getResourceId())) {
-                        transactionError = false;
-                        break;
-                    }
-                }
-
-            }*/
-
-            ArrayList<Quota> quotaResponseList = dbConnect.getQuotaService().getQuotaFromUsageMonitoringResponse(ocfUsageMonitoringResponse);
-
-            dbConnect.getQuotaService().updateQuota(quotaResponseList);
-            dbConnect.getTransactionService().updateTransaction(quotaResponseList, newResourceTransactions);
-
-            GenerateCDRService generateCDRService = new GenerateCDRService();
-            generateCDRService.buildCDRCharging(newResourceTransactions, appInstance.getAbstractAF());
-
             dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
 
-            if (!transactionError) {
-//                dbConnect.getTransactionService().updateTransactionWaitingToComplete(quotaResponseList);
-                usageMonitoringService.buildResponseUsageMonitoring(true);
+            //check Have new Commit Data
+            if (context.getPcefInstance().getCommitDataNewList().size() > 0) {
+                nextState = EState.W_MONGO_PROCESS_USAGE_MONITORING_MOD_PROCESS;
             } else {
-//                dbConnect.getTransactionService().deleteTransactionError();
-                usageMonitoringService.buildResponseUsageMonitoring(false);
+                if (!transactionError) {
+                    usageMonitoringService.buildResponseUsageMonitoring(true);
+                } else {
+                    usageMonitoringService.buildResponseUsageMonitoring(false);
+                }
+                nextState = EState.END;
             }
+
 
         } catch (Exception e) {
             AFLog.d("wUsageMonitoringUpdate error -" + e.getStackTrace()[0]);
@@ -230,7 +196,54 @@ public class W_USAGE_MONITORING extends ComplexState {
             }
 
         }
-        setWorkState(EState.END);
+        setWorkState(nextState);
+    }
+
+
+    @MessageRecieved(messageType = EState.W_MONGO_PROCESS_USAGE_MONITORING_MOD_PROCESS)
+    public void modProcess() throws Exception {
+        MongoDBConnect dbConnect = null;
+        EState nextState = null;
+
+        try {
+            dbConnect = new MongoDBConnect(appInstance);
+
+            //Application Logic wait mongodb process
+            W_MOD_PROCESS wModProcess = new W_MOD_PROCESS(appInstance, dbConnect);
+            wModProcess.dispatch();
+
+            nextState = context.getStateL2();
+            if (EState.END.equals(context.getStateL3())) {
+                if (EState.END.equals(nextState)) {
+                    UsageMonitoringService usageMonitoringService = new UsageMonitoringService(appInstance);
+                    if (wModProcess.isResponseSuccess()) {
+                        usageMonitoringService.buildResponseUsageMonitoring(true);
+                    } else {
+                        usageMonitoringService.buildResponseUsageMonitoring(false);
+                    }
+                } else {
+                    OCFUsageMonitoringService ocfUsageMonitoringService = new OCFUsageMonitoringService(appInstance);
+                    if (EState.W_USAGE_MONITORING_UPDATE.equals(nextState)) {
+                        ocfUsageMonitoringService.buildUsageMonitoringUpdate(dbConnect);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            if (dbConnect != null) {
+                dbConnect.getTransactionService().deleteTransactionError();
+            }
+
+            AFLog.d("mod Process error:" + e.getStackTrace()[0]);
+            throw e;
+        } finally {
+            if (dbConnect != null) {
+                dbConnect.closeConnection();
+            }
+            if (nextState == null) {
+                nextState = EState.END;
+            }
+        }
+        setWorkState(nextState);
     }
 
 

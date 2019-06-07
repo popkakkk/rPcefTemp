@@ -15,9 +15,10 @@ public class MainTest {
         clearTheFile();
 
 //
+        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/scene_test_eqota_not_enough.xml", "", "");
 //        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/scene_test.xml", "", "");
 //        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/scene_test_interval.xml", "", "");
-        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/scene_test_update_new_resource.xml", "", "");
+//        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/scene_test_update_new_resource.xml", "", "");
 
 //        AFTest.getInstance().run("rPCEF", "./conf/rPCEF.EC02.0.0", "./scene/scene_test_update_quota_available.xml", "", "");
 
