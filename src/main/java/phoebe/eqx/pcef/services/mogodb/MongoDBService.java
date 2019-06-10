@@ -60,7 +60,8 @@ public abstract class MongoDBService {
     public void updateSetByQuery(BasicDBObject searchQuery, BasicDBObject updateQuery) {
         BasicDBObject setUpdate = new BasicDBObject("$set", updateQuery);
         writeQueryLog("update", collectionName, searchQuery + "," + setUpdate);
-        db.getCollection(collectionName).update(searchQuery, setUpdate);
+        WriteResult writeResult = db.getCollection(collectionName).update(searchQuery, setUpdate);
+        writeResult.getN();
     }
 
 
@@ -167,14 +168,14 @@ public abstract class MongoDBService {
             ArrayList slice = new ArrayList();
             slice.add("$" + tempNameRtids);
             slice.add(-1);
-            $project.put("lastRtid", new BasicDBObject("$slice", slice));
+            $project.put("lastRtid", new BasicDBObject("$slice", slice)); //last of rtids
 
 
             List<DBObject> pipeline = Arrays.asList(
                     new BasicDBObject("$unwind", "$" + EQuota.resources.name()), //unwind resources
                     new BasicDBObject("$lookup", $lookupTransaction), //join transaction by resourceId
                     new BasicDBObject("$unwind", $unwindTransactionData), //unwind transactionData
-                    new BasicDBObject("$sort", new BasicDBObject(tempNameTransaction + "." + ETransaction.createDate.name(), -1)), //sort createDate
+                    new BasicDBObject("$sort", new BasicDBObject(tempNameTransaction + "." + ETransaction.createDate.name(), 1)), //sort createDate ASC
                     new BasicDBObject("$match", $match),//status Done
                     new BasicDBObject("$group", $group),
                     new BasicDBObject("$project", $project));

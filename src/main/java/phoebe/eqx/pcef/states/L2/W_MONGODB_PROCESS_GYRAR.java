@@ -22,16 +22,14 @@ public class W_MONGODB_PROCESS_GYRAR extends MongoState {
     }
 
 
-    @MessageRecieved(messageType = EState.BEGIN)
+   /* @MessageRecieved(messageType = EState.BEGIN)
     public void findQuota() {
         EState nextState = null;
 
         try {
-            GyRARRequest gyRARRequest = context.getPcefInstance().getGyRARRequest();
-            dbConnect.getQuotaService().findAllQuotaByPrivateId(gyRARRequest.getUserValue());
 
-            List<CommitData> commitDataList = dbConnect.getQuotaService().findDataToCommit(gyRARRequest.getUserValue(), null, false);
-            context.getPcefInstance().setCommitDatas(commitDataList);
+
+
             nextState = EState.REMOVE_QUOTA_GYRAR;
         } catch (Exception e) {
             setResponseFail();
@@ -39,10 +37,10 @@ public class W_MONGODB_PROCESS_GYRAR extends MongoState {
         }
         setWorkState(nextState);
     }
-
-    @MessageRecieved(messageType = EState.REMOVE_QUOTA_GYRAR)
-    public EState findAndModifyProfile() {
-        EState nextState = null;
+*/
+    @MessageRecieved(messageType = EState.BEGIN)
+    public void findQuota() {
+        EState nextState;
         try {
 
             DBObject dbObject = dbConnect.getProfileService().findAndModifyLockProfile(context.getPcefInstance().getGyRARRequest().getUserValue());
@@ -51,6 +49,10 @@ public class W_MONGODB_PROCESS_GYRAR extends MongoState {
                 context.getPcefInstance().setProfile(profile);
 
                 //remove quota
+                GyRARRequest gyRARRequest = context.getPcefInstance().getGyRARRequest();
+                List<CommitData> commitDataList = dbConnect.getQuotaService().findDataToCommit(gyRARRequest.getUserValue(), null, false);
+                context.getPcefInstance().setCommitDatas(commitDataList);
+
                 dbConnect.getQuotaService().removeQuota(context.getPcefInstance().getGyRARRequest().getUserValue());
 
                 setState(EState.W_USAGE_MONITORING_UPDATE);
@@ -65,6 +67,6 @@ public class W_MONGODB_PROCESS_GYRAR extends MongoState {
             setResponseFail();
             nextState = EState.END;
         }
-        return nextState;
+        setWorkState(nextState);
     }
 }

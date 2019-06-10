@@ -23,7 +23,7 @@
 
             <EquinoxRawData orig="mOCHKF.ES05.DAMOCLES.0" name="HTTP" invoke="umUpdate_" type="response" method="POST"
                             url="/rpcef/api/v1/metering-method" ctype="text/plain" val="{
-    &quot;command&quot;:&quot;usageMonitoringStart&quot;,
+    &quot;command&quot;:&quot;usageMonitoringUpdate&quot;,
     &quot;sessionId&quot;:&quot;SessionA1234567891234679ACTIVE&quot;,
     &quot;tid&quot;:&quot;TRANSACTION001&quot;,
     &quot;requestNumber&quot;:&quot;1&quot;,

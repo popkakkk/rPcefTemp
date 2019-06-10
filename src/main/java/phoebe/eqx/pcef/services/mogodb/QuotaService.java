@@ -10,6 +10,7 @@ import phoebe.eqx.pcef.core.data.ResourceResponse;
 import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.model.EQuota;
+import phoebe.eqx.pcef.enums.model.element.EResourceQuota;
 import phoebe.eqx.pcef.instance.AppInstance;
 
 import phoebe.eqx.pcef.instance.CommitData;
@@ -231,7 +232,8 @@ public class QuotaService extends MongoDBService {
         try {
             BasicDBObject searchQuery = new BasicDBObject();
             searchQuery.put(EQuota.userValue.name(), context.getPcefInstance().getProfile().getUserValue());
-            searchQuery.put(EQuota.resources.name(), new BasicDBObject("$elemMatch", new BasicDBObject("resourceId", transaction.getResourceId())));
+//            searchQuery.put(EQuota.resources.name(), new BasicDBObject("$elemMatch", new BasicDBObject(EResourceQuota.resourceId.name(), transaction.getResourceId())));
+            searchQuery.put(EQuota.resources.name()+"."+EResourceQuota.resourceId.name(),  transaction.getResourceId());
             DBCursor dbCursor = findByQuery(searchQuery);
 
             if (dbCursor.hasNext()) {

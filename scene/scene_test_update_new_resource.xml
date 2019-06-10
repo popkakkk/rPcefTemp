@@ -13,7 +13,7 @@
 
         &quot;tid&quot;:&quot;SACF-777&quot;,
 
-        &quot;rtid&quot;:&quot;SPW-A12345678912346791&quot;,
+        &quot;rtid&quot;:&quot;SPW-A12345678912346792&quot;,
 
         &quot;actualTime&quot;:&quot;20181105174020&quot;,
 
@@ -65,7 +65,7 @@
 
          &quot;_id&quot;: &quot;5caf0d8edd70922b00cc4d4e&quot;,
 
-         &quot;productId&quot;: &quot;PD-2018&quot;,
+         &quot;productId&quot;: &quot;PD-2019&quot;,
 
          &quot;productCategory&quot;:          {
 
@@ -377,7 +377,7 @@
 
             <EquinoxRawData orig="mOCHKF.ES05.DAMOCLES.0" name="HTTP" invoke="umUpdate_" type="response" method="POST"
                             url="/rpcef/api/v1/metering-method" ctype="text/plain" val="{
-    &quot;command&quot;:&quot;usageMonitoringStart&quot;,
+    &quot;command&quot;:&quot;usageMonitoringUpdate&quot;,
     &quot;sessionId&quot;:&quot;SessionA1234567891234679ACTIVE&quot;,
     &quot;tid&quot;:&quot;TRANSACTION001&quot;,
     &quot;requestNumber&quot;:&quot;1&quot;,

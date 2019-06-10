@@ -24,8 +24,8 @@ public class Transaction {
     private Date updateDate;
 
 
-    private Integer isActive;
     private String status;
+    private Integer isActive;
 
 
     public String getSessionId() {

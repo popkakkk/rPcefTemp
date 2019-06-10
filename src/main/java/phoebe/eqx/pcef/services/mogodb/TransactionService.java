@@ -1,13 +1,13 @@
 package phoebe.eqx.pcef.services.mogodb;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCursor;
-import com.mongodb.MongoClient;
+import com.mongodb.*;
 import ec02.af.utils.AFLog;
+import phoebe.eqx.pcef.DBResult;
 import phoebe.eqx.pcef.core.data.ResourceQuota;
 import phoebe.eqx.pcef.core.data.ResourceResponse;
 import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.core.model.Transaction;
+import phoebe.eqx.pcef.enums.DBOperation;
 import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.enums.EStatusLifeCycle;
 import phoebe.eqx.pcef.enums.model.ETransaction;
@@ -81,16 +81,31 @@ public class TransactionService extends MongoDBService {
     }
 
     public DBCursor findTransactionForRefund(String refId) {
-        BasicDBObject searchQuery = new BasicDBObject();
-        searchQuery.put(ETransaction.tid.name(), refId);
 
-        ArrayList<String> inStatus = new ArrayList();
-        inStatus.add(EStatusLifeCycle.Done.getName());
-        inStatus.add(EStatusLifeCycle.Completed.getName());
+        try {
+            AFLog.d("Find Transaction Refund ..");
 
-        searchQuery.put(ETransaction.status.name(), new BasicDBObject("$in", inStatus));
+            BasicDBObject searchQuery = new BasicDBObject();
+            searchQuery.put(ETransaction.tid.name(), refId);
 
-        return findByQuery(searchQuery);
+            ArrayList<String> inStatus = new ArrayList<>();
+            inStatus.add(EStatusLifeCycle.Done.getName());
+            inStatus.add(EStatusLifeCycle.Completed.getName());
+            searchQuery.put(ETransaction.status.name(), new BasicDBObject("$in", inStatus));
+            PCEFUtils.writeDBMessageRequest(collectionName, DBOperation.FIND, searchQuery);
+
+            DBCursor cursor = findByQuery(searchQuery);
+
+            List<Object> results = new ArrayList<>();
+            results.add(cursor.iterator().next());
+
+            PCEFUtils.writeDBMessageResponse(DBResult.SUCCESS, cursor.size(), Arrays.asList(cursor.iterator().next()));
+            return cursor;
+        } catch (MongoException e) {
+            PCEFUtils.writeDBMessageResponse(DBResult.SUCCESS, 0, null);
+            throw e;
+        }
+
     }
 
 
@@ -292,8 +307,6 @@ public class TransactionService extends MongoDBService {
     public void filterResourceRequestErrorCommitResource(OCFUsageMonitoringResponse ocfUsageMonitoringResponse, List<CommitData> commitDataList) {
 
 
-        int index = 0;
-
         List<CommitData> filterCommitDatas = new ArrayList<>();
         for (CommitData commitData : commitDataList) {
 
@@ -318,9 +331,9 @@ public class TransactionService extends MongoDBService {
 
             if (!found || error) {
                 if (!found) {
-                    AFLog.d("Resource Id:" + resourceId + "no have quota");
+                    AFLog.d("Resource Id:" + resourceId + "no have quota!!!");
                 } else {
-                    AFLog.d("Resource Id:" + resourceId + "return description error");
+                    AFLog.d("Resource Id:" + resourceId + "return description error!!!");
                 }
 
                 /*if (commitData.get_id().getResourceId().equals(context.getPcefInstance().getTransaction().getResourceId())) {
@@ -329,15 +342,14 @@ public class TransactionService extends MongoDBService {
 */
 
                 //remove
-                AFLog.d("remove transaction to commit by resourceId : " + resourceId);
+                AFLog.d("remove Transaction resourceId : " + resourceId);
                 removeManyTransactionByTid(commitData.getTransactionIds());
 
                 //filter
                 filterCommitDatas.add(commitData);
             }
-            index++;
-        }
 
+        }
         commitDataList.removeAll(filterCommitDatas);
 
     }

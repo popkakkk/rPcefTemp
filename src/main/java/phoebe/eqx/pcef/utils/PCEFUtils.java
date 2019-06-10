@@ -5,11 +5,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import ec02.af.abstracts.AbstractAF;
 import ec02.af.utils.AFLog;
+import phoebe.eqx.pcef.DBResult;
 import phoebe.eqx.pcef.core.cdr.Opudr;
+import phoebe.eqx.pcef.enums.DBOperation;
 import phoebe.eqx.pcef.enums.EEvent;
 import phoebe.eqx.pcef.enums.config.EConfig;
 import phoebe.eqx.pcef.enums.stats.EStatCmd;
 import phoebe.eqx.pcef.enums.stats.EStatMode;
+import phoebe.eqx.pcef.instance.Config;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -166,20 +169,42 @@ public class PCEFUtils {
         AFLog.d("[MESSAGE_FLOW] : " + gsonToJson(messageFlow));
     }
 
+
+    public static void writeDBMessageRequest(String collection, DBOperation dbOperation, Object query) {
+        DBMsgRequest msgRequest = new DBMsgRequest();
+        msgRequest.setDatabase(Config.MY_DB_NAME);
+        msgRequest.setColletion(collection);
+        msgRequest.setOperation(dbOperation.name());
+        msgRequest.setQuery(query);
+        AFLog.d("[DATABASE] : " + gsonToJson(msgRequest));
+    }
+
+
+    public static void writeDBMessageResponse(DBResult dbResult, int totalRecord, List<Object> objects) {
+        DBMsgResponse dbMsgResponse = new DBMsgResponse();
+        dbMsgResponse.setCode(dbResult.getCode());
+        dbMsgResponse.setErrMsg(dbResult.getDesc());
+        dbMsgResponse.setTotalRecord(totalRecord);
+        if (objects != null) {
+            dbMsgResponse.setResult(objects);
+        }
+        AFLog.d("[DATABASE] : " + gsonToJson(dbMsgResponse));
+    }
+
+
     public static String generateCdr(Opudr opudr) throws JAXBException {
 
-            AFLog.d("Generate CDR");
+        AFLog.d("Generate CDR");
 
-            StringWriter stringWriter = new StringWriter();
+        StringWriter stringWriter = new StringWriter();
 
-            JAXBContext jaxbContext = JAXBContext.newInstance(Opudr.class);
-            Marshaller marshaller = jaxbContext.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+        JAXBContext jaxbContext = JAXBContext.newInstance(Opudr.class);
+        Marshaller marshaller = jaxbContext.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
-            marshaller.marshal(opudr, stringWriter);
+        marshaller.marshal(opudr, stringWriter);
 
-            return stringWriter.toString();
-
+        return stringWriter.toString();
 
 
     }
