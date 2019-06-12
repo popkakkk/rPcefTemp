@@ -1,7 +1,7 @@
 package phoebe.eqx.pcef.enums;
 
 public enum DBOperation {
-    FIND,
+    READ,
     INSERT,
     UPDATE,
     DELETE,

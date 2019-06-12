@@ -128,10 +128,11 @@ public class MessagePool {
         String data = new Gson().toJson(refundManagementResponse);
         this.requestObj = data;
         Map<String, String> map = new HashMap<>();
-        map.put("name", "HTTP");
-        map.put("method", EEquinoxRawData.Name.HTTP.getName());
-        map.put("type", EEquinoxRawData.TypeHTTP.RESPONSE.getType());
+        map.put("name", EEquinoxRawData.Name.HTTP.getName());
+        map.put("method", "POST");
+        map.put("type", EEquinoxRawData.TypeHTTP.REQUEST.getType());
         map.put("ctype", "text/plain");
+        map.put("url", Config.URL_OCF_USAGE_MONITORING);
         map.put("to", Config.RESOURCE_NAME_OCF);
         map.put("timeout", Config.TIMEOUT_OCF);
         map.put("invoke", invokeId);
@@ -147,6 +148,15 @@ public class MessagePool {
         Map<String, String> map = new HashMap<>();
         map.put("timeout", timeout);
         map.put("type", type);
+        rawData.setRawDataAttributes(map);
+        return rawData;
+    }
+    public EquinoxRawData getES00ProfileResponse(String privateId) {
+        EquinoxRawData rawData = AFDataFactory.createEquinoxRawData();
+        Map<String, String> map = new HashMap<>();
+        map.put("type", EEquinoxRawData.TypeHTTP.REQUEST.getType());
+        map.put("to", Config.RESOURCE_NAME_ES00);
+        map.put("invoke", privateId);
         rawData.setRawDataAttributes(map);
         return rawData;
     }

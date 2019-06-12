@@ -2,9 +2,9 @@ package phoebe.eqx.pcef.services.mogodb;
 
 import com.google.gson.Gson;
 import com.mongodb.*;
+import ec02.af.abstracts.AbstractAF;
 import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.enums.EStatusLifeCycle;
-import phoebe.eqx.pcef.enums.model.EProfile;
 import phoebe.eqx.pcef.enums.model.EQuota;
 import phoebe.eqx.pcef.enums.model.ETransaction;
 import phoebe.eqx.pcef.enums.model.element.EResourceQuota;
@@ -22,6 +22,7 @@ public abstract class MongoDBService {
     protected DB db;
     protected String collectionName;
     protected RequestContext context;
+    protected AbstractAF abstractAF;
 
     public Gson gson = new Gson();
 
@@ -31,6 +32,7 @@ public abstract class MongoDBService {
         this.appInstance = appInstance;
         this.collectionName = collectionName;
         this.context = appInstance.getMyContext();
+        this.abstractAF = appInstance.getAbstractAF();
     }
 
 
@@ -41,14 +43,14 @@ public abstract class MongoDBService {
         System.out.println(writeResult);
     }
 
-    public void insertByQuery(BasicDBObject basicDBObject) {
+    public WriteResult insertByQuery(BasicDBObject basicDBObject) {
         writeQueryLog("insert", collectionName, basicDBObject);
-        db.getCollection(collectionName).insert(basicDBObject);
+        return db.getCollection(collectionName).insert(basicDBObject);
     }
 
-    public void insertManyByObject(List<BasicDBObject> insertList) {
+    public WriteResult insertManyByObject(List<BasicDBObject> insertList) {
         writeQueryLog("insert many", collectionName, insertList.toString());
-        db.getCollection(collectionName).insert(insertList);
+      return  db.getCollection(collectionName).insert(insertList);
     }
 
 
@@ -57,11 +59,11 @@ public abstract class MongoDBService {
         return db.getCollection(collectionName).find(whereQuery);
     }
 
-    public void updateSetByQuery(BasicDBObject searchQuery, BasicDBObject updateQuery) {
+    public WriteResult updateSetByQuery(BasicDBObject searchQuery, BasicDBObject updateQuery) {
         BasicDBObject setUpdate = new BasicDBObject("$set", updateQuery);
         writeQueryLog("update", collectionName, searchQuery + "," + setUpdate);
-        WriteResult writeResult = db.getCollection(collectionName).update(searchQuery, setUpdate);
-        writeResult.getN();
+        return db.getCollection(collectionName).update(searchQuery, setUpdate);
+
     }
 
 

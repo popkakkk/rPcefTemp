@@ -32,7 +32,7 @@ public class GetResourceIdService extends PCEFService {
 
 
     private String generateTransactionId() {
-        return "PCEF" + PCEFUtils.regularDateFormat.format(appInstance.getMyContext().getStartTime());
+        return "PCEF" + PCEFUtils.actualTimeDFM.format(appInstance.getMyContext().getStartTime());
     }
 
     public void buildGetResourceId() throws PCEFException {
@@ -62,7 +62,7 @@ public class GetResourceIdService extends PCEFService {
                         new Header("x-app-name", "Singularity"),
                         new Header("x-channel", "WEB"),
                         new Header("x-transaction-id", generateTransactionId()), //gen to get product
-                        new Header("x-auth-role", "SGL-00003"),
+                        new Header("x-auth-role", "SGL-000003"),
                         new Header("x-user-request", context.getPcefInstance().getUsageMonitoringRequest().getUserValue())
                 );
 
@@ -82,10 +82,8 @@ public class GetResourceIdService extends PCEFService {
             }
 
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.sent_Get_Product_request);
-            PCEFUtils.writeMessageFlow("Build Get ResourceResponse ID Request", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (PCEFException e) {
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.sent_Get_Product_request);
-            PCEFUtils.writeMessageFlow("Build Get ResourceResponse ID Request", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             context.setPcefException(e);
             throw e;
         }
@@ -110,7 +108,6 @@ public class GetResourceIdService extends PCEFService {
                 appInstance.getMyContext().getPcefInstance().setResourceId(resourceId);
 
                 PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.receive_Get_Product_response);
-                PCEFUtils.writeMessageFlow("Read Get ResourceResponse ID Response :" + resourceId, MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
             } catch (TimeoutException e) {
                 PCEFUtils.increaseStatistic(abstractAF, EStatMode.TIMEOUT, EStatCmd.receive_Get_Product_response);
                 e.setError(EError.GET_PRODUCT_RESPONSE_TIMEOUT);
@@ -123,7 +120,6 @@ public class GetResourceIdService extends PCEFService {
         } catch (PCEFException e) {
             context.setPcefException(e);
             //summarylog fail
-            PCEFUtils.writeMessageFlow("Read Get ResourceResponse ID Response", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
 

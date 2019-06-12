@@ -37,11 +37,9 @@ public class RefundManagementService extends PCEFService {
             ValidateMessage.validateRefundManagement(refundManagementRequest, abstractAF);
 
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.Receive_Refund_Management_Request);
-            PCEFUtils.writeMessageFlow("Read Refund Management Request", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (PCEFException e) {
             context.setPcefException(e);
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.Receive_Refund_Management_Request);
-            PCEFUtils.writeMessageFlow("Read Refund Management Request-" + e.getStackTrace()[0], MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         }
 
 
@@ -80,9 +78,7 @@ public class RefundManagementService extends PCEFService {
             appInstance.getOutList().add(equinoxRawData);
             appInstance.setFinish(true);
 
-            PCEFUtils.writeMessageFlow("Build Refund Management Response", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Build Refund Management Response -" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
        /*     PCEFException pcefException = new PCEFException();
             pcefException.setError(EError.);
             pcefException.setErrorMsg(ExceptionUtils.getStackTrace(e));

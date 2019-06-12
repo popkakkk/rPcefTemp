@@ -1,21 +1,25 @@
 package phoebe.eqx.pcef.services.mogodb;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
+import com.mongodb.*;
 import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.data.ResourceQuota;
 import phoebe.eqx.pcef.core.data.ResourceResponse;
+import phoebe.eqx.pcef.core.logs.summary.SummaryLog;
 import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.core.model.Transaction;
+import phoebe.eqx.pcef.enums.DBOperation;
+import phoebe.eqx.pcef.enums.EError;
+import phoebe.eqx.pcef.enums.Operation;
 import phoebe.eqx.pcef.enums.model.EQuota;
 import phoebe.eqx.pcef.enums.model.element.EResourceQuota;
+import phoebe.eqx.pcef.enums.stats.EStatCmd;
+import phoebe.eqx.pcef.enums.stats.EStatMode;
 import phoebe.eqx.pcef.instance.AppInstance;
 
 import phoebe.eqx.pcef.instance.CommitData;
 import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
+import phoebe.eqx.pcef.utils.DBResult;
 import phoebe.eqx.pcef.utils.MessageFlow;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 
@@ -40,9 +44,6 @@ public class QuotaService extends MongoDBService {
     }
 
 
-
-
-
     private List<BasicDBObject> getQuotaToBasicObjectList(ArrayList<Quota> quotaResponses) {
         List<BasicDBObject> quotaBasicObjectList = new ArrayList<>();
         for (Quota quota : quotaResponses) {
@@ -55,18 +56,49 @@ public class QuotaService extends MongoDBService {
 
 
     public void insertQuotaInitial(ArrayList<Quota> quotaResponses) {
+        List<BasicDBObject> quotaBasicObjectList = null;
+        SummaryLog summaryLog;
         try {
-            List<BasicDBObject> quotaBasicObjectList = getQuotaToBasicObjectList(quotaResponses);
-            insertManyByObject(quotaBasicObjectList);
-            this.minExpireDate = calMinExpireDate(quotaBasicObjectList);
-            this.haveNewQuota = true;
+            quotaBasicObjectList = getQuotaToBasicObjectList(quotaResponses);
 
-            PCEFUtils.writeMessageFlow("Insert Quota Initial", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
+            summaryLog = new SummaryLog(Operation.UpdateQuota.name(), new Date(), quotaBasicObjectList);
+            context.getSummaryLogs().add(summaryLog);
+
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.sent_update_Quota_request);
+            PCEFUtils.writeDBMessageRequest(collectionName, DBOperation.UPDATE, quotaBasicObjectList);
+
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Insert Quota Initial error" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
+            context.setPcefException(PCEFUtils.getPCEFException(e, EError.UPDATE_QUOTA_REQUEST_ERROR));
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.sent_update_Quota_request);
             throw e;
         }
 
+        try {
+            WriteResult writeResult = insertManyByObject(quotaBasicObjectList);
+            this.minExpireDate = calMinExpireDate(quotaBasicObjectList);
+            this.haveNewQuota = true;
+
+            BasicDBObject dbResLog = new BasicDBObject();
+//            dbResLog.put("_id", quotaBasicObjectList.get("_id"));
+
+            List<Object> objectList = (List) quotaBasicObjectList;
+            PCEFUtils.writeDBMessageResponse(DBResult.SUCCESS, writeResult.getN(), objectList);
+
+            summaryLog.getSummaryLogDetail().setResponse(new Date(), dbResLog);
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.receive_update_Quota_response);
+
+
+        } catch (MongoTimeoutException e) {
+            PCEFUtils.writeDBMessageResponseError();
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.TIMEOUT, EStatCmd.receive_update_Quota_response);
+            context.setPcefException(PCEFUtils.getPCEFException(e, EError.UPDATE_PROFILE_RESPONSE_ERROR));
+            throw e;
+        } catch (MongoException e) {
+            PCEFUtils.writeDBMessageResponseError();
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.receive_update_Quota_response);
+            context.setPcefException(PCEFUtils.getPCEFException(e, EError.UPDATE_PROFILE_RESPONSE_ERROR));
+            throw e;
+        }
     }
 
 
@@ -79,8 +111,11 @@ public class QuotaService extends MongoDBService {
     }
 
 
-    private void deleteQuotaByKey(String key) {
-        BasicDBObject delete = new BasicDBObject(EQuota._id.name(), key);
+    private void deleteQuotaByKey(String monitoringKey, String userValue) {
+        BasicDBObject delete = new BasicDBObject();
+        delete.put(EQuota.monitoringKey.name(), monitoringKey);
+        delete.put(EQuota.userValue.name(), userValue);
+
         writeQueryLog("remove", collectionName, delete.toString());
         db.getCollection(collectionName).remove(delete);
 
@@ -155,7 +190,7 @@ public class QuotaService extends MongoDBService {
             for (String mkCommit : mkCommits) {
                 if (!mkResponses.contains(mkCommit)) {
                     //delete
-                    deleteQuotaByKey(mkCommit);
+                    deleteQuotaByKey(mkCommit, context.getPcefInstance().getProfile().getUserValue());
                     AFLog.d("[QUOTA UPDATE] Delete Quota by monitoringKey:" + mkCommit);
                 } else {
                     mkUpdateCounter.add(mkCommit);
@@ -180,7 +215,8 @@ public class QuotaService extends MongoDBService {
                         } else {
                             //new counter(old mk) -->update set
                             BasicDBObject search = new BasicDBObject();
-                            search.put(EQuota._id.name(), mk);
+                            search.put(EQuota.monitoringKey.name(), mk);
+                            search.put(EQuota.userValue.name(), context.getPcefInstance().getProfile().getUserValue());
                             updateSetByQuery(search, quotaBasicObject);
                             AFLog.d("[QUOTA UPDATE] Update Quota:" + quotaBasicObject);
                         }
@@ -205,27 +241,23 @@ public class QuotaService extends MongoDBService {
                 AFLog.d("[QUOTA UPDATE] minExpireDate:" + PCEFUtils.isoDateFormatter.format(minExpireDate));
             }
 
-            PCEFUtils.writeMessageFlow("Quota Action", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Quota Action error-" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
-
-
     }
 
 
     public void filterTransactionConfirmIsNewResource(List<Transaction> otherTransaction) {
-        int index = 0;
+        List<Transaction> filterTransaction = new ArrayList<>();
         for (Transaction transaction : otherTransaction) {
             AFLog.d("Confirm Resource Is New Resource..");
             DBCursor quotaCursor = findQuotaByTransaction(transaction);
             if (quotaCursor.hasNext()) {
-                AFLog.d("[Confirm Resource Is New Resource] have quota:" + quotaCursor.next().get(EQuota._id.name()) + ",filter tid:" + transaction.getTid());
-                otherTransaction.remove(index);
+                AFLog.d("[Confirm Resource Is New Resource] have quota:" + quotaCursor.next().get(EQuota.monitoringKey.name()) + ",filter tid:" + transaction.getTid());
+                filterTransaction.add(transaction);
             }
-            index++;
         }
+        otherTransaction.removeAll(filterTransaction);
     }
 
     public DBCursor findQuotaByTransaction(Transaction transaction) {
@@ -233,17 +265,14 @@ public class QuotaService extends MongoDBService {
             BasicDBObject searchQuery = new BasicDBObject();
             searchQuery.put(EQuota.userValue.name(), context.getPcefInstance().getProfile().getUserValue());
 //            searchQuery.put(EQuota.resources.name(), new BasicDBObject("$elemMatch", new BasicDBObject(EResourceQuota.resourceId.name(), transaction.getResourceId())));
-            searchQuery.put(EQuota.resources.name()+"."+EResourceQuota.resourceId.name(),  transaction.getResourceId());
+            searchQuery.put(EQuota.resources.name() + "." + EResourceQuota.resourceId.name(), transaction.getResourceId());
             DBCursor dbCursor = findByQuery(searchQuery);
 
             if (dbCursor.hasNext()) {
-                PCEFUtils.writeMessageFlow("Find Quota resource Id:" + transaction.getResourceId() + "[Found]", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
             } else {
-                PCEFUtils.writeMessageFlow("Find Quota resource Id:" + transaction.getResourceId() + "[Not Found]", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
             }
             return dbCursor;
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Find Quota resource Id:" + transaction.getResourceId() + "-error" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
     }
@@ -335,31 +364,31 @@ public class QuotaService extends MongoDBService {
     }
 
 
-    public DBObject findAndModifyLockQuota(String monitoringKey) {
+    public DBObject findAndModifyLockQuota(String monitoringKey, String userValue) {
         try {
 
             BasicDBObject query = new BasicDBObject();
-            query.put(EQuota._id.name(), monitoringKey);
+            query.put(EQuota.monitoringKey.name(), monitoringKey);
+            query.put(EQuota.userValue.name(), userValue);
             query.put(EQuota.processing.name(), 0);
 
             BasicDBObject update = new BasicDBObject();
             update.put(EQuota.processing.name(), 1);//lock
 
             DBObject dbObject = findAndModify(query, update);
-            PCEFUtils.writeMessageFlow("Find and Modify Quota Lock Process", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
 
             return dbObject;
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Find and Modify Quota Lock Process error " + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
     }
 
-    public void updateUnLockQuota(String monitoringKey) {
+    public void updateUnLockQuota(String monitoringKey, String userValue) {
 
         try {
             BasicDBObject query = new BasicDBObject();
-            query.put(EQuota._id.name(), monitoringKey);
+            query.put(EQuota.monitoringKey.name(), monitoringKey);
+            query.put(EQuota.userValue.name(), userValue);
             query.put(EQuota.processing.name(), 1);
 
             BasicDBObject update = new BasicDBObject();
@@ -367,9 +396,7 @@ public class QuotaService extends MongoDBService {
 
             updateSetByQuery(query, update);
 
-            PCEFUtils.writeMessageFlow("Update Quota Unlock Process mk:" + monitoringKey, MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Update Quota Unlock Process mk:" + monitoringKey + ",error - " + e.getStackTrace()[0], MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         }
 
     }
@@ -383,7 +410,7 @@ public class QuotaService extends MongoDBService {
             }
 
             //processing 0 --> 1
-            DBObject dbObject = findAndModifyLockQuota(quota.getMonitoringKey());
+            DBObject dbObject = findAndModifyLockQuota(quota.getMonitoringKey(),context.getPcefInstance().getProfile().getUserValue());
             if (dbObject != null) {
                 //success
                 quota.setProcessing(1);

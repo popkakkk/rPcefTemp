@@ -28,13 +28,16 @@ public class W_MONGODB_PROCESS_REFUND_MANAGEMENT extends MongoState {
             String refId = context.getPcefInstance().getRefundManagementRequest().getRefId();
             DBCursor transactionCursor = dbConnect.getTransactionService().findTransactionForRefund(refId);
             if (transactionCursor.hasNext()) {
+
                 Transaction transactionRefund = gson.fromJson(gson.toJson(transactionCursor.next()), Transaction.class);
                 context.getPcefInstance().setTransaction(transactionRefund);
 
+                AFLog.d("Found Transaction :" + transactionRefund.toString());
                 if (EStatusLifeCycle.Done.getName().equals(transactionRefund.getStatus())) {
+                    AFLog.d("Status[Done] Refund with available quota");
                     nextState = EState.REFUND_STATUS_DONE;
                 } else {
-                    //status complete
+                    AFLog.d("Status[Complete] Refund with exhaust quota");
                     nextState = EState.REFUND_STATUS_COMPLETED;
                 }
             } else {
@@ -58,7 +61,7 @@ public class W_MONGODB_PROCESS_REFUND_MANAGEMENT extends MongoState {
         EState nextState = null;
         try {
             Transaction transactionRefund = context.getPcefInstance().getTransaction();
-            DBObject quotaDBObj = dbConnect.getQuotaService().findAndModifyLockQuota(transactionRefund.getMonitoringKey());
+            DBObject quotaDBObj = dbConnect.getQuotaService().findAndModifyLockQuota(transactionRefund.getMonitoringKey(), context.getPcefInstance().getTransaction().getUserValue());
             if (quotaDBObj == null) {
                 E11TimoutService e11TimoutService = new E11TimoutService(appInstance);
                 e11TimoutService.buildInterval();
@@ -87,7 +90,7 @@ public class W_MONGODB_PROCESS_REFUND_MANAGEMENT extends MongoState {
         try {
 
             Transaction transactionRefund = context.getPcefInstance().getTransaction();
-            DBObject quotaDBObj = dbConnect.getQuotaService().findAndModifyLockQuota(transactionRefund.getMonitoringKey());
+            DBObject quotaDBObj = dbConnect.getQuotaService().findAndModifyLockQuota(transactionRefund.getMonitoringKey(), context.getPcefInstance().getTransaction().getUserValue());
             if (quotaDBObj == null) {
                 E11TimoutService e11TimoutService = new E11TimoutService(appInstance);
                 e11TimoutService.buildInterval();

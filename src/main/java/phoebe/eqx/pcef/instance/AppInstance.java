@@ -25,10 +25,6 @@ public class AppInstance {
 
     List<RequestContext> requestContexts = new ArrayList<>();
 
-    //------ instance logs ------------------
-    private List<SummaryLog> summaryLogs = new ArrayList<>();
-    private String requestLog;
-    private String responseLog;
 
 
     //------- transient ---------------------
@@ -60,21 +56,6 @@ public class AppInstance {
         myContext.getInvokeManager().patchResponse(outList);
 
     }
- /*   public void setSummaryLogExternalResponse(Operation operation, Object resp) throws Exception {
-
-        InvokeObject invokeObject = this.invokeManager.find(operation);
-        SummaryLog summaryLog = findMatchSummaryLog(invokeObject.getInvokeId(), operation.name());
-
-        if (summaryLog != null) {
-            Date resTime = invokeObject.getResTime();
-            summaryLog.getSummaryLogDetail().setRes(resp);
-            summaryLog.getSummaryLogDetail().setResTime(PCEFUtils.dtLongFormatterMs.format(resTime));
-
-            Date reqTime = PCEFUtils.dtLongFormatterMs.parse(summaryLog.getSummaryLogDetail().getReqTime());
-            long usedTime = resTime.getTime() - reqTime.getTime();
-            summaryLog.getSummaryLogDetail().setUsedTime(String.valueOf(usedTime));
-        }
-    }*/
 
 
     public RequestContext getRequestContextTimeout() {
@@ -100,27 +81,6 @@ public class AppInstance {
     }
 
 
-    public SummaryLog findMatchSummaryLog(String invokeId, String logName) {
-        for (SummaryLog summaryLog : summaryLogs) {
-            if (summaryLog.getInvokeId().equals(invokeId)) {
-                if (summaryLog.getLogName().equals(logName)) {
-                    return summaryLog;
-                }
-            }
-        }
-        AFLog.d("SummaryLog list Don't match invoke");
-        return null;
-    }
-
-    public String getSummaryLogStr() {
-        StringBuilder builder = new StringBuilder().append("{");
-        for (SummaryLog summaryLog : summaryLogs) {
-            HashMap<String, SummaryLogDetail> logNameMapDetils = new HashMap<>();
-            logNameMapDetils.put(summaryLog.getLogName(), summaryLog.getSummaryLogDetail());
-            builder.append(PCEFUtils.gsonToJson(logNameMapDetils));
-        }
-        return builder.append("}").toString();
-    }
 
 
     public RequestContext getMyContext() {
@@ -163,29 +123,7 @@ public class AppInstance {
         this.finish = finish;
     }
 
-    public List<SummaryLog> getSummaryLogs() {
-        return summaryLogs;
-    }
 
-    public void setSummaryLogs(List<SummaryLog> summaryLogs) {
-        this.summaryLogs = summaryLogs;
-    }
-
-    public String getRequestLog() {
-        return requestLog;
-    }
-
-    public void setRequestLog(String requestLog) {
-        this.requestLog = requestLog;
-    }
-
-    public String getResponseLog() {
-        return responseLog;
-    }
-
-    public void setResponseLog(String responseLog) {
-        this.responseLog = responseLog;
-    }
 
 
 }

@@ -1,8 +1,15 @@
 package phoebe.eqx.pcef.core.logs.summary;
 
+import ec02.af.utils.AFLog;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import phoebe.eqx.pcef.utils.PCEFUtils;
+
+import java.text.ParseException;
+import java.util.Date;
+
 public class SummaryLogDetail {
 
-    private String invokeId;
+    private String invokeId = "";
     private String reqTime;
     private String resTime;
     private String usedTime;
@@ -17,6 +24,16 @@ public class SummaryLogDetail {
         this.reqTime = reqTime;
         this.req = req;
         this.res = "{}";
+    }
+
+    public void setResponse(Date resTime, Object res) {
+        this.resTime = PCEFUtils.dtLongFormatterMs.format(resTime);
+        this.res = res;
+        try {
+            this.usedTime = String.valueOf(resTime.compareTo(PCEFUtils.dtLongFormatterMs.parse(reqTime)));
+        } catch (Exception e) {
+            AFLog.d("cal used time error - " + ExceptionUtils.getStackTrace(e));
+        }
     }
 
 

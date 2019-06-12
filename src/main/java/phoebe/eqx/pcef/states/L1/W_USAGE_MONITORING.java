@@ -109,12 +109,24 @@ public class W_USAGE_MONITORING extends ComplexState {
             transactionList.add(appInstance.getMyContext().getPcefInstance().getTransaction());
             transactionList.addAll(appInstance.getMyContext().getPcefInstance().getOtherStartTransactions());
 
-            dbConnect.getTransactionService().filterTransactionErrorNewResource(ocfUsageMonitoringResponse, transactionList, quotaResponseList);
-
             ocfUsageMonitoringService.processFirstUsage(dbConnect, ocfUsageMonitoringResponse, quotaResponseList, transactionList);
             dbConnect.getProfileService().updateProfileUnLockInitial(dbConnect.getQuotaService().getMinExpireDate());
 
-            usageMonitoringService.buildResponseUsageMonitoring(true);
+            //check My Transaction Error
+            boolean transactionError = true;
+            for (Transaction t : transactionList) {
+                if (t.getResourceId().equals(context.getPcefInstance().getTransaction().getResourceId())) {
+                    transactionError = false;
+                    break;
+                }
+            }
+
+            if (!transactionError) {
+                usageMonitoringService.buildResponseUsageMonitoring(true);
+            } else {
+                usageMonitoringService.buildResponseUsageMonitoring(false);
+            }
+
         } catch (Exception e) {
             AFLog.d("wUsageMonitoringStart error:" + e.getStackTrace()[0]);
             if (dbConnect != null) {
@@ -154,9 +166,6 @@ public class W_USAGE_MONITORING extends ComplexState {
             //filter
 
 
-
-
-
             ocfUsageMonitoringService.processUpdate(dbConnect, ocfUsageMonitoringResponse, quotaResponseList, newResourceTransactions);
 
             //check My Transaction Error
@@ -164,6 +173,7 @@ public class W_USAGE_MONITORING extends ComplexState {
             for (Transaction t : newResourceTransactions) {
                 if (t.getResourceId().equals(thisTransaction.getResourceId())) {
                     transactionError = false;
+                    break;
                 }
             }
 

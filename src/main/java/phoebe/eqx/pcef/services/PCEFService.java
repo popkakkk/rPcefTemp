@@ -78,7 +78,7 @@ abstract public class PCEFService {
         //add Summary Log
         reqLogObj = SummaryLog.getSummaryLogRequest(operation, reqLogObj);
         SummaryLog summaryLog = new SummaryLog(operation.name(), rawData.getInvoke(), reqTime, reqLogObj);
-        appInstance.getSummaryLogs().add(summaryLog);
+        context.getSummaryLogs().add(summaryLog);
 
         //add invoke object to list
         context.getInvokeManager().addToInvokeList(rawData.getInvoke(), rawData, operation, reqTime);
@@ -96,8 +96,8 @@ abstract public class PCEFService {
             Date now = new Date();
             Date appointmentDate = context.getPcefInstance().getProfile().getAppointmentDate();
             long timeout = (Math.abs(appointmentDate.getTime() - now.getTime()) / 1000) + Config.DELAY_TIMEOUT;
-            AFLog.d("Current Date    :" + PCEFUtils.isoDateFormatter.format(now));
-            AFLog.d("Appointment Date:" + PCEFUtils.isoDateFormatter.format(appointmentDate));
+            AFLog.d("Current Date    :" + PCEFUtils.datetimeFormat.format(now));
+            AFLog.d("Appointment Date:" + PCEFUtils.datetimeFormat.format(appointmentDate));
             AFLog.d("delay           :" + Config.DELAY_TIMEOUT);
             AFLog.d("timeout=" + timeout + " second");
             return String.valueOf(timeout);
@@ -115,7 +115,6 @@ abstract public class PCEFService {
 
         GenerateCDRService generateCDRService = new GenerateCDRService();
         generateCDRService.buildCDRCharging(newResourceTransactions, appInstance.getAbstractAF());
-
     }
 
     public void processFirstUsage(MongoDBConnect dbConnect, OCFUsageMonitoringResponse ocfUsageMonitoringResponse, ArrayList<Quota> quotaResponseList, List<Transaction> newResourceTransactions) {

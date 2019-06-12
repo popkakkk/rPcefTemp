@@ -5,10 +5,12 @@ import com.google.gson.Gson;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoException;
 import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.exceptions.TimeoutIntervalException;
 import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.core.model.Transaction;
+import phoebe.eqx.pcef.enums.EError;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.instance.CommitData;
@@ -16,6 +18,7 @@ import phoebe.eqx.pcef.services.E11TimoutService;
 import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 import phoebe.eqx.pcef.states.abs.MessageRecieved;
 import phoebe.eqx.pcef.states.abs.MongoState;
+import phoebe.eqx.pcef.utils.PCEFUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +60,7 @@ public class W_MONGODB_PROCESS_USAGE_MONITORING extends MongoState {
             nextState = EState.END;
         } catch (DuplicateKeyException e) {
             nextState = EState.CHECK_QUOTA_AVAILIABLE;
-        } catch (Exception e) {
+        } catch (MongoException e) {
             try {
                 E11TimoutService e11TimoutService = new E11TimoutService(appInstance);
                 e11TimoutService.buildInterval();
@@ -66,8 +69,12 @@ public class W_MONGODB_PROCESS_USAGE_MONITORING extends MongoState {
             } catch (TimeoutIntervalException ex) {
                 setResponseFail();
                 nextState = EState.END;
+                context.setPcefException(PCEFUtils.getPCEFException(e, EError.INSERT_PROFILE_RESPONSE_ERROR));
             }
 
+        } catch (Exception e) {
+            setResponseFail();
+            nextState = EState.END;
         }
         setWorkState(nextState);
     }
@@ -125,7 +132,7 @@ public class W_MONGODB_PROCESS_USAGE_MONITORING extends MongoState {
                     } else {
                         AFLog.d("Quota Exhaust");
                         context.getPcefInstance().setCommitDatas(commitDataList);
-                        DBObject findModQuota = dbConnect.getQuotaService().findAndModifyLockQuota(quota.getMonitoringKey());
+                        DBObject findModQuota = dbConnect.getQuotaService().findAndModifyLockQuota(quota.getMonitoringKey(), context.getPcefInstance().getProfile().getUserValue());
                         if (findModQuota != null) {
                             nextState = EState.FIND_AND_MOD_PROFILE_FOR_UPDATE_QUOTA_EXHAUST;
                         } else {

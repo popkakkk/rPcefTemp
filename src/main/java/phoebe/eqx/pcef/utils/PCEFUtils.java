@@ -5,9 +5,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import ec02.af.abstracts.AbstractAF;
 import ec02.af.utils.AFLog;
-import phoebe.eqx.pcef.DBResult;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import phoebe.eqx.pcef.core.cdr.Opudr;
+import phoebe.eqx.pcef.core.exceptions.PCEFException;
 import phoebe.eqx.pcef.enums.DBOperation;
+import phoebe.eqx.pcef.enums.EError;
 import phoebe.eqx.pcef.enums.EEvent;
 import phoebe.eqx.pcef.enums.config.EConfig;
 import phoebe.eqx.pcef.enums.stats.EStatCmd;
@@ -29,7 +32,6 @@ public class PCEFUtils {
 
 
     public static String HOST_NAME;
-    public static final SimpleDateFormat regularDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     public static final SimpleDateFormat cdrDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     public static final SimpleDateFormat datetimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     public static final SimpleDateFormat dtLongFormatterMs = new SimpleDateFormat("yyyyMMddHHmmss SSSS", Locale.US);
@@ -77,6 +79,7 @@ public class PCEFUtils {
     public static void increaseStatistic(AbstractAF abstractAF, EStatMode eMode, EStatCmd eCmd) {
         String str = "rPCEF " + eCmd.getCmd() + " " + eMode.getMode();
         abstractAF.getEquinoxUtils().incrementStats(str);
+        writeMessageFlow(str);
     }
 
     public static String gsonToJson(Object object) {
@@ -118,7 +121,7 @@ public class PCEFUtils {
             abstractAF.getEquinoxUtils().writeLog("rPCEF_APP_LOG", "Request : " + req.trim());
             abstractAF.getEquinoxUtils().writeLog("rPCEF_APP_LOG", "Response : " + res.trim());
             abstractAF.getEquinoxUtils().writeLog("rPCEF_APP_LOG", "Summary : " + summaryLog.trim());
-            abstractAF.getEquinoxUtils().writeLog("rPCEF_APP_LOG", String.format("Start Time : %s, Used Time : %s, %s", regularDateFormat.format(startTime), usedTime, msg));
+            abstractAF.getEquinoxUtils().writeLog("rPCEF_APP_LOG", String.format("Start Time : %s, Used Time : %s, %s", actualTimeDFM.format(startTime), usedTime, msg));
         } catch (Exception e) {
             AFLog.d("WriteLog failed", e);
         }
@@ -164,9 +167,18 @@ public class PCEFUtils {
     }
 
 
-    public static void writeMessageFlow(String message, MessageFlow.Status status, String sessionId) {
+ /*   public static void writeMessageFlow(String message, MessageFlow.Status status, String sessionId) {
         MessageFlow messageFlow = new MessageFlow(message, status.name(), sessionId);
         AFLog.d("[MESSAGE_FLOW] : " + gsonToJson(messageFlow));
+
+    }*/
+
+    public static void writeDBMessageResponseError() {
+        writeDBMessageResponse(DBResult.ERROR, 0, null);
+    }
+
+    private static void writeMessageFlow(String message) {
+        AFLog.d("[MESSAGE_FLOW] : " + message);
     }
 
 
@@ -209,7 +221,18 @@ public class PCEFUtils {
 
     }
 
+    public static <T> List<T> getList(T t) {
+        List<T> list = new ArrayList<>();
+        list.add(t);
+        return list;
+    }
 
+    public static PCEFException getPCEFException(Exception e, EError eError) {
+        PCEFException pcefException = new PCEFException();
+        pcefException.setError(eError);
+        pcefException.setErrorMsg(ExceptionUtils.getStackTrace(e));
+        return pcefException;
+    }
 }
 
 

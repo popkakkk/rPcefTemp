@@ -39,11 +39,10 @@ public class GyRARService extends PCEFService {
             ValidateMessage.validateGyRAR(gyRARRequest, abstractAF);
 
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.receive_GyRAR_request);
-            PCEFUtils.writeMessageFlow("Read GyRAR Request", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
+
         } catch (PCEFException e) {
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.receive_GyRAR_request);
             context.setPcefException(e);
-            PCEFUtils.writeMessageFlow("Read GyRAR Request-" + e.getStackTrace()[0], MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
             throw e;
         }
 
@@ -81,7 +80,6 @@ public class GyRARService extends PCEFService {
 
             //sum log
 
-            PCEFUtils.writeMessageFlow("Build GyRAR Response", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
            /*
             PCEFException pcefException = new PCEFException();
@@ -90,7 +88,6 @@ public class GyRARService extends PCEFService {
             WriteLog.writeErrorLogGyRAR(abstractAF, e, context.getPcefInstance().getGyRARRequest());
 */
 
-            PCEFUtils.writeMessageFlow("Build GyRAR Response -" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
 

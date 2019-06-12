@@ -2,22 +2,22 @@ package phoebe.eqx.pcef.services.mogodb;
 
 import com.mongodb.*;
 import ec02.af.utils.AFLog;
-import phoebe.eqx.pcef.DBResult;
 import phoebe.eqx.pcef.core.data.ResourceQuota;
 import phoebe.eqx.pcef.core.data.ResourceResponse;
+import phoebe.eqx.pcef.core.logs.summary.SummaryLog;
 import phoebe.eqx.pcef.core.model.Quota;
 import phoebe.eqx.pcef.core.model.Transaction;
-import phoebe.eqx.pcef.enums.DBOperation;
-import phoebe.eqx.pcef.enums.ERequestType;
-import phoebe.eqx.pcef.enums.EStatusLifeCycle;
+import phoebe.eqx.pcef.enums.*;
 import phoebe.eqx.pcef.enums.model.ETransaction;
+import phoebe.eqx.pcef.enums.stats.EStatCmd;
+import phoebe.eqx.pcef.enums.stats.EStatMode;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.instance.CommitData;
 import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.instance.PCEFInstance;
 import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
 import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
-import phoebe.eqx.pcef.utils.MessageFlow;
+import phoebe.eqx.pcef.utils.DBResult;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 
 import java.util.*;
@@ -28,10 +28,13 @@ public class TransactionService extends MongoDBService {
     }
 
     public void insertTransaction(String resourceId) {
+
+        SummaryLog summaryLog;
+        Transaction transaction = new Transaction();
+        BasicDBObject transactionBasicObject;
+
         try {
             UsageMonitoringRequest usageMonitoringRequest = context.getPcefInstance().getUsageMonitoringRequest();
-
-            Transaction transaction = new Transaction();
             transaction.setSessionId(usageMonitoringRequest.getSessionId());
             transaction.setRtid(usageMonitoringRequest.getRtid());
             transaction.setTid(usageMonitoringRequest.getTid());
@@ -52,19 +55,52 @@ public class TransactionService extends MongoDBService {
             transaction.setClientId(usageMonitoringRequest.getClientId());
             transaction.setIsActive(1);
 
-            BasicDBObject transactionBasicObject = BasicDBObject.parse(gson.toJson(transaction));
+            transactionBasicObject = BasicDBObject.parse(gson.toJson(transaction));
             transactionBasicObject.put(ETransaction.updateDate.name(), transaction.getUpdateDate());
             transactionBasicObject.put(ETransaction.createDate.name(), transaction.getCreateDate());
 
-            insertByQuery(transactionBasicObject);
+            summaryLog = new SummaryLog(Operation.InsertTransaction.name(), new Date(), transactionBasicObject);
+            context.getSummaryLogs().add(summaryLog);
+
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.sent_insert_Transaction_request);
+            PCEFUtils.writeDBMessageRequest(collectionName, DBOperation.INSERT, transactionBasicObject);
+        } catch (Exception e) {
+            context.setPcefException(PCEFUtils.getPCEFException(e, EError.INSERT_TRANSACTION_BUILD_ERROR));
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.sent_insert_Transaction_request);
+            throw e;
+        }
+
+        try {
+            /**insert**/
+            WriteResult writeResult = insertByQuery(transactionBasicObject);
 
             context.getPcefInstance().setTransaction(transaction);
             context.getPcefInstance().setInsertTransaction(true);
 
-            PCEFUtils.writeMessageFlow("Insert Transaction", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
-        } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Insert Transaction", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
+            BasicDBObject dbResLog = new BasicDBObject();
+            dbResLog.put("_id", transactionBasicObject.get("_id"));
+            dbResLog.put(ETransaction.resourceId.name(), transactionBasicObject.get(ETransaction.resourceId.name()));
+            dbResLog.put(ETransaction.resourceName.name(), transactionBasicObject.get(ETransaction.resourceName.name()));
+            PCEFUtils.writeDBMessageResponse(DBResult.SUCCESS, writeResult.getN(), PCEFUtils.getList(dbResLog));
 
+
+            summaryLog.getSummaryLogDetail().setResponse(new Date(), dbResLog);
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.receive_insert_Transaction_response);
+        } catch (DuplicateKeyException e) {
+            PCEFUtils.writeDBMessageResponseError();
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.DUPPLICATE_KEY, EStatCmd.receive_insert_Transaction_response);
+            context.setPcefException(PCEFUtils.getPCEFException(e, EError.INSERT_TRANSACTION_RESPONSE_DUPPLICATE_KEY));
+            throw e;
+        } catch (MongoTimeoutException e) {
+            PCEFUtils.writeDBMessageResponseError();
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.TIMEOUT, EStatCmd.receive_insert_Transaction_response);
+            context.setPcefException(PCEFUtils.getPCEFException(e, EError.INSERT_TRANSACTION_RESPONSE_TIMEOUT));
+            throw e;
+        } catch (MongoException e) {
+            PCEFUtils.writeDBMessageResponseError();
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.receive_insert_Transaction_response);
+            context.setPcefException(PCEFUtils.getPCEFException(e, EError.INSERT_TRANSACTION_RESPONSE_ERROR));
+            throw e;
         }
     }
 
@@ -92,20 +128,16 @@ public class TransactionService extends MongoDBService {
             inStatus.add(EStatusLifeCycle.Done.getName());
             inStatus.add(EStatusLifeCycle.Completed.getName());
             searchQuery.put(ETransaction.status.name(), new BasicDBObject("$in", inStatus));
-            PCEFUtils.writeDBMessageRequest(collectionName, DBOperation.FIND, searchQuery);
+            PCEFUtils.writeDBMessageRequest(collectionName, DBOperation.READ, searchQuery);
 
             DBCursor cursor = findByQuery(searchQuery);
 
-            List<Object> results = new ArrayList<>();
-            results.add(cursor.iterator().next());
-
-            PCEFUtils.writeDBMessageResponse(DBResult.SUCCESS, cursor.size(), Arrays.asList(cursor.iterator().next()));
+            PCEFUtils.writeDBMessageResponse(DBResult.SUCCESS, cursor.size(), PCEFUtils.getList(cursor.iterator().next()));
             return cursor;
         } catch (MongoException e) {
             PCEFUtils.writeDBMessageResponse(DBResult.SUCCESS, 0, null);
             throw e;
         }
-
     }
 
 
@@ -139,7 +171,7 @@ public class TransactionService extends MongoDBService {
             AFLog.d("[find other transaction start found]:" + otherStartTransactionList.size());
             return otherStartTransactionList;
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Find Other transaction error" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
+
             throw e;
         }
 
@@ -178,13 +210,14 @@ public class TransactionService extends MongoDBService {
 
         BasicDBObject updateQuery = new BasicDBObject();
         updateQuery.put(ETransaction.isActive.name(), 0);
+        updateQuery.put(ETransaction.updateDate.name(), new Date());
 
         updateSetByQuery(searchQuery, updateQuery);
     }
 
 
     public void filterTransactionErrorNewResource(OCFUsageMonitoringResponse ocfUsageMonitoringResponse, List<Transaction> newResourceTransactions, ArrayList<Quota> quotas) {
-
+        AFLog.d("Check New Resource Request Error");
         List<String> deleteList = new ArrayList<>();
 
         List<Transaction> filterNewTransactions = new ArrayList<>();
@@ -222,14 +255,15 @@ public class TransactionService extends MongoDBService {
 
         //remove
         if (deleteList.size() > 0) {
-            AFLog.d("remove transaction receive quota error..");
+            AFLog.d("Remove Transaction where receive Quota error..");
             removeManyTransactionByTid(deleteList);
         }
     }
 
     public void filterTransactionAndQuotaCheckUnitEnough(ArrayList<Quota> quotaResponses, List<Transaction> newResourceTransactions) {
-        List<String> deleteList = new ArrayList<>();
+        AFLog.d("Check Quota Not Enough");
 
+        List<String> deleteList = new ArrayList<>();
         ArrayList<Quota> filterQuotaResponses = new ArrayList<>();
 
         for (Quota quota : quotaResponses) {
@@ -238,9 +272,16 @@ public class TransactionService extends MongoDBService {
             //exist quota
             if (quota.getQuotaByKey() == null) {
                 List<CommitData> commitDataList = findDataToCommit(quota.getUserValue(), quota.getMonitoringKey(), false);
-                int sumTransaction = commitDataList.stream().mapToInt(CommitData::getCount).sum();
-                int quotaUnit = commitDataList.get(0).getQuotaByKey().getUnit();
-                available = quotaUnit - sumTransaction;
+
+                if (commitDataList.size() == 0) {
+                    available = 0;
+                    AFLog.d("Exist Quota Response MK:" + quota.getMonitoringKey() + "Not Found");
+                } else {
+                    int sumTransaction = commitDataList.stream().mapToInt(CommitData::getCount).sum();
+                    int quotaUnit = commitDataList.get(0).getQuotaByKey().getUnit();// spec mk
+                    available = quotaUnit - sumTransaction;
+                    AFLog.d("Exist Quota Response MK:" + quota.getMonitoringKey() + "available =" + available);
+                }
 
                 if (available <= 0) {
                     if (context.getRequestType().equals(ERequestType.USAGE_MONITORING)) { //flow USAGE MONITORING UPDATE ONLY
@@ -305,8 +346,7 @@ public class TransactionService extends MongoDBService {
 
 
     public void filterResourceRequestErrorCommitResource(OCFUsageMonitoringResponse ocfUsageMonitoringResponse, List<CommitData> commitDataList) {
-
-
+        AFLog.d("Check Update Resource Request Error");
         List<CommitData> filterCommitDatas = new ArrayList<>();
         for (CommitData commitData : commitDataList) {
 
@@ -411,9 +451,9 @@ public class TransactionService extends MongoDBService {
                 updateSetByQuery(searchQuery, updateQuery);
             }
 
-            PCEFUtils.writeMessageFlow("Update Transaction", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
+
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Update Transaction error" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
+
             throw e;
         }
     }

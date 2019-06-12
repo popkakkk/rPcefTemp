@@ -4,7 +4,9 @@ public enum ERequestType {
     USAGE_MONITORING,
     E11_TIMEOUT,
     GyRAR,
-    REFUND_MANAGEMENT
+    REFUND_MANAGEMENT,
+    UNKNOWN,
+    CALCULATE_TIMEOUT
 
 
 }

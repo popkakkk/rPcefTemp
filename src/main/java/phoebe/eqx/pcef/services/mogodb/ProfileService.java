@@ -2,12 +2,18 @@ package phoebe.eqx.pcef.services.mogodb;
 
 import com.mongodb.*;
 import ec02.af.utils.AFLog;
+import phoebe.eqx.pcef.core.logs.summary.SummaryLog;
 import phoebe.eqx.pcef.core.model.Profile;
+import phoebe.eqx.pcef.enums.DBOperation;
+import phoebe.eqx.pcef.enums.EError;
+import phoebe.eqx.pcef.enums.Operation;
 import phoebe.eqx.pcef.enums.model.EProfile;
+import phoebe.eqx.pcef.enums.stats.EStatCmd;
+import phoebe.eqx.pcef.enums.stats.EStatMode;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
-import phoebe.eqx.pcef.utils.MessageFlow;
+import phoebe.eqx.pcef.utils.DBResult;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 
 import java.util.Date;
@@ -20,6 +26,10 @@ public class ProfileService extends MongoDBService {
     }
 
     public void insertProfile() {
+        BasicDBObject profileBasicObject = null;
+        SummaryLog summaryLog;
+
+        //request
         try {
             UsageMonitoringRequest usageMonitoringRequest = context.getPcefInstance().getUsageMonitoringRequest();
             Profile profile = new Profile();
@@ -32,70 +42,149 @@ public class ProfileService extends MongoDBService {
             profile.setSequenceNumber(0);
             context.getPcefInstance().setProfile(profile);
 
-            BasicDBObject profileBasicObject = BasicDBObject.parse(gson.toJson(profile));
+            profileBasicObject = BasicDBObject.parse(gson.toJson(profile));
             profileBasicObject.put(EProfile.appointmentDate.name(), profile.getAppointmentDate());
 
-            insertByQuery(profileBasicObject);
-            PCEFUtils.writeMessageFlow("Insert Profile", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
-        } catch (DuplicateKeyException e) {
-            PCEFUtils.writeMessageFlow("Insert Profile Duplicate Key", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
-            throw e;
+            summaryLog = new SummaryLog(Operation.InsertProfile.name(), new Date(), profileBasicObject);
+            context.getSummaryLogs().add(summaryLog);
+
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.sent_insert_Profile_request);
+            PCEFUtils.writeDBMessageRequest(collectionName, DBOperation.INSERT, profileBasicObject);
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Insert Profile", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
+            context.setPcefException(PCEFUtils.getPCEFException(e, EError.INSERT_PROFILE_BUILD_ERROR));
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.sent_insert_Profile_request);
             throw e;
         }
-    }
 
 
-    public boolean checkCanProcessProfile(DBCursor lockProcessCursor) {
-        DBObject dbObject = lockProcessCursor.next();
-        String isProcessing = String.valueOf(dbObject.get(EProfile.isProcessing.name()));
-        return isProcessing.equals("0");
+        //response
+        try {
+            WriteResult writeResult = insertByQuery(profileBasicObject);
+
+            BasicDBObject dbResLog = new BasicDBObject();
+            dbResLog.put("_id", profileBasicObject.get("_id"));
+            PCEFUtils.writeDBMessageResponse(DBResult.SUCCESS, writeResult.getN(), PCEFUtils.getList(dbResLog));
+
+            summaryLog.getSummaryLogDetail().setResponse(new Date(), dbResLog);
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.receive_insert_Profile_response);
+        } catch (DuplicateKeyException e) {
+            PCEFUtils.writeDBMessageResponseError();
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.DUPPLICATE_KEY, EStatCmd.receive_insert_Profile_response);
+            throw e;
+        } catch (MongoTimeoutException e) {
+            PCEFUtils.writeDBMessageResponseError();
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.TIMEOUT, EStatCmd.receive_insert_Profile_response);
+            throw e;
+        } catch (MongoException e) {
+            PCEFUtils.writeDBMessageResponseError();
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.receive_insert_Profile_response);
+            throw e;
+        } catch (Exception e) {
+            PCEFUtils.writeDBMessageResponseError();
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.receive_insert_Profile_response);
+            context.setPcefException(PCEFUtils.getPCEFException(e, EError.INSERT_PROFILE_RESPONSE_ERROR));
+            throw e;
+        }
     }
 
 
     public DBCursor findProfileByPrivateId(String privateId) {
 
-        try {
+        BasicDBObject searchQuery;
+        SummaryLog summaryLog;
 
-            BasicDBObject searchQuery = new BasicDBObject();
+        //request
+        try {
+            searchQuery = new BasicDBObject();
             searchQuery.put(EProfile._id.name(), privateId);
 
+            summaryLog = new SummaryLog(Operation.ReadProfile.name(), new Date(), searchQuery);
+            context.getSummaryLogs().add(summaryLog);
+
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.sent_read_Profile_request);
+            PCEFUtils.writeDBMessageRequest(collectionName, DBOperation.READ, searchQuery);
+        } catch (Exception e) {
+            context.setPcefException(PCEFUtils.getPCEFException(e, EError.READ_PROFILE_BUILD_REQUEST_ERROR));
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.sent_read_Profile_request);
+            throw e;
+        }
+
+        //response
+        try {
             DBCursor dbCursor = findByQuery(searchQuery);
+            DBObject dbResLog = new BasicDBObject();
 
             if (dbCursor.hasNext()) {
                 DBObject profileDbObject = dbCursor.iterator().next();
-
+                dbResLog = profileDbObject;
                 Profile profile = gson.fromJson(gson.toJson(profileDbObject), Profile.class);
                 context.getPcefInstance().setProfile(profile);
-
-                PCEFUtils.writeMessageFlow("Find Profile by privateId [Found]", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
-            } else {
-                PCEFUtils.writeMessageFlow("Find Profile by privateId [Not Found]", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
             }
+            PCEFUtils.writeDBMessageResponse(DBResult.SUCCESS, dbCursor.size(), PCEFUtils.getList(dbResLog));
+
+            summaryLog.getSummaryLogDetail().setResponse(new Date(), dbResLog);
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.receive_read_Profile_response);
+
             return dbCursor;
-        } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Find Profile by privateId", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
+        } catch (MongoTimeoutException e) {
+            PCEFUtils.writeDBMessageResponseError();
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.TIMEOUT, EStatCmd.receive_read_Profile_response);
+            context.setPcefException(PCEFUtils.getPCEFException(e, EError.READ_PROFILE_BUILD_REQUEST_ERROR));
+            throw e;
+        } catch (MongoException e) {
+            PCEFUtils.writeDBMessageResponseError();
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.receive_read_Profile_response);
+            context.setPcefException(PCEFUtils.getPCEFException(e, EError.READ_PROFILE_BUILD_REQUEST_ERROR));
             throw e;
         }
+
+
     }
 
     private void updateProfileUnlock(BasicDBObject updateQuery) {
+        BasicDBObject searchQuery = null;
+        SummaryLog summaryLog;
         try {
             AFLog.d("Update Profile Unlock ..");
 
             updateQuery.put(EProfile.isProcessing.name(), 0);//unlock
             updateQuery.put(EProfile.sequenceNumber.name(), context.getPcefInstance().getProfile().getSequenceNumber());
 
-            BasicDBObject searchQuery = new BasicDBObject();
+            searchQuery = new BasicDBObject();
             searchQuery.put(EProfile.userValue.name(), context.getPcefInstance().getProfile().getUserValue());
             searchQuery.put(EProfile.isProcessing.name(), 1);
 
-            updateSetByQuery(searchQuery, updateQuery);
-            appInstance.getMyContext().setLockProfile(false);
-            PCEFUtils.writeMessageFlow("Update Profile Unlock", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
+            summaryLog = new SummaryLog(Operation.UpdateProfile.name(), new Date(), searchQuery.toString() + updateQuery.toString());
+            context.getSummaryLogs().add(summaryLog);
+
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.sent_update_Profile_request);
+            PCEFUtils.writeDBMessageRequest(collectionName, DBOperation.UPDATE, searchQuery.toString() + updateQuery.toString());
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Update Profile Unlock error-" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
+            context.setPcefException(PCEFUtils.getPCEFException(e, EError.UPDATE_PROFILE_REQUEST_ERROR));
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.sent_update_Profile_request);
+            throw e;
+        }
+
+
+        try {
+            WriteResult writeResult = updateSetByQuery(searchQuery, updateQuery);
+            appInstance.getMyContext().setLockProfile(false);
+
+            BasicDBObject dbResLog = new BasicDBObject();
+            dbResLog.put("_id", searchQuery.get("_id"));
+            PCEFUtils.writeDBMessageResponse(DBResult.SUCCESS, writeResult.getN(), PCEFUtils.getList(dbResLog));
+
+            summaryLog.getSummaryLogDetail().setResponse(new Date(), dbResLog);
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.receive_update_Profile_response);
+        } catch (MongoTimeoutException e) {
+            PCEFUtils.writeDBMessageResponseError();
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.TIMEOUT, EStatCmd.receive_update_Profile_response);
+            context.setPcefException(PCEFUtils.getPCEFException(e, EError.UPDATE_PROFILE_RESPONSE_ERROR));
+            throw e;
+        } catch (MongoException e) {
+            PCEFUtils.writeDBMessageResponseError();
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.receive_update_Profile_response);
+            context.setPcefException(PCEFUtils.getPCEFException(e, EError.UPDATE_PROFILE_RESPONSE_ERROR));
             throw e;
         }
     }
@@ -125,26 +214,41 @@ public class ProfileService extends MongoDBService {
     }
 
     public DBObject findAndModifyLockProfile(String privateId) {
+        SummaryLog summaryLog;
+        BasicDBObject query;
+        BasicDBObject update;
         try {
-            BasicDBObject query = new BasicDBObject();
+            query = new BasicDBObject();
             query.put(EProfile.userValue.name(), privateId);
             query.put(EProfile.isProcessing.name(), 0);
 
-            BasicDBObject update = new BasicDBObject();
+            update = new BasicDBObject();
             update.put(EProfile.isProcessing.name(), 1);//lock
 
-            DBObject dbObject = findAndModify(query, update);
+            summaryLog = new SummaryLog(Operation.InsertTransaction.name(), new Date(), query.toString() + update.toString());
+            context.getSummaryLogs().add(summaryLog);
 
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.sent_insert_Transaction_request);
+            PCEFUtils.writeDBMessageRequest(collectionName, DBOperation.INSERT, query.toString() + update.toString());
+
+        } catch (Exception e) {
+            context.setPcefException(PCEFUtils.getPCEFException(e, EError.INSERT_TRANSACTION_BUILD_ERROR));
+            PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.sent_insert_Transaction_request);
+            throw e;
+
+        }
+
+
+        try {
+
+
+            DBObject dbObject = findAndModify(query, update);
             if (dbObject != null) {
                 appInstance.getMyContext().setLockProfile(true);
-                PCEFUtils.writeMessageFlow("Find and Modify Profile Lock privateId:" + privateId + ",[Found]", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
-            } else {
-                PCEFUtils.writeMessageFlow("Find and Modify Profile Lock privateId:" + privateId + ",[Not Found]", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
             }
 
             return dbObject;
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Find and Modify Profile Lock privateId:" + privateId + " error" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
     }

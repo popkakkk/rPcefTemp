@@ -59,11 +59,9 @@ public class RefundTransactionService extends PCEFService {
             EquinoxRawData equinoxRawData = messagePool.getRefundTransactionRequest(refundTransactionRequest, invokeId);
             invokeExternal(equinoxRawData, operation, messagePool.getRequestObj());
 
-            PCEFUtils.writeMessageFlow("Build Refund Transaction Request", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.sent_Refund_Transaction_request);
         } catch (Exception e) {
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.sent_Refund_Transaction_request);
-            PCEFUtils.writeMessageFlow("Build Refund Transaction Stop Request", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             PCEFException pcefException = new PCEFException();
             pcefException.setErrorMsg(ExceptionUtils.getStackTrace(e));
             pcefException.setError(EError.REFUND_TRANSACTION_BUILD_REQUEST_ERROR);
@@ -89,7 +87,6 @@ public class RefundTransactionService extends PCEFService {
 //            context.setSummaryLogExternalResponse(Operation.TestOperation, SummaryLog.getSummaryLogResponse(Operation.TestOperation, testResponseData));
 
                 PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.receive_Refund_Transaction_response);
-                PCEFUtils.writeMessageFlow("Read Refund Transaction Response", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
             } catch (TimeoutException e) {
                 PCEFUtils.increaseStatistic(abstractAF, EStatMode.TIMEOUT, EStatCmd.receive_Refund_Transaction_response);
                 e.setError(EError.REFUND_TRANSACTION_RESPONSE_TIMEOUT);
@@ -102,7 +99,6 @@ public class RefundTransactionService extends PCEFService {
         } catch (PCEFException e) {
             //summarylog fail
             context.setPcefException(e);
-            PCEFUtils.writeMessageFlow("Read Refund Transaction Response", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
     }

@@ -24,6 +24,8 @@ public enum EConfig {
     RESOURCE_NAME_SACF("resource-name-sacf", EConfigType.MANDATORY, null),
     RESOURCE_NAME_OCF("resource-name-ocf", EConfigType.MANDATORY, null),
     RESOURCE_NAME_REFUND("resource-name-refund", EConfigType.MANDATORY, null),
+    RESOURCE_NAME_ES00("resource-name-es00", EConfigType.MANDATORY, null),
+
 
     //Log name
     LOG_SUMMARY_NAME("log-summary-name", EConfigType.MANDATORY, null),

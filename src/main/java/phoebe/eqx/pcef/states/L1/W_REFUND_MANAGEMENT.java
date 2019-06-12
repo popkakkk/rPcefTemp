@@ -104,7 +104,7 @@ public class W_REFUND_MANAGEMENT extends ComplexState {
         generateCDRService.buildCDRRefund(cdrStatus, appInstance);
 
         //update quota unlock
-        dbConnect.getQuotaService().updateUnLockQuota(transactionRefund.getMonitoringKey());
+        dbConnect.getQuotaService().updateUnLockQuota(transactionRefund.getMonitoringKey(), context.getPcefInstance().getTransaction().getUserValue());
 
         refundManagementService.buildResponseRefundManagement(true);
 

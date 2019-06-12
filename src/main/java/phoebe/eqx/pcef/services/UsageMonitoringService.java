@@ -37,10 +37,8 @@ public class UsageMonitoringService extends PCEFService {
             ValidateMessage.validateUsageMonitoringRequest(usageMonitoringRequest);
 
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.Receive_Usage_Monitoring_Request);
-            PCEFUtils.writeMessageFlow("Read Usage Monitoring Request", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (PCEFException e) {
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.Receive_Usage_Monitoring_Request);
-            PCEFUtils.writeMessageFlow("Read Usage Monitoring Request", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             context.setPcefException(e);
             throw e;
         }
@@ -81,9 +79,7 @@ public class UsageMonitoringService extends PCEFService {
             EquinoxRawData equinoxRawData = messagePool.getUsageMonitoringResponse(usageMonitoringResponse, invokeId, getTimeoutFromAppointmentDate());
             appInstance.getOutList().add(equinoxRawData);
 
-            PCEFUtils.writeMessageFlow("Build Usage Monitoring Response", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Build Usage Monitoring Response - " + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
 
             String resourceId = "";
             if (context.getPcefInstance().getTransaction() != null) {

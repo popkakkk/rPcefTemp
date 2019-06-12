@@ -132,8 +132,6 @@ public class Transaction {
         this.clientId = clientId;
     }
 
-
-
     public Integer getIsActive() {
         return isActive;
     }
@@ -156,5 +154,28 @@ public class Transaction {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "sessionId='" + sessionId + '\'' +
+                ", rtid='" + rtid + '\'' +
+                ", tid='" + tid + '\'' +
+                ", actualTime='" + actualTime + '\'' +
+                ", app='" + app + '\'' +
+                ", clientId='" + clientId + '\'' +
+                ", userType='" + userType + '\'' +
+                ", userValue='" + userValue + '\'' +
+                ", resourceId='" + resourceId + '\'' +
+                ", resourceName='" + resourceName + '\'' +
+                ", monitoringKey='" + monitoringKey + '\'' +
+                ", counterId='" + counterId + '\'' +
+                ", createDate=" + createDate +
+                ", updateDate=" + updateDate +
+                ", status='" + status + '\'' +
+                ", isActive=" + isActive +
+                '}';
     }
 }

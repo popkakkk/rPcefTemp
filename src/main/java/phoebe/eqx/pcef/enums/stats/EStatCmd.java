@@ -7,7 +7,7 @@ public enum EStatCmd {
     Sent_Usage_Monitoring_Response("sent Usage Monitoring response"),
 
     //Refund Management
-    Receive_Refund_Management_Request("receive Usage Monitoring request"),
+    Receive_Refund_Management_Request("receive Refund Management request"),
     Sent_Refund_Management_Response("sent Refund Management response"),
 
     //GyRAR

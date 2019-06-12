@@ -2,6 +2,7 @@ package phoebe.eqx.pcef.main;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mongodb.DBCursor;
 import ec02.af.abstracts.AbstractAF;
 import ec02.af.data.AFDataFactory;
 import ec02.af.utils.AFLog;
@@ -13,6 +14,7 @@ import ec02.data.interfaces.ESxxData;
 import ec02.data.interfaces.EquinoxPropertiesAF;
 import ec02.data.interfaces.EquinoxRawData;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import phoebe.eqx.pcef.core.exceptions.PCEFException;
 import phoebe.eqx.pcef.core.model.Profile;
 import phoebe.eqx.pcef.core.model.Transaction;
@@ -20,6 +22,9 @@ import phoebe.eqx.pcef.enums.ERequestType;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.instance.InvokeManager;
 import phoebe.eqx.pcef.instance.context.RequestContext;
+import phoebe.eqx.pcef.message.builder.MessagePool;
+import phoebe.eqx.pcef.services.E11TimoutService;
+import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
 import phoebe.eqx.pcef.states.L1.W_E11_TIMEOUT;
 import phoebe.eqx.pcef.states.L1.W_GyRAR;
 import phoebe.eqx.pcef.states.L1.W_REFUND_MANAGEMENT;
@@ -158,11 +163,40 @@ public class EQX4Wrapper {
                         requestContext = new RequestContext(val, invoke, equinoxPropertiesAF.getSession(), ERequestType.REFUND_MANAGEMENT);
                         appInstance.getRequestContexts().add(requestContext);
 
+                    } else {
+                        AFLog.d("Find Profile for check message is private Id request..");
+                        String session = equinoxPropertiesAF.getSession();
+                        requestContext = new RequestContext("", invoke, equinoxPropertiesAF.getSession(), ERequestType.UNKNOWN);
+                        appInstance.getRequestContexts().add(requestContext);
+                        appInstance.setMyContext(requestContext);
+                        MongoDBConnect dbConnect = null;
+                        try {
+                            dbConnect = new MongoDBConnect(appInstance);
+                            DBCursor dbCursor = dbConnect.getProfileService().findProfileByPrivateId(session);
+                            if (dbCursor.hasNext()) {
+                                E11TimoutService timoutService = new E11TimoutService(appInstance);
+                                timoutService.buildRecurringTimout();
+                                requestContext.setRequestType(ERequestType.CALCULATE_TIMEOUT);
+                                process = false;
+                            } else {
+                                AFLog.d("Message is not private Id response ..finish");
+                                appInstance.setFinish(true);
+                                process = false;
+                            }
+                        } catch (Exception e) {
+                            AFLog.d("Find Profile for check message is private Id response.. error-" + ExceptionUtils.getStackTrace(e));
+                            throw e;
+                        } finally {
+                            if (dbConnect != null) {
+                                dbConnect.closeConnection();
+                            }
+                        }
                     }
                 } else if ("response".equals(type)) {
                     requestContext = appInstance.findCompleteContextListMatchResponse(rawData, ret);
                     process = requestContext.getInvokeManager().dataResponseComplete();
                 }
+
             }
 
 
@@ -243,54 +277,45 @@ public class EQX4Wrapper {
             abstractAF, ArrayList<EquinoxRawData> equinoxRawDatas, AppInstance appInstance, EquinoxPropertiesAF equinoxPropertiesAF) {
         try {
 
-
+            //write Error Log
             if (appInstance.getMyContext().getPcefException() != null) {
                 writeErrorLog(appInstance);
             }
 
-
-            //sent Outgoing Message
+            //Sent Outgoing Message
             List<EquinoxRawData> outList = appInstance.getOutList();
             if (null != outList && 0 < outList.size()) {
                 int i = 0;
                 for (; i < outList.size(); i++) {
-                    EquinoxRawData outListObj = outList.get(i);
-                    Map<String, String> optionalAttribute = outListObj.getRawDataAttributes();
-
-                    //Create Object Default
-                    ESxxData eSxxData = ESxxDataFactory.createObject(EEquinoxRawData.Name.HTTP);
-                    eSxxData.getEquinoxRawData().setRawDataAttributes(optionalAttribute);
-
-                    eSxxData.getEquinoxRawData().setRawDataMessage(outListObj.getRawDataMessage());
-                    abstractAF.getEquinoxUtils().getDataBuffer().putESxxDatas(eSxxData);
+                    putESXXDatas(abstractAF, outList.get(i));
                 }
             }
 
-
+            //Set Min Timeout
             String timout = getMinTimeout(appInstance);
             eqxPropOut.setTimeout(timout);
             AFLog.d("EquinoxProperties timeout =" + timout);
 
+            //Clear Request Context [Context Terminate]
+            if (appInstance.getMyContext().isTerminate()) {
+//                writeSummaryLog(eqxPropOut, abstractAF, equinoxRawDatas, appInstance);
 
-            //clear request context
-            boolean response = false;
-            if (outList.size() == 1) {
-                if (outList.get(0).getType().equals("response")) {
-                    response = true;
+                if (appInstance.getMyContext().getRequestType().equals(ERequestType.USAGE_MONITORING)) {
+                    MessagePool messagePool = new MessagePool(abstractAF);
+                    EquinoxRawData es00RawData = messagePool.getES00ProfileResponse(appInstance.getMyContext().getPcefInstance().getProfile().getUserValue());
+                    putESXXDatas(abstractAF, es00RawData);
+                    appInstance.setFinish(true);
+                } else {
+                    AFLog.d("clear context:" + appInstance.getMyContext().getRequestType());
+                    appInstance.removeRequestContext();
                 }
             }
 
-            if (response) {
-                AFLog.d("clear context:" + appInstance.getMyContext().getRequestType());
-//                writeSummaryLog(eqxPropOut, abstractAF, equinoxRawDatas, appInstance);
-                appInstance.removeRequestContext();
-            }
-
-
-            //set Ret
+            //Clear Instance [Application Finish]
             if (appInstance.isFinish()) {
                 eqxPropOut.setState(EStateApp.IDLE.getName());
                 eqxPropOut.setRet(EEquinoxMessage.Ret.END);
+                eqxPropOut.setTimeout("0");
                 AFLog.d("set State:" + EStateApp.IDLE.getName() + ", set Ret:" + EEquinoxMessage.Ret.END);
             } else {
                 eqxPropOut.setState(EStateApp.ACTIVE.getName());
@@ -304,7 +329,20 @@ public class EQX4Wrapper {
     }
 
 
-    private static void writeErrorLog( AppInstance appInstance) {
+    private static void putESXXDatas(AbstractAF abstractAF, EquinoxRawData outListObj) {
+        Map<String, String> optionalAttribute = outListObj.getRawDataAttributes();
+
+        //Create Object Default
+        ESxxData eSxxData = ESxxDataFactory.createObject(EEquinoxRawData.Name.HTTP);
+        eSxxData.getEquinoxRawData().setRawDataAttributes(optionalAttribute);
+
+        eSxxData.getEquinoxRawData().setRawDataMessage(outListObj.getRawDataMessage());
+        abstractAF.getEquinoxUtils().getDataBuffer().putESxxDatas(eSxxData);
+    }
+
+
+
+    private static void writeErrorLog(AppInstance appInstance) {
         ERequestType requestType = appInstance.getMyContext().getRequestType();
         PCEFException pcefException = appInstance.getMyContext().getPcefException();
 
@@ -327,7 +365,7 @@ public class EQX4Wrapper {
 
     }
 
-    private static void writeSummaryLog(EquinoxPropertiesAF equinoxPropertiesAF, AbstractAF
+   /* private static void writeSummaryLog(EquinoxPropertiesAF equinoxPropertiesAF, AbstractAF
             abstractAF, ArrayList<EquinoxRawData> equinoxRawDatas, AppInstance appInstance) {
         //get Request Log
         String requestLog = appInstance.getRequestLog();
@@ -337,7 +375,7 @@ public class EQX4Wrapper {
         String summaryLog = appInstance.getSummaryLogStr();
 
 //        PCEFUtils.writeLog(abstractAF, requestLog, responseLog, summaryLog, appInstance.getStartTime(), "");
-    }
+    }*/
 
 
     private static String getMinTimeout(AppInstance appInstance) {
@@ -398,7 +436,7 @@ public class EQX4Wrapper {
 
 
     private enum EStateApp {
-        IDLE("BEGIN"),
+        IDLE("IDLE"),
         ACTIVE("ACTIVE");
 
         private String name;

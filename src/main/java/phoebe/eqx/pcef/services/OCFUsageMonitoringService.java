@@ -40,7 +40,7 @@ public class OCFUsageMonitoringService extends PCEFService {
     public static final String CMD_UM_STOP = "usageMonitoringStop";
 
     private String generateSessionId() {
-        return "PCEF:ACTIVE:" + PCEFUtils.regularDateFormat.format(appInstance.getMyContext().getStartTime());
+        return "PCEF:ACTIVE:" + PCEFUtils.actualTimeDFM.format(appInstance.getMyContext().getStartTime());
     }
 
     private String generateTransactionId() {
@@ -64,23 +64,56 @@ public class OCFUsageMonitoringService extends PCEFService {
         transactionList.addAll(context.getPcefInstance().getOtherStartTransactions());
 
         //set all new resource
-        List<String> resourceIdList = new ArrayList<>();
+//        List<String> resourceIdList = new ArrayList<>();
+        ArrayList<ResourceRequest> newResources = new ArrayList<>();
+
+        HashMap<String, Transaction> transactionHashMap = new HashMap<>();
         for (Transaction t : transactionList) {
-            String resourceId = t.getResourceId();
-            if (!resourceIdList.contains(resourceId)) {
-                ResourceRequest resourceRequest = new ResourceRequest();
-                resourceRequest.setResourceId(resourceId);
-                resourceRequest.setResourceName(t.getResourceName());
-                resourceRequest.setRtid(t.getRtid());
-
-                //add resources
-                umRequest.getResources().add(resourceRequest);
-                context.getPcefInstance().getNewResourcesRequests().add(resourceRequest);
-
-                //for check duplicate resourceId
-                resourceIdList.add(resourceId);
+            Transaction lastTransactionResourceId = transactionHashMap.get(t.getResourceId());
+            if (lastTransactionResourceId == null) {
+                transactionHashMap.put(t.getResourceId(), t);
+            } else {
+                if (t.getCreateDate().after(lastTransactionResourceId.getCreateDate())) {
+                    transactionHashMap.replace(t.getResourceId(), t);
+                }
             }
         }
+
+        transactionHashMap.forEach((s, transaction) -> {
+            ResourceRequest resourceRequest = new ResourceRequest();
+            resourceRequest.setResourceId(transaction.getResourceId());
+            resourceRequest.setResourceName(transaction.getResourceName());
+            resourceRequest.setRtid(transaction.getRtid());
+            newResources.add(resourceRequest);
+        });
+        umRequest.getResources().addAll(newResources);
+
+        /*for (Transaction t : transactionList) {
+            String resourceId = t.getResourceId();
+
+            Transaction tRequest = transactionHashMap.get(resourceId);
+
+            if (tRequest == null) {
+                ResourceRequest r = new ResourceRequest();
+                r.setResourceId(resourceId);
+                r.setResourceName(t.getResourceName());
+                r.setRtid(t.getRtid());
+
+                //add resources
+                newResources.add(r);
+//                context.getPcefInstance().getNewResourcesRequests().add(resourceRequest);
+
+                //for check duplicate resourceId
+                transactionHashMap.put(resourceId, t);
+//                resourceIdList.add(resourceId);
+            } else {
+                if (t.getCreateDate().after(tRequest.getCreateDate())) {
+                    tRequest.
+                }
+
+            }
+        }*/
+
 
 
         MessagePool messagePool = new MessagePool(abstractAF);
@@ -113,7 +146,6 @@ public class OCFUsageMonitoringService extends PCEFService {
             buildUsageMonitoring(umStartRequest, operation, invokeId, transactionList);
 
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.sent_Usage_Monitoring_Start_request);
-            PCEFUtils.writeMessageFlow("Build Usage Monitoring Start Request", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
             PCEFException pcefException = new PCEFException();
             pcefException.setError(EError.USAGE_MONITORING_START_BUILD_REQUEST_ERROR);
@@ -121,7 +153,6 @@ public class OCFUsageMonitoringService extends PCEFService {
 
             context.setPcefException(pcefException);
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.sent_Usage_Monitoring_Start_request);
-            PCEFUtils.writeMessageFlow("Build Usage Monitoring Start Request" + e.getStackTrace()[0], MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
     }
@@ -166,7 +197,6 @@ public class OCFUsageMonitoringService extends PCEFService {
             buildUsageMonitoring(ocfUsageMonitoringRequest, operation, invokeId, transactionList);
 
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.sent_Usage_Monitoring_Update_request);
-            PCEFUtils.writeMessageFlow("Build Usage Monitoring Update Request", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
             PCEFException pcefException = new PCEFException();
             pcefException.setError(EError.USAGE_MONITORING_UPDATE_BUILD_REQUEST_ERROR);
@@ -174,7 +204,6 @@ public class OCFUsageMonitoringService extends PCEFService {
 
             context.setPcefException(pcefException);
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.sent_Usage_Monitoring_Update_request);
-            PCEFUtils.writeMessageFlow("Build Usage Monitoring Update Request", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
     }
@@ -198,7 +227,6 @@ public class OCFUsageMonitoringService extends PCEFService {
             ocfUsageMonitoringRequest.setActualTime(PCEFUtils.actualTimeDFM.format(new Date()));
 
             buildUsageMonitoring(ocfUsageMonitoringRequest, operation, invokeId, transactionStartList);
-            PCEFUtils.writeMessageFlow("Build Usage Monitoring Stop Request", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.sent_Usage_Monitoring_Stop_request);
         } catch (Exception e) {
             PCEFException pcefException = new PCEFException();
@@ -208,7 +236,6 @@ public class OCFUsageMonitoringService extends PCEFService {
             context.setPcefException(pcefException);
 
             PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.sent_Usage_Monitoring_Stop_request);
-            PCEFUtils.writeMessageFlow("Build Usage Monitoring Stop Request", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
     }
@@ -231,7 +258,6 @@ public class OCFUsageMonitoringService extends PCEFService {
 
 
                 PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.receive_Usage_Monitoring_Start_response);
-                PCEFUtils.writeMessageFlow("Read Usage Monitoring Start Response", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
                 return ocfUsageMonitoringResponse;
             } catch (TimeoutException e) {
                 PCEFUtils.increaseStatistic(abstractAF, EStatMode.TIMEOUT, EStatCmd.receive_Usage_Monitoring_Start_response);
@@ -244,7 +270,6 @@ public class OCFUsageMonitoringService extends PCEFService {
             }
         } catch (PCEFException e) {
             context.setPcefException(e);
-            PCEFUtils.writeMessageFlow("Read Usage Monitoring Start Response", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
 
@@ -266,7 +291,6 @@ public class OCFUsageMonitoringService extends PCEFService {
 
 
                 PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.receive_Usage_Monitoring_Update_response);
-                PCEFUtils.writeMessageFlow("Read Usage Monitoring Update Response", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
                 return ocfUsageMonitoringResponse;
             } catch (TimeoutException e) {
                 PCEFUtils.increaseStatistic(abstractAF, EStatMode.TIMEOUT, EStatCmd.receive_Usage_Monitoring_Update_response);
@@ -280,7 +304,6 @@ public class OCFUsageMonitoringService extends PCEFService {
         } catch (PCEFException e) {
             //summarylog fail
             context.setPcefException(e);
-            PCEFUtils.writeMessageFlow("Read Usage Monitoring Update Response", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
 
@@ -302,7 +325,6 @@ public class OCFUsageMonitoringService extends PCEFService {
 
 
                 PCEFUtils.increaseStatistic(abstractAF, EStatMode.SUCCESS, EStatCmd.receive_Usage_Monitoring_Stop_response);
-                PCEFUtils.writeMessageFlow("Read Usage Monitoring Stop Response", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
                 return ocfUsageMonitoringResponse;
             } catch (TimeoutException e) {
                 PCEFUtils.increaseStatistic(abstractAF, EStatMode.TIMEOUT, EStatCmd.receive_Usage_Monitoring_Stop_response);
@@ -316,7 +338,6 @@ public class OCFUsageMonitoringService extends PCEFService {
         } catch (PCEFException e) {
 
             context.setPcefException(e);
-            PCEFUtils.writeMessageFlow("Read Usage Monitoring Stop Response", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
             throw e;
         }
     }
@@ -338,7 +359,11 @@ public class OCFUsageMonitoringService extends PCEFService {
             resourceRequest.setUsedUnit(String.valueOf(unit));
 
             if (ERequestType.USAGE_MONITORING.equals(requestType)) {
-                resourceRequest.setRtid(commitData.getLastRtid());
+                if (commitData.get_id().getResourceId().equals(context.getPcefInstance().getTransaction().getResourceId())) {
+                    resourceRequest.setRtid(context.getPcefInstance().getTransaction().getRtid());
+                } else {
+                    resourceRequest.setRtid(commitData.getLastRtid());
+                }
                 resourceRequest.setReportingReason("0");
             } else if (ERequestType.E11_TIMEOUT.equals(requestType)) {
                 resourceRequest.setRtid(commitData.getLastRtid()); // last tid of profile

@@ -16,6 +16,13 @@ public class SummaryLog {
         this.summaryLogDetail = new SummaryLogDetail(invokeId, PCEFUtils.dtLongFormatterMs.format(reqTime), req);
     }
 
+    public SummaryLog(String logName, Date reqTime, Object req) {
+        this.logName = logName;
+        this.invokeId = "";
+        this.summaryLogDetail = new SummaryLogDetail(invokeId, PCEFUtils.dtLongFormatterMs.format(reqTime), req);
+    }
+
+
     public static Object getSummaryLogResponse(Operation operation, Object responseObj) {
         Object object = "";
         if (Operation.TestOperation.equals(operation)) {

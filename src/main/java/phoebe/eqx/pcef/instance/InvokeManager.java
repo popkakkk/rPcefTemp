@@ -2,6 +2,7 @@ package phoebe.eqx.pcef.instance;
 
 import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import phoebe.eqx.pcef.core.data.InvokeObject;
 import phoebe.eqx.pcef.enums.EEvent;
 import phoebe.eqx.pcef.enums.Operation;
@@ -58,7 +59,7 @@ public class InvokeManager {
         for (InvokeObject invokeObject : list) {
             Operation operation = invokeObject.getOperation();
             if (clientOperation.equals(operation)) {
-                AFLog.d("InvokeExternal found " + operation + " " + invokeObject);
+//                AFLog.d("InvokeExternal found " + operation + " " + invokeObject);
                 return invokeObject;
             }
         }
@@ -71,7 +72,6 @@ public class InvokeManager {
         for (InvokeObject invokeObject : list) {
             outList.add(invokeObject.getOperationRawReq());
         }
-
 
 
     }
@@ -106,11 +106,11 @@ public class InvokeManager {
     }
 
 
-    private List<InvokeObject> findRetryTimeoutList() throws Exception {
+    private List<InvokeObject> findRetryTimeoutList()  {
         ArrayList<InvokeObject> retryList = new ArrayList<InvokeObject>();
         for (InvokeObject invokeObject : list) {
             if (!invokeObject.isHasResult()) {
-                if (invokeObject.getRetry() != 0) {
+                if (invokeObject.getRetry() > 0) {
                     retryList.add(invokeObject);
                 }
             }
@@ -125,6 +125,8 @@ public class InvokeManager {
             if (retryList.size() == 0) {
                 return false;
             }
+
+            AFLog.d("Build Retry Timeout ..");
             ArrayList<EquinoxRawData> rawOutList = appInstance.getOutList();
             for (InvokeObject invokeObject : retryList) {
                 invokeObject.countRetry();
@@ -144,6 +146,8 @@ public class InvokeManager {
                 }
             }
         } catch (Exception e) {
+            AFLog.d("Build Retry Timeout .. error -" + ExceptionUtils.getStackTrace(e));
+            return false;
         }
         return true;
     }
