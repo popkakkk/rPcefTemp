@@ -1,0 +1,18 @@
+<dummy-request>
+    <dummy-message id="1">
+
+
+        <EquinoxMessage from="rPCEF_au.E11.0" via="rPCEF_au.E11.0" session="0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" timeout="10" ret="0" diag="4:3:0">
+            <EquinoxRawData ctype="text/plain" val="" name="HTTP" invoke="0X9XGyxtxkMzjhNPXRl7PR9F4qOojLtA1548757885384" to="rPCEF_au.ES00.SERV.0" type="request" orig="rPCEF_au.ES00.SERV" ret="0" />
+            <EquinoxInstance>
+                <value val="" />
+            </EquinoxInstance>
+        </EquinoxMessage>
+    </dummy-message>
+
+
+
+
+
+
+</dummy-request>

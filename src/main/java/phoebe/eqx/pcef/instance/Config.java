@@ -27,6 +27,7 @@ public class Config {
     public static String RESOURCE_NAME_PRODUCT;
     public static String RESOURCE_NAME_SACF;
     public static String RESOURCE_NAME_REFUND;
+    public static String RESOURCE_NAME_ES00;
 
 
     public static String TIMEOUT_OCF;
@@ -61,6 +62,7 @@ public class Config {
         RESOURCE_NAME_SACF = PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_SACF);
         RESOURCE_NAME_OCF = PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_OCF);
         RESOURCE_NAME_REFUND = PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_REFUND);
+        RESOURCE_NAME_ES00 = PCEFUtils.getWarmConfig(abstractAF, EConfig.RESOURCE_NAME_ES00);
 
         TIMEOUT_OCF = PCEFUtils.getWarmConfig(abstractAF, EConfig.TIMEOUT_OCF);
         TIMEOUT_PRODUCT = PCEFUtils.getWarmConfig(abstractAF, EConfig.TIMEOUT_PRODUCT);

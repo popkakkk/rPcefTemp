@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import ec02.af.abstracts.AbstractAF;
 import ec02.af.utils.AFLog;
-import phoebe.eqx.pcef.DBResult;
 import phoebe.eqx.pcef.core.cdr.Opudr;
 import phoebe.eqx.pcef.enums.DBOperation;
 import phoebe.eqx.pcef.enums.EEvent;
@@ -192,6 +191,11 @@ public class PCEFUtils {
     }
 
 
+    public void writeDBMessgeResponseError(){
+        writeDBMessageResponse(DBResult.ERROR,0,null);
+    }
+
+
     public static String generateCdr(Opudr opudr) throws JAXBException {
 
         AFLog.d("Generate CDR");
@@ -205,8 +209,13 @@ public class PCEFUtils {
         marshaller.marshal(opudr, stringWriter);
 
         return stringWriter.toString();
+    }
 
 
+    public static  <T> List<T> getList(T t) {
+        List<T> list = new ArrayList<>();
+        list.add(t);
+        return list;
     }
 
 

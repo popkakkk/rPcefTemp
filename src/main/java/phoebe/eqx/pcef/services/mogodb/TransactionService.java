@@ -2,7 +2,7 @@ package phoebe.eqx.pcef.services.mogodb;
 
 import com.mongodb.*;
 import ec02.af.utils.AFLog;
-import phoebe.eqx.pcef.DBResult;
+import phoebe.eqx.pcef.utils.DBResult;
 import phoebe.eqx.pcef.core.data.ResourceQuota;
 import phoebe.eqx.pcef.core.data.ResourceResponse;
 import phoebe.eqx.pcef.core.model.Quota;
@@ -55,15 +55,24 @@ public class TransactionService extends MongoDBService {
             BasicDBObject transactionBasicObject = BasicDBObject.parse(gson.toJson(transaction));
             transactionBasicObject.put(ETransaction.updateDate.name(), transaction.getUpdateDate());
             transactionBasicObject.put(ETransaction.createDate.name(), transaction.getCreateDate());
+            PCEFUtils.writeDBMessageRequest(collectionName, DBOperation.INSERT, transactionBasicObject);
 
-            insertByQuery(transactionBasicObject);
+            /**insert**/
+            WriteResult writeResult = insertByQuery(transactionBasicObject);
 
             context.getPcefInstance().setTransaction(transaction);
             context.getPcefInstance().setInsertTransaction(true);
 
-            PCEFUtils.writeMessageFlow("Insert Transaction", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
+
+            BasicDBObject dbResLog = new BasicDBObject();
+            dbResLog.put("_id", transactionBasicObject.get("_id"));
+            dbResLog.put(ETransaction.resourceId.name(), transactionBasicObject.get(ETransaction.resourceId.name()));
+            dbResLog.put(ETransaction.resourceName.name(), transactionBasicObject.get(ETransaction.resourceName.name()));
+            PCEFUtils.writeDBMessageResponse(DBResult.SUCCESS, writeResult.getN(), PCEFUtils.getList(dbResLog));
+
+//            PCEFUtils.writeMessageFlow("Insert Transaction", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
-            PCEFUtils.writeMessageFlow("Insert Transaction", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
+//            PCEFUtils.writeMessageFlow("Insert Transaction", MessageFlow.Status.Error, context.getPcefInstance().getSessionId());
 
         }
     }
@@ -96,16 +105,12 @@ public class TransactionService extends MongoDBService {
 
             DBCursor cursor = findByQuery(searchQuery);
 
-            List<Object> results = new ArrayList<>();
-            results.add(cursor.iterator().next());
-
-            PCEFUtils.writeDBMessageResponse(DBResult.SUCCESS, cursor.size(), Arrays.asList(cursor.iterator().next()));
+            PCEFUtils.writeDBMessageResponse(DBResult.SUCCESS, cursor.size(), PCEFUtils.getList(cursor.iterator().next()));
             return cursor;
         } catch (MongoException e) {
             PCEFUtils.writeDBMessageResponse(DBResult.SUCCESS, 0, null);
             throw e;
         }
-
     }
 
 
@@ -222,7 +227,7 @@ public class TransactionService extends MongoDBService {
 
         //remove
         if (deleteList.size() > 0) {
-            AFLog.d("remove transaction receive quota error..");
+            AFLog.d("Remove Transaction where receive Quota error..");
             removeManyTransactionByTid(deleteList);
         }
     }
@@ -238,9 +243,14 @@ public class TransactionService extends MongoDBService {
             //exist quota
             if (quota.getQuotaByKey() == null) {
                 List<CommitData> commitDataList = findDataToCommit(quota.getUserValue(), quota.getMonitoringKey(), false);
-                int sumTransaction = commitDataList.stream().mapToInt(CommitData::getCount).sum();
-                int quotaUnit = commitDataList.get(0).getQuotaByKey().getUnit();
-                available = quotaUnit - sumTransaction;
+                if (commitDataList.size() == 0) {
+                    AFLog.d("Exist Quota Response MK:" + quota.getMonitoringKey() + ",Not found in database");
+                    available = 0;
+                } else {
+                    int sumTransaction = commitDataList.stream().mapToInt(CommitData::getCount).sum();
+                    int quotaUnit = commitDataList.get(0).getQuotaByKey().getUnit();// spec mk
+                    available = quotaUnit - sumTransaction;
+                }
 
                 if (available <= 0) {
                     if (context.getRequestType().equals(ERequestType.USAGE_MONITORING)) { //flow USAGE MONITORING UPDATE ONLY

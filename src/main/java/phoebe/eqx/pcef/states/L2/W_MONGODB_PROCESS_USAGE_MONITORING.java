@@ -125,7 +125,7 @@ public class W_MONGODB_PROCESS_USAGE_MONITORING extends MongoState {
                     } else {
                         AFLog.d("Quota Exhaust");
                         context.getPcefInstance().setCommitDatas(commitDataList);
-                        DBObject findModQuota = dbConnect.getQuotaService().findAndModifyLockQuota(quota.getMonitoringKey());
+                        DBObject findModQuota = dbConnect.getQuotaService().findAndModifyLockQuota(quota.getMonitoringKey(), context.getPcefInstance().getProfile().getUserValue());
                         if (findModQuota != null) {
                             nextState = EState.FIND_AND_MOD_PROFILE_FOR_UPDATE_QUOTA_EXHAUST;
                         } else {

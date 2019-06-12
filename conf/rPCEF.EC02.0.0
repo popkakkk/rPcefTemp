@@ -57,6 +57,7 @@
         <resource-name-sacf value="rPCEF.ES05.SACF"/>
         <resource-name-product value="rPCEF.ES04.PRODUCT"/>
         <resource-name-refund value="rPCEF.ES05.REFUND"/>
+        <resource-name-es00 value="rPCEF.ES00.0"/>
 
         <!-- timeout -->
         <timeout-ocf value = "4" />

@@ -40,9 +40,6 @@ public class QuotaService extends MongoDBService {
     }
 
 
-
-
-
     private List<BasicDBObject> getQuotaToBasicObjectList(ArrayList<Quota> quotaResponses) {
         List<BasicDBObject> quotaBasicObjectList = new ArrayList<>();
         for (Quota quota : quotaResponses) {
@@ -72,15 +69,17 @@ public class QuotaService extends MongoDBService {
 
     public void removeQuota(String privateId) {
         AFLog.d("Delete Quota with privateId:" + privateId + " ..");
-
         BasicDBObject delete = new BasicDBObject(EQuota.userValue.name(), privateId);
         writeQueryLog("remove", collectionName, delete);
         db.getCollection(collectionName).remove(delete);
     }
 
 
-    private void deleteQuotaByKey(String key) {
-        BasicDBObject delete = new BasicDBObject(EQuota._id.name(), key);
+    private void deleteQuotaByKey(String monitoringKey, String userValue) {
+        BasicDBObject delete = new BasicDBObject();
+        delete.put(EQuota.monitoringKey.name(), monitoringKey);
+        delete.put(EQuota.userValue.name(), userValue);
+
         writeQueryLog("remove", collectionName, delete.toString());
         db.getCollection(collectionName).remove(delete);
 
@@ -155,7 +154,7 @@ public class QuotaService extends MongoDBService {
             for (String mkCommit : mkCommits) {
                 if (!mkResponses.contains(mkCommit)) {
                     //delete
-                    deleteQuotaByKey(mkCommit);
+                    deleteQuotaByKey(mkCommit, context.getPcefInstance().getProfile().getUserValue());
                     AFLog.d("[QUOTA UPDATE] Delete Quota by monitoringKey:" + mkCommit);
                 } else {
                     mkUpdateCounter.add(mkCommit);
@@ -180,7 +179,8 @@ public class QuotaService extends MongoDBService {
                         } else {
                             //new counter(old mk) -->update set
                             BasicDBObject search = new BasicDBObject();
-                            search.put(EQuota._id.name(), mk);
+                            search.put(EQuota.monitoringKey.name(), mk);
+                            search.put(EQuota.userValue.name(), context.getPcefInstance().getProfile().getUserValue());
                             updateSetByQuery(search, quotaBasicObject);
                             AFLog.d("[QUOTA UPDATE] Update Quota:" + quotaBasicObject);
                         }
@@ -216,16 +216,16 @@ public class QuotaService extends MongoDBService {
 
 
     public void filterTransactionConfirmIsNewResource(List<Transaction> otherTransaction) {
-        int index = 0;
+        List<Transaction> filterTransaction = new ArrayList<>();
         for (Transaction transaction : otherTransaction) {
             AFLog.d("Confirm Resource Is New Resource..");
             DBCursor quotaCursor = findQuotaByTransaction(transaction);
             if (quotaCursor.hasNext()) {
-                AFLog.d("[Confirm Resource Is New Resource] have quota:" + quotaCursor.next().get(EQuota._id.name()) + ",filter tid:" + transaction.getTid());
-                otherTransaction.remove(index);
+                AFLog.d("[Confirm Resource Is New Resource] have quota:" + quotaCursor.next().get(EQuota.monitoringKey.name()) + ",filter tid:" + transaction.getTid());
+                filterTransaction.add(transaction);
             }
-            index++;
         }
+        otherTransaction.removeAll(filterTransaction);
     }
 
     public DBCursor findQuotaByTransaction(Transaction transaction) {
@@ -233,7 +233,7 @@ public class QuotaService extends MongoDBService {
             BasicDBObject searchQuery = new BasicDBObject();
             searchQuery.put(EQuota.userValue.name(), context.getPcefInstance().getProfile().getUserValue());
 //            searchQuery.put(EQuota.resources.name(), new BasicDBObject("$elemMatch", new BasicDBObject(EResourceQuota.resourceId.name(), transaction.getResourceId())));
-            searchQuery.put(EQuota.resources.name()+"."+EResourceQuota.resourceId.name(),  transaction.getResourceId());
+            searchQuery.put(EQuota.resources.name() + "." + EResourceQuota.resourceId.name(), transaction.getResourceId());
             DBCursor dbCursor = findByQuery(searchQuery);
 
             if (dbCursor.hasNext()) {
@@ -335,11 +335,12 @@ public class QuotaService extends MongoDBService {
     }
 
 
-    public DBObject findAndModifyLockQuota(String monitoringKey) {
+    public DBObject findAndModifyLockQuota(String monitoringKey, String userValue) {
         try {
 
             BasicDBObject query = new BasicDBObject();
-            query.put(EQuota._id.name(), monitoringKey);
+            query.put(EQuota.monitoringKey.name(), monitoringKey);
+            query.put(EQuota.userValue.name(), userValue);
             query.put(EQuota.processing.name(), 0);
 
             BasicDBObject update = new BasicDBObject();
@@ -355,11 +356,11 @@ public class QuotaService extends MongoDBService {
         }
     }
 
-    public void updateUnLockQuota(String monitoringKey) {
-
+    public void updateUnLockQuota(String monitoringKey, String userValue) {
         try {
             BasicDBObject query = new BasicDBObject();
-            query.put(EQuota._id.name(), monitoringKey);
+            query.put(EQuota.monitoringKey.name(), monitoringKey);
+            query.put(EQuota.userValue.name(), userValue);
             query.put(EQuota.processing.name(), 1);
 
             BasicDBObject update = new BasicDBObject();
@@ -383,7 +384,7 @@ public class QuotaService extends MongoDBService {
             }
 
             //processing 0 --> 1
-            DBObject dbObject = findAndModifyLockQuota(quota.getMonitoringKey());
+            DBObject dbObject = findAndModifyLockQuota(quota.getMonitoringKey(), context.getPcefInstance().getProfile().getUserValue());
             if (dbObject != null) {
                 //success
                 quota.setProcessing(1);

@@ -338,7 +338,7 @@ public class OCFUsageMonitoringService extends PCEFService {
             resourceRequest.setUsedUnit(String.valueOf(unit));
 
             if (ERequestType.USAGE_MONITORING.equals(requestType)) {
-                resourceRequest.setRtid(commitData.getLastRtid());
+                resourceRequest.setRtid(context.getPcefInstance().getTransaction().getRtid());
                 resourceRequest.setReportingReason("0");
             } else if (ERequestType.E11_TIMEOUT.equals(requestType)) {
                 resourceRequest.setRtid(commitData.getLastRtid()); // last tid of profile

@@ -58,7 +58,7 @@ public class W_MONGODB_PROCESS_REFUND_MANAGEMENT extends MongoState {
         EState nextState = null;
         try {
             Transaction transactionRefund = context.getPcefInstance().getTransaction();
-            DBObject quotaDBObj = dbConnect.getQuotaService().findAndModifyLockQuota(transactionRefund.getMonitoringKey());
+            DBObject quotaDBObj = dbConnect.getQuotaService().findAndModifyLockQuota(transactionRefund.getMonitoringKey(), context.getPcefInstance().getTransaction().getUserValue());
             if (quotaDBObj == null) {
                 E11TimoutService e11TimoutService = new E11TimoutService(appInstance);
                 e11TimoutService.buildInterval();
@@ -87,7 +87,7 @@ public class W_MONGODB_PROCESS_REFUND_MANAGEMENT extends MongoState {
         try {
 
             Transaction transactionRefund = context.getPcefInstance().getTransaction();
-            DBObject quotaDBObj = dbConnect.getQuotaService().findAndModifyLockQuota(transactionRefund.getMonitoringKey());
+            DBObject quotaDBObj = dbConnect.getQuotaService().findAndModifyLockQuota(transactionRefund.getMonitoringKey(),context.getPcefInstance().getTransaction().getUserValue());
             if (quotaDBObj == null) {
                 E11TimoutService e11TimoutService = new E11TimoutService(appInstance);
                 e11TimoutService.buildInterval();

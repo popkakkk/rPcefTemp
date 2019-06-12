@@ -140,13 +140,23 @@ public class MessagePool {
         return rawData;
     }
 
+    public EquinoxRawData getES00ProfileResponse(String privateId) {
+        EquinoxRawData rawData = AFDataFactory.createEquinoxRawData();
+        Map<String, String> map = new HashMap<>();
+        map.put("type", EEquinoxRawData.TypeHTTP.REQUEST.getType());
+        map.put("to", Config.RESOURCE_NAME_ES00);
+        map.put("invoke", privateId);
+        rawData.setRawDataAttributes(map);
+        return rawData;
+    }
+
 
     public EquinoxRawData sentTimeout(String timeout, String type) {
-
         EquinoxRawData rawData = AFDataFactory.createEquinoxRawData();
         Map<String, String> map = new HashMap<>();
         map.put("timeout", timeout);
         map.put("type", type);
+
         rawData.setRawDataAttributes(map);
         return rawData;
     }

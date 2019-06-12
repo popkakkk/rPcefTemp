@@ -20,6 +20,7 @@ public class RequestContext {
     private ERequestType requestType;
 
     private Date timeoutDate;
+    private boolean terminate;
 
     private boolean interval;
     private int intervalRetry;
@@ -200,5 +201,11 @@ public class RequestContext {
         this.quotaExhaust = quotaExhaust;
     }
 
+    public boolean isTerminate() {
+        return terminate;
+    }
 
+    public void setTerminate(boolean terminate) {
+        this.terminate = terminate;
+    }
 }

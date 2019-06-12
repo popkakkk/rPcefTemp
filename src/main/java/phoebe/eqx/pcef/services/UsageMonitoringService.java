@@ -16,7 +16,6 @@ import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
 import phoebe.eqx.pcef.utils.MessageFlow;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 import phoebe.eqx.pcef.utils.ValidateMessage;
-import phoebe.eqx.pcef.utils.WriteLog;
 
 public class UsageMonitoringService extends PCEFService {
 
@@ -80,6 +79,7 @@ public class UsageMonitoringService extends PCEFService {
             MessagePool messagePool = new MessagePool(abstractAF);
             EquinoxRawData equinoxRawData = messagePool.getUsageMonitoringResponse(usageMonitoringResponse, invokeId, getTimeoutFromAppointmentDate());
             appInstance.getOutList().add(equinoxRawData);
+            context.setTerminate(true);
 
             PCEFUtils.writeMessageFlow("Build Usage Monitoring Response", MessageFlow.Status.Success, context.getPcefInstance().getSessionId());
         } catch (Exception e) {
@@ -97,11 +97,6 @@ public class UsageMonitoringService extends PCEFService {
             throw e;
         }
     }
-
-
-
-
-
 
 
 }

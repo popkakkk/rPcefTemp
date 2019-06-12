@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.mongodb.*;
 import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.enums.EStatusLifeCycle;
-import phoebe.eqx.pcef.enums.model.EProfile;
 import phoebe.eqx.pcef.enums.model.EQuota;
 import phoebe.eqx.pcef.enums.model.ETransaction;
 import phoebe.eqx.pcef.enums.model.element.EResourceQuota;
@@ -41,9 +40,9 @@ public abstract class MongoDBService {
         System.out.println(writeResult);
     }
 
-    public void insertByQuery(BasicDBObject basicDBObject) {
+    public WriteResult insertByQuery(BasicDBObject basicDBObject) {
         writeQueryLog("insert", collectionName, basicDBObject);
-        db.getCollection(collectionName).insert(basicDBObject);
+     return    db.getCollection(collectionName).insert(basicDBObject);
     }
 
     public void insertManyByObject(List<BasicDBObject> insertList) {

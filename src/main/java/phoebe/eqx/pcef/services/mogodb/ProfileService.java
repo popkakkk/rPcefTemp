@@ -3,10 +3,12 @@ package phoebe.eqx.pcef.services.mogodb;
 import com.mongodb.*;
 import ec02.af.utils.AFLog;
 import phoebe.eqx.pcef.core.model.Profile;
+import phoebe.eqx.pcef.enums.DBOperation;
 import phoebe.eqx.pcef.enums.model.EProfile;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.message.parser.req.UsageMonitoringRequest;
+import phoebe.eqx.pcef.utils.DBResult;
 import phoebe.eqx.pcef.utils.MessageFlow;
 import phoebe.eqx.pcef.utils.PCEFUtils;
 
@@ -62,6 +64,11 @@ public class ProfileService extends MongoDBService {
             searchQuery.put(EProfile._id.name(), privateId);
 
             DBCursor dbCursor = findByQuery(searchQuery);
+
+
+            PCEFUtils.writeDBMessageRequest(collectionName, DBOperation.FIND, searchQuery);
+
+//            PCEFUtils.writeDBMessageResponse(DBResult.SUCCESS, dbCursor.size(), dbCursor.iterator().next());
 
             if (dbCursor.hasNext()) {
                 DBObject profileDbObject = dbCursor.iterator().next();

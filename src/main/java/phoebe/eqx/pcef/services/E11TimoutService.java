@@ -3,7 +3,6 @@ package phoebe.eqx.pcef.services;
 import ec02.af.utils.AFLog;
 import ec02.data.interfaces.EquinoxRawData;
 import phoebe.eqx.pcef.core.exceptions.TimeoutIntervalException;
-import phoebe.eqx.pcef.enums.Operation;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.instance.Config;
 import phoebe.eqx.pcef.message.builder.MessagePool;
@@ -18,6 +17,7 @@ public class E11TimoutService extends PCEFService {
         AFLog.d("Build Recurring Timeout");
         MessagePool messagePool = new MessagePool(appInstance.getAbstractAF());
         EquinoxRawData equinoxRawData = messagePool.sentTimeout(getTimeoutFromAppointmentDate(), "response");
+        context.setTerminate(true);
         appInstance.getOutList().add(equinoxRawData);
     }
 
