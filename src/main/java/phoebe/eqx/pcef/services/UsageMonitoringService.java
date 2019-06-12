@@ -78,6 +78,7 @@ public class UsageMonitoringService extends PCEFService {
             MessagePool messagePool = new MessagePool(abstractAF);
             EquinoxRawData equinoxRawData = messagePool.getUsageMonitoringResponse(usageMonitoringResponse, invokeId, getTimeoutFromAppointmentDate());
             appInstance.getOutList().add(equinoxRawData);
+            context.setTerminate(true);
 
         } catch (Exception e) {
 

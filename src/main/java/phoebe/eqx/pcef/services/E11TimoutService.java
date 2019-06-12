@@ -18,6 +18,7 @@ public class E11TimoutService extends PCEFService {
         AFLog.d("Build Recurring Timeout");
         MessagePool messagePool = new MessagePool(appInstance.getAbstractAF());
         EquinoxRawData equinoxRawData = messagePool.sentTimeout(getTimeoutFromAppointmentDate(), "response");
+        context.setTerminate(true);
         appInstance.getOutList().add(equinoxRawData);
     }
 
@@ -36,6 +37,7 @@ public class E11TimoutService extends PCEFService {
         context.setInterval(true);
         AFLog.d("WAIT INTERVAL :" + context.getIntervalRetry() + " TIME!!!");
         AFLog.d("set Interval :" + context.isInterval());
+
         appInstance.getOutList().add(equinoxRawData);
     }
 

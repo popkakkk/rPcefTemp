@@ -6,6 +6,7 @@ import phoebe.eqx.pcef.core.model.Transaction;
 import phoebe.eqx.pcef.enums.state.EState;
 import phoebe.eqx.pcef.instance.AppInstance;
 import phoebe.eqx.pcef.message.parser.res.OCFUsageMonitoringResponse;
+import phoebe.eqx.pcef.services.E11TimoutService;
 import phoebe.eqx.pcef.services.GyRARService;
 import phoebe.eqx.pcef.services.OCFUsageMonitoringService;
 import phoebe.eqx.pcef.services.mogodb.MongoDBConnect;
@@ -28,6 +29,7 @@ public class W_GyRAR extends ComplexState {
         GyRARService gyRARService = new GyRARService(appInstance);
         gyRARService.readGyRAR();
 
+        gyRARService.buildResponseGyRAR(true);
         setWorkState(EState.W_MONGO_PROCESS_GyRAR);
     }
 
@@ -78,10 +80,11 @@ public class W_GyRAR extends ComplexState {
 
             ocfUsageMonitoringService.processGyRar(dbConnect, ocfUsageMonitoringResponse, quotaResponseList, newResourceTransactions);
             dbConnect.getProfileService().updateProfileUnLock(dbConnect.getQuotaService().isHaveNewQuota(), dbConnect.getQuotaService().getMinExpireDate());
+  /* GyRARService gyRARService = new GyRARService(appInstance);
+            gyRARService.buildResponseGyRAR(true);*/
 
-            GyRARService gyRARService = new GyRARService(appInstance);
-            gyRARService.buildResponseGyRAR(true);
-
+            E11TimoutService timoutService = new E11TimoutService(appInstance);
+            timoutService.buildRecurringTimout();
         } catch (Exception e) {
             AFLog.d(" error:" + e.getStackTrace()[0]);
             throw e;

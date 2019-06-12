@@ -274,13 +274,12 @@ public class TransactionService extends MongoDBService {
                 List<CommitData> commitDataList = findDataToCommit(quota.getUserValue(), quota.getMonitoringKey(), false);
 
                 if (commitDataList.size() == 0) {
+                    AFLog.d("Exist Quota Response MK:" + quota.getMonitoringKey() + ",Not found in database");
                     available = 0;
-                    AFLog.d("Exist Quota Response MK:" + quota.getMonitoringKey() + "Not Found");
                 } else {
                     int sumTransaction = commitDataList.stream().mapToInt(CommitData::getCount).sum();
                     int quotaUnit = commitDataList.get(0).getQuotaByKey().getUnit();// spec mk
                     available = quotaUnit - sumTransaction;
-                    AFLog.d("Exist Quota Response MK:" + quota.getMonitoringKey() + "available =" + available);
                 }
 
                 if (available <= 0) {

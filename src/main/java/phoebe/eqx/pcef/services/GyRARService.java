@@ -70,6 +70,7 @@ public class GyRARService extends PCEFService {
                 gyRARResponse.setStatus(EStatusResponse.FAIL.getCode());
                 gyRARResponse.setDevMessage(EStatusResponse.FAIL.getDescription());
                 PCEFUtils.increaseStatistic(abstractAF, EStatMode.ERROR, EStatCmd.sent_GyRAR_response);
+                context.setTerminate(true);
             }
 
 

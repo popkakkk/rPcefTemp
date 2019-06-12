@@ -21,6 +21,7 @@ import phoebe.eqx.pcef.utils.erd.Header;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,16 +54,16 @@ public class GetResourceIdService extends PCEFService {
                 Marshaller marshaller = jaxbContext.createMarshaller();
                 marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
-
-                String url = Config.URL_PRODUCT + "?category=IoT&page=1&limit=20&sort=id&order=desc" + "&keyword=" + resourceName;
+                String url = Config.URL_PRODUCT + "?category=IoT&page=1&limit=20&sort=id&order=desc&" + URLEncoder.encode("keyword=" + resourceName, "UTF-8");
                 AFLog.d("url = " + url);
+
 
                 List<Header> headers = Arrays.asList(
                         new Header("Content-Type", "application/json"),
                         new Header("x-app-name", "Singularity"),
                         new Header("x-channel", "WEB"),
                         new Header("x-transaction-id", generateTransactionId()), //gen to get product
-                        new Header("x-auth-role", "SGL-000003"),
+                        new Header("x-auth-role", "SGL-00000"),
                         new Header("x-user-request", context.getPcefInstance().getUsageMonitoringRequest().getUserValue())
                 );
 
